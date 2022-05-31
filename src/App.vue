@@ -4,7 +4,7 @@
   <div class="container">
     <div id="header" class="header">Header</div>
     <div id="users" class="user-area">Users</div>
-    <div id="tasks" class="task-area">Tasks</div>
+    <TaskArea class="task-area">Tasks</TaskArea>
     <div id="lanes" class="lane-area">Lanes</div>
   </div>
 </template>
