@@ -1,12 +1,12 @@
 import { describe, it, expect } from "vitest";
-
-import { mount } from "@vue/test-utils";
+import { render, fireEvent } from "@testing-library/vue";
 import TaskArea from "@/components/TaskArea.vue";
-import { vi } from "vitest";
 
 describe("TaskArea", () => {
-  it("renders properly", () => {
-    const wrapper = mount(TaskArea);
-    expect(wrapper.text()).toContain("Tasks");
+  it("creates new task when pressing the '+' button", async () => {
+    const { getByText } = render(TaskArea);
+    const createTaskButton = getByText("+");
+    await fireEvent.click(createTaskButton);
+    getByText("Add task description here");
   });
 });
