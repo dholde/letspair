@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import { useStore } from "@/stores/letsPairStore";
+const store = useStore();
 function createTask() {
-  alert("Test");
+  store.createTask();
 }
 </script>
 <template>
