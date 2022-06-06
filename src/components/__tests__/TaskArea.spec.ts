@@ -6,7 +6,7 @@ describe("TaskArea", () => {
   it("creates new task when pressing the '+' button", async () => {
     const { getByRole, getByText } = render(TaskArea);
     const createTaskButton = getByRole("button", { name: "+" });
-    // await fireEvent.click(createTaskButton);
-    // getByText("Add task description here");
+    await fireEvent.click(createTaskButton);
+    getByText("Add task description here");
   });
 });
