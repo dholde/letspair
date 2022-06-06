@@ -5,7 +5,7 @@ const task = {
   oder: 1,
 };
 export const restHandlers = [
-  rest.post("http://lpckalhost:3000/task", (req, res, ctx) => {
+  rest.post("http://localhost:3000/task", (req, res, ctx) => {
     return res(ctx.status(200), ctx.json(task));
   }),
 ];
