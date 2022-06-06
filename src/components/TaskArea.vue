@@ -1,5 +1,7 @@
 <template>
-  <div id="taskArea">Tasks</div>
+  <div id="taskArea">
+    <button>+</button>
+  </div>
 </template>
 
 <script setup lang="ts"></script>
