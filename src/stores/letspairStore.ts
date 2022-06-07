@@ -1,5 +1,6 @@
-import type { Task } from "@/models/Task";
+import { Task } from "@/models/Task";
 import { defineStore } from "pinia";
+import axios from "axios";
 
 export const useStore = defineStore({
   id: "letsPair",
@@ -7,8 +8,10 @@ export const useStore = defineStore({
     tasks: [] as Task[],
   }),
   actions: {
-    createTask() {
-      alert("Create task");
+    async createTask() {
+      const { data } = await axios.post("http://localhost:3000/task");
+      const task = data as Task;
+      this.tasks.push(task);
     },
   },
 });

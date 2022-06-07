@@ -1,6 +1,11 @@
 <script setup lang="ts">
+import { computed } from "vue";
 import { useStore } from "@/stores/letsPairStore";
+import PairingTask from "./PairingTask.vue";
 const store = useStore();
+const tasks = computed(() => {
+  return store.tasks;
+});
 function createTask() {
   store.createTask();
 }
@@ -9,6 +14,7 @@ function createTask() {
   <div id="taskArea">
     Tasks
     <button @click="createTask">+</button>
+    <PairingTask v-for="task in tasks" :key="task.id" :task="task" />
   </div>
 </template>
 
