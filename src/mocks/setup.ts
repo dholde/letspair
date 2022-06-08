@@ -3,7 +3,6 @@ import { server } from "./server";
 
 // Start server before all tests
 beforeAll(() => {
-  console.log("Service WEB WORKER BEFORE ALL");
   server.listen({ onUnhandledRequest: "error" });
 });
 
