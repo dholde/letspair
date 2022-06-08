@@ -13,6 +13,6 @@ describe("TaskArea", () => {
     const createTaskButton = getByRole("button", { name: "+" });
     await fireEvent.click(createTaskButton);
     console.log(`assert ...`);
-    await findByText("Very important task 1");
+    await findByText("Add a task decription here");
   });
 });

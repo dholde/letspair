@@ -2,7 +2,7 @@ import { rest } from "msw";
 import { v4 as uuidv4 } from "uuid";
 const task = {
   id: `${uuidv4()}`,
-  description: "Very important task 1",
+  description: "",
   order: 0,
 };
 export const restHandlers = [

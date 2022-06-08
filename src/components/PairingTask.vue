@@ -3,7 +3,11 @@ import { useStore } from "@/stores/letsPairStore";
 defineProps(["task"]);
 </script>
 <template>
-  <div>{{ task.description }}</div>
+  <div>
+    {{
+      task.description !== "" ? task.description : "Add a task decription here"
+    }}
+  </div>
 </template>
 
 <style>
