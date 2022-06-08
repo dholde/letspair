@@ -1,6 +1,7 @@
 import { rest } from "msw";
+import { v4 as uuidv4 } from "uuid";
 const task = {
-  id: "1",
+  id: `${uuidv4()}`,
   description: "Very important task 1",
   order: 0,
 };
