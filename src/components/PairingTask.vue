@@ -4,14 +4,27 @@ defineProps(["task"]);
 </script>
 <template>
   <div class="task">
-    {{
-      task.description !== "" ? task.description : "Add a task decription here"
-    }}
+    <div class="inner">
+      {{
+        task.description !== ""
+          ? task.description
+          : "Add a task decription here"
+      }}
+    </div>
   </div>
 </template>
 
 <style>
 .task {
-  height: 3em;
+  height: 2em;
+  position: relative;
+  background-color: var(--bg-color-task);
+  margin: 5px;
+}
+.inner {
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
 }
 </style>
