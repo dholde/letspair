@@ -3,7 +3,7 @@ import { useStore } from "@/stores/letsPairStore";
 defineProps(["task"]);
 </script>
 <template>
-  <div>
+  <div class="task">
     {{
       task.description !== "" ? task.description : "Add a task decription here"
     }}
@@ -11,8 +11,7 @@ defineProps(["task"]);
 </template>
 
 <style>
-.addButton {
-  height: 20px;
-  width: 20px;
+.task {
+  height: 3em;
 }
 </style>

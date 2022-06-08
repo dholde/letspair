@@ -1,5 +1,5 @@
 import { afterAll, afterEach, beforeAll } from "vitest";
-import { server } from "./server";
+import { server } from "./requestMocks";
 
 // Start server before all tests
 beforeAll(() => {
