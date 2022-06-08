@@ -1,10 +1,12 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import TaskArea from "@/components/TaskArea.vue";
+</script>
 
 <template>
   <div class="container">
     <div id="header" class="header">Header</div>
     <div id="users" class="user-area">Users</div>
-    <div id="tasks" class="task-area">Tasks</div>
+    <TaskArea class="task-area" />
     <div id="lanes" class="lane-area">Lanes</div>
   </div>
 </template>
