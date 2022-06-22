@@ -19,6 +19,6 @@ export default defineConfig({
     // simulate DOM with happy-dom
     // (requires installing happy-dom as a peer dependency)
     environment: "jsdom",
-    setupFiles: ["./src/mocks/setup.ts"],
+    setupFiles: ["./vitestSetup.ts"],
   },
 });
