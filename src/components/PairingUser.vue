@@ -5,7 +5,7 @@ defineProps(["user"]);
 <template>
   <div class="user">
     <div class="inner">
-      {{ user.name !== "" ? task.name : "User Name" }}
+      {{ user.name !== "" ? user.name : "User Name" }}
     </div>
   </div>
 </template>

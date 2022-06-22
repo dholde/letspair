@@ -15,7 +15,7 @@ function createUser() {
 
 <template>
   <div id="userArea">
-    Tasks
+    Users
     <button @click="createUser">+</button>
     <PairingUser v-for="user in users" :key="user.id" :user="user" />
   </div>
