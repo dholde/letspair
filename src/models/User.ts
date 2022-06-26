@@ -1,12 +1,11 @@
 export class User {
   public id: string;
-  public name: string;
   public order: number;
+  public name?: string;
   public laneId?: string;
 
-  constructor(id: string, name: string, order: number) {
+  constructor(id: string, order: number) {
     this.id = id;
-    this.name = name;
     this.order = order;
   }
 }
