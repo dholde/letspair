@@ -10,5 +10,6 @@ describe("LaneArea", () => {
         plugins: [createTestingPinia({ stubActions: false })],
       },
     });
+    const addLaneButton = getByRole("button", { name: "+" });
   });
 });
