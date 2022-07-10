@@ -3,3 +3,9 @@
   --bg-color-secondary: #cccccc;
   --bg-color-task: #accbff;
 }
+
+ul.no-bullets {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
