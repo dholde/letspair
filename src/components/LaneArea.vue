@@ -16,7 +16,7 @@ function createLane() {
     <button @click="createLane">+</button>
     <ul class="no-bullets">
       <li v-for="lane in lanes" :key="lane.id">
-        <PairingLane />
+        <PairingLane :lane="lane" />
       </li>
     </ul>
   </div>
