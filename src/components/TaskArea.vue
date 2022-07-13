@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue";
-import { useStore } from "@/stores/letsPairStore";
+import { useStore } from "@/stores/letspairStore";
 import PairingTask from "./PairingTask.vue";
 const store = useStore();
 const tasks = computed(() => {
@@ -17,10 +17,3 @@ function createTask() {
     <PairingTask v-for="task in tasks" :key="task.id" :task="task" />
   </div>
 </template>
-
-<style>
-.addButton {
-  height: 20px;
-  width: 20px;
-}
-</style>

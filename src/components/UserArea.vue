@@ -20,10 +20,3 @@ function createUser() {
     <PairingUser v-for="user in users" :key="user.id" :user="user" />
   </div>
 </template>
-
-<style>
-.addButton {
-  height: 20px;
-  width: 20px;
-}
-</style>

@@ -36,4 +36,13 @@ export const restHandlers = [
       );
     }
   ),
+
+  rest.post("http://localhost:3000/lane", (req, res, ctx) => {
+    return res(
+      ctx.status(201),
+      ctx.json({
+        id: `${uuidv4()}`,
+      })
+    );
+  }),
 ];

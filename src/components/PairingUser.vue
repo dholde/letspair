@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useStore } from "@/stores/letsPairStore";
 defineProps(["user"]);
 </script>
 <template>

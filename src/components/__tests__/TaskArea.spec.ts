@@ -5,7 +5,7 @@ import { createTestingPinia } from "@pinia/testing";
 
 describe("TaskArea", () => {
   it("creates new task when pressing the '+' button", async () => {
-    const { getByRole, getByText, findByText } = render(TaskArea, {
+    const { getByRole, findByText } = render(TaskArea, {
       global: {
         plugins: [createTestingPinia({ stubActions: false })],
       },

@@ -1,13 +1,15 @@
-import { Task } from "@/models/Task";
+import type { Task } from "@/models/Task";
 import { defineStore } from "pinia";
 import axios from "axios";
 import type { User } from "@/models/User";
+import type { Lane } from "@/models/Lane";
 
 export const useStore = defineStore({
   id: "letsPair",
   state: () => ({
     tasks: [] as Task[],
     users: [] as User[],
+    lanes: [] as Lane[],
   }),
   actions: {
     async createTask() {
@@ -21,6 +23,11 @@ export const useStore = defineStore({
       });
       const user = data as User;
       this.users.push(user);
+    },
+    async createLane() {
+      const { data } = await axios.post("http://localhost:3000/lane");
+      const lane = data as Lane;
+      this.lanes.push(lane);
     },
   },
 });
