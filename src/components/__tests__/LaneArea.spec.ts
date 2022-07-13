@@ -2,7 +2,6 @@ import { describe, it, expect } from "vitest";
 import { render, fireEvent, within } from "@testing-library/vue";
 import LaneArea from "@/components/LaneArea.vue";
 import { createTestingPinia } from "@pinia/testing";
-import { nextTick } from "vue";
 import { retry } from "./Utils";
 
 describe("LaneArea", () => {
@@ -24,7 +23,8 @@ describe("LaneArea", () => {
       listItems = await findAllByRole("listitem");
       expect(listItems).toHaveLength(3);
     }
-    // Retrying as the list items are added asynchronously. Testing-library's find methods do not work here as there are already listitems in the list before.
+    // Retrying as the list items are added asynchronously.
+    // Testing-library's find methods do not work here as there are already listitems in the list before. Meaning findAllByRole will always resolve immediately after first list item was added.
     await retry(assertThree, 1, 1000);
   });
 });
