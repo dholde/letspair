@@ -3,8 +3,8 @@ defineProps(["lane"]);
 </script>
 <template>
   <div :id="lane.id" class="pairing-lane">
-    <div class="users">These are the users</div>
-    <div class="tasks">These are the tasks</div>
+    <div class="users"></div>
+    <div class="tasks"></div>
   </div>
 </template>
 <style scoped>
