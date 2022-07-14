@@ -3,6 +3,7 @@ import { defineStore } from "pinia";
 import axios from "axios";
 import type { User } from "@/models/User";
 import type { Lane } from "@/models/Lane";
+import { STATEMENT_OR_BLOCK_KEYS } from "@babel/types";
 
 export const useStore = defineStore({
   id: "letsPair",
@@ -28,6 +29,12 @@ export const useStore = defineStore({
       const { data } = await axios.post("http://localhost:3000/lane");
       const lane = data as Lane;
       this.lanes.push(lane);
+    },
+  },
+  getters: {
+    usersForLaneId: (state) => {
+      return (laneId: string) =>
+        state.users.filter((user) => user.laneId === laneId);
     },
   },
 });
