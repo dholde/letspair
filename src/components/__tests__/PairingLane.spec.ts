@@ -9,6 +9,11 @@ describe("PairingLane", () => {
       global: {
         plugins: [createTestingPinia({ stubActions: false })],
       },
+      props: {
+        lane: {
+          id: "123",
+        },
+      },
     });
 
     const renderedComponent = container.firstElementChild;
