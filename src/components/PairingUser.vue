@@ -2,7 +2,7 @@
 defineProps(["user"]);
 </script>
 <template>
-  <div class="user">
+  <div class="user" draggable="true">
     <div class="inner">
       {{ user.name ? user.name : "User Name" }}
     </div>

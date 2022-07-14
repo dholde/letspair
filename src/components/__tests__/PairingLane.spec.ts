@@ -2,6 +2,7 @@ import { describe, it } from "vitest";
 import { render, fireEvent } from "@testing-library/vue";
 import { createTestingPinia } from "@pinia/testing";
 import PairingLane from "@/components/PairingLane.vue";
+import { debug } from "console";
 
 describe("PairingLane", () => {
   it("should contain user after dropping user element", async () => {
@@ -21,6 +22,7 @@ describe("PairingLane", () => {
       await fireEvent.drop(renderedComponent, {
         dataTransfer: "Data transfer test",
       });
+      debug(renderedComponent);
       await findByText("Data transfer test");
     }
   });
