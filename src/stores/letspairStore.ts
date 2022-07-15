@@ -3,7 +3,6 @@ import { defineStore } from "pinia";
 import axios from "axios";
 import type { User } from "@/models/User";
 import type { Lane } from "@/models/Lane";
-import { STATEMENT_OR_BLOCK_KEYS } from "@babel/types";
 
 export const useStore = defineStore({
   id: "letsPair",
