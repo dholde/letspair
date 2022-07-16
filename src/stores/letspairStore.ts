@@ -20,6 +20,7 @@ export const useStore = defineStore({
     async createUser() {
       const { data } = await axios.post("http://localhost:3000/user", {
         order: this.users.length + 1,
+        name: "John Wayne",
       });
       const user = data as User;
       this.users.push(user);
