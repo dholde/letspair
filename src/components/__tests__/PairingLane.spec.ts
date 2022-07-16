@@ -8,13 +8,14 @@ import { v4 as uuidv4 } from "uuid";
 describe("PairingLane", () => {
   it("should contain user after dropping user element", async () => {
     const laneId = uuidv4();
+    const userName = "John Wayne";
     const user = {
       id: uuidv4(),
-      name: "Super Man",
+      name: userName,
       laneId: "",
     };
     const userId = uuidv4();
-    const { findByText, container } = render(PairingLane, {
+    const { findByText, findAllByRole, container } = render(PairingLane, {
       global: {
         plugins: [
           createTestingPinia({
@@ -38,7 +39,10 @@ describe("PairingLane", () => {
         dataTransfer: "Data transfer test",
       });
       debug(renderedComponent);
-      await findByText("Super Man");
+      await findByText(userName);
+      const userListItems = await findAllByRole("listitem");
+      const userListItem = userListItems[0];
+      console.log("Test");
     } else {
       assert.fail("PairingLane component was not rendered.");
     }

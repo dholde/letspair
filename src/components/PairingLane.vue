@@ -1,11 +1,14 @@
 <script setup lang="ts">
-import { ref } from "vue";
-defineProps(["lane"]);
-const testText = ref("Test");
+import { ref, computed } from "vue";
+import { useStore } from "@/stores/letspairStore";
+const props = defineProps(["lane"]);
+const store = useStore();
+const users = computed(() => {
+  return store.usersForLaneId(props.lane.id);
+});
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function onDrop(event: any) {
   event.preventDefault();
-  testText.value = "Data transfer test";
 }
 </script>
 <template>
@@ -16,7 +19,11 @@ function onDrop(event: any) {
     @dragover.prevent
     @dragenter.prevent
   >
-    <div class="users">{{ testText }}</div>
+    <div class="users">
+      <ul class="no-bullets">
+        <li v-for="user in users" :key="user.id">{{ user.name }}</li>
+      </ul>
+    </div>
     <div class="tasks"></div>
   </div>
 </template>
