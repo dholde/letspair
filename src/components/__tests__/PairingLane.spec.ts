@@ -14,7 +14,7 @@ describe("PairingLane", () => {
       name: userName,
       laneId: "",
     };
-    const { findByText, findAllByRole, container } = render(PairingLane, {
+    const { findAllByRole, container } = render(PairingLane, {
       global: {
         plugins: [
           createTestingPinia({
