@@ -36,7 +36,11 @@ describe("PairingLane", () => {
     if (renderedComponent) {
       await fireEvent.drop(renderedComponent, {
         dataTransfer: {
-          user: JSON.stringify(user),
+          getData: function (dataType: string) {
+            if (dataType === "user") {
+              return JSON.stringify(user);
+            }
+          },
         },
       });
       const userListItems = await findAllByRole("listitem");
