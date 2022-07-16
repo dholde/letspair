@@ -1,14 +1,20 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { computed } from "vue";
 import { useStore } from "@/stores/letspairStore";
+import axios from "axios";
+import type { User } from "@/models/User";
 const props = defineProps(["lane"]);
 const store = useStore();
 const users = computed(() => {
   return store.usersForLaneId(props.lane.id);
 });
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function onDrop(event: any) {
+async function onDrop(event: any) {
   event.preventDefault();
+  const userAsString: string = event.dataTransfer["user"];
+  const userFromDropEvent = JSON.parse(userAsString);
+  await axios.put("http://localhost:3000/user", userFromDropEvent);
+  store.addUserToLane(userFromDropEvent, props.lane.id);
 }
 </script>
 <template>

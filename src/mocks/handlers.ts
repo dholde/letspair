@@ -45,4 +45,7 @@ export const restHandlers = [
       })
     );
   }),
+  rest.put("http://localhost:3000/user", (req, res, ctx) => {
+    return res(ctx.status(204));
+  }),
 ];

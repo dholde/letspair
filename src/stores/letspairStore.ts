@@ -29,6 +29,12 @@ export const useStore = defineStore({
       const lane = data as Lane;
       this.lanes.push(lane);
     },
+    async addUserToLane(user: User, laneId: string) {
+      const indexOfUpdatedUser = this.users.findIndex(
+        (existingUser) => existingUser.id === user.id
+      );
+      this.users[indexOfUpdatedUser].laneId = laneId;
+    },
   },
   getters: {
     usersForLaneId: (state) => {

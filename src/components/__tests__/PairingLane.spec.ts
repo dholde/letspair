@@ -14,7 +14,6 @@ describe("PairingLane", () => {
       name: userName,
       laneId: "",
     };
-    const userId = uuidv4();
     const { findByText, findAllByRole, container } = render(PairingLane, {
       global: {
         plugins: [
@@ -36,13 +35,14 @@ describe("PairingLane", () => {
     const renderedComponent = container.firstElementChild;
     if (renderedComponent) {
       await fireEvent.drop(renderedComponent, {
-        dataTransfer: "Data transfer test",
+        dataTransfer: {
+          user: JSON.stringify(user),
+        },
       });
-      debug(renderedComponent);
-      await findByText(userName);
       const userListItems = await findAllByRole("listitem");
       const userListItem = userListItems[0];
-      console.log("Test");
+      expect(userListItem.innerHTML).toBe(userName);
+      debug(renderedComponent);
     } else {
       assert.fail("PairingLane component was not rendered.");
     }
