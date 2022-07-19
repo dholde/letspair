@@ -4,7 +4,6 @@ import LaneArea from "@/components/LaneArea.vue";
 import { createTestingPinia } from "@pinia/testing";
 import { retry } from "./Utils";
 import { v4 as uuidv4 } from "uuid";
-import { debug } from "console";
 
 describe("LaneArea", () => {
   it("Should create a new lanes when clicking on the '+' button", async () => {
@@ -33,7 +32,7 @@ describe("LaneArea", () => {
     const pairingLane1 = { id: uuidv4() };
     const pairingLane2 = { id: uuidv4() };
     const user = { id: uuidv4(), name: "John Wayne", laneId: pairingLane1.id };
-    const { baseElement, getAllByRole } = render(LaneArea, {
+    const { baseElement } = render(LaneArea, {
       global: {
         plugins: [
           createTestingPinia({
@@ -46,42 +45,35 @@ describe("LaneArea", () => {
       },
     });
     const renderedLaneArea = baseElement;
-    let renderedPairingLane1 = Array.from(
+    const renderedPairingLane1 = Array.from(
       renderedLaneArea.querySelectorAll("div.pairing-lane")
-    ).filter(
-      (renderedPairingLane) => renderedPairingLane.id === pairingLane1.id
-    );
-    let renderedPairingLane2 = Array.from(
+    ).find((renderedPairingLane) => renderedPairingLane.id === pairingLane1.id);
+    const renderedPairingLane2 = Array.from(
       renderedLaneArea.querySelectorAll("div.pairing-lane")
-    ).filter(
-      (renderedPairingLane) => renderedPairingLane.id === pairingLane2.id
-    );
-    expect(renderedPairingLane1[0].innerHTML).toContain("John Wayne");
-    expect(renderedPairingLane2[0].innerHTML).not.toContain("John Wayne");
+    ).find((renderedPairingLane) => renderedPairingLane.id === pairingLane2.id);
+    if (renderedPairingLane1 && renderedPairingLane2) {
+      expect(renderedPairingLane1.innerHTML).toContain("John Wayne");
+      expect(renderedPairingLane2.innerHTML).not.toContain("John Wayne");
 
-    await fireEvent.drop(renderedPairingLane2[0], {
-      dataTransfer: {
-        getData: function (dataType: string) {
-          if (dataType === "user") {
-            return JSON.stringify(user);
-          }
+      await fireEvent.drop(renderedPairingLane2, {
+        dataTransfer: {
+          getData: function (dataType: string) {
+            if (dataType === "user") {
+              return JSON.stringify(user);
+            }
+          },
         },
-      },
-    });
-    renderedPairingLane1 = Array.from(
-      renderedLaneArea.querySelectorAll("div.pairing-lane")
-    ).filter(
-      (renderedPairingLane) => renderedPairingLane.id === pairingLane1.id
-    );
-    renderedPairingLane2 = Array.from(
-      renderedLaneArea.querySelectorAll("div.pairing-lane")
-    ).filter(
-      (renderedPairingLane) => renderedPairingLane.id === pairingLane2.id
-    );
-    const test = renderedPairingLane2[0] as any as HTMLElement;
-    const { findByText } = within(test);
-    const lane2 = await findByText("John Wayne");
-    expect(renderedPairingLane1[0].innerHTML).not.toContain("John Wayne");
-    expect(renderedPairingLane2[0].innerHTML).toContain("John Wayne");
+      });
+      const renderedPairingLane2AsHTMLElement =
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        renderedPairingLane2 as any as HTMLElement;
+      const { findByText } = within(renderedPairingLane2AsHTMLElement);
+      await findByText("John Wayne");
+      expect(renderedPairingLane1.innerHTML).not.toContain("John Wayne");
+    } else {
+      assert.fail(
+        `One of the pairing lanes or both were not rendered: PairingLane1: ${pairingLane1}, PairingLane2: ${pairingLane2}`
+      );
+    }
   });
 });
