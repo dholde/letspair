@@ -6,7 +6,7 @@ import { debug } from "console";
 import { v4 as uuidv4 } from "uuid";
 
 describe("PairingLane", () => {
-  it("should contain user after dropping user element", async () => {
+  it("Should contain user after dropping user element", async () => {
     const laneId = uuidv4();
     const userName = "John Wayne";
     const user = {
@@ -45,8 +45,7 @@ describe("PairingLane", () => {
       });
       const userListItems = await findAllByRole("listitem");
       const userListItem = userListItems[0];
-      expect(userListItem.innerHTML).toBe(userName);
-      debug(renderedComponent);
+      expect(userListItem.innerHTML).toContain(userName);
     } else {
       assert.fail("PairingLane component was not rendered.");
     }

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { useStore } from "@/stores/letspairStore";
+import PairingUser from "./PairingUser.vue";
 import axios from "axios";
 const props = defineProps(["lane"]);
 const store = useStore();
@@ -26,7 +27,9 @@ async function onDrop(event: DragEvent) {
   >
     <div class="users">
       <ul class="no-bullets">
-        <li v-for="user in users" :key="user.id">{{ user.name }}</li>
+        <li v-for="user in users" :key="user.id">
+          <PairingUser :user="user" />
+        </li>
       </ul>
     </div>
     <div class="tasks"></div>
