@@ -46,26 +46,42 @@ describe("LaneArea", () => {
       },
     });
     const renderedLaneArea = baseElement;
-    const elementsWithId = renderedLaneArea.querySelectorAll("li.pairing-lane");
-    console.log(elementsWithId.length);
-    Array.from(elementsWithId).forEach(function (el) {
-      console.log(el.getAttribute("id"));
-    });
-    const renderedListOfLanes = getAllByRole("list");
-    const renderedPairingLane1 = Array.from(
+    let renderedPairingLane1 = Array.from(
       renderedLaneArea.querySelectorAll("div.pairing-lane")
     ).filter(
       (renderedPairingLane) => renderedPairingLane.id === pairingLane1.id
     );
-    const renderedPairingLane2 = Array.from(
+    let renderedPairingLane2 = Array.from(
       renderedLaneArea.querySelectorAll("div.pairing-lane")
     ).filter(
       (renderedPairingLane) => renderedPairingLane.id === pairingLane2.id
     );
-    const id = renderedLaneArea.querySelectorAll("div.pairing-lane")[0].id;
-    debug;
-    // const { findAllByRole } = within(renderedListOfLanes);
-    // const renderedLaneListItems = await findAllByRole("listitems");
-    // expect(renderedLaneListItems).toHaveLength(2);
+    expect(renderedPairingLane1[0].innerHTML).toContain("John Wayne");
+    expect(renderedPairingLane2[0].innerHTML).not.toContain("John Wayne");
+
+    await fireEvent.drop(renderedPairingLane2[0], {
+      dataTransfer: {
+        getData: function (dataType: string) {
+          if (dataType === "user") {
+            return JSON.stringify(user);
+          }
+        },
+      },
+    });
+    renderedPairingLane1 = Array.from(
+      renderedLaneArea.querySelectorAll("div.pairing-lane")
+    ).filter(
+      (renderedPairingLane) => renderedPairingLane.id === pairingLane1.id
+    );
+    renderedPairingLane2 = Array.from(
+      renderedLaneArea.querySelectorAll("div.pairing-lane")
+    ).filter(
+      (renderedPairingLane) => renderedPairingLane.id === pairingLane2.id
+    );
+    const test = renderedPairingLane2[0] as any as HTMLElement;
+    const { findByText } = within(test);
+    const lane2 = await findByText("John Wayne");
+    expect(renderedPairingLane1[0].innerHTML).not.toContain("John Wayne");
+    expect(renderedPairingLane2[0].innerHTML).toContain("John Wayne");
   });
 });
