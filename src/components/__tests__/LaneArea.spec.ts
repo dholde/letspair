@@ -6,7 +6,7 @@ import { retry } from "./Utils";
 import { v4 as uuidv4 } from "uuid";
 
 describe("LaneArea", () => {
-  it("Should create a new lanes when clicking on the '+' button", async () => {
+  it("creates a new lanes when clicking on the '+' button", async () => {
     const { getByRole } = render(LaneArea, {
       global: {
         plugins: [createTestingPinia({ stubActions: false })],
@@ -28,7 +28,7 @@ describe("LaneArea", () => {
     // Testing-library's find methods do not work here as there are already listitems in the list before. Meaning findAllByRole will always resolve immediately after first list item was added.
     await retry(assertThree, 1, 1000);
   });
-  it("Should remove user from a lane if the same user is moved (dropped) to another lane", async () => {
+  it("removes a user from a lane if the user is moved (dropped) to another lane", async () => {
     const pairingLane1 = { id: uuidv4() };
     const pairingLane2 = { id: uuidv4() };
     const user = { id: uuidv4(), name: "John Wayne", laneId: pairingLane1.id };

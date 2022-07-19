@@ -6,7 +6,7 @@ import { debug } from "console";
 import { v4 as uuidv4 } from "uuid";
 
 describe("PairingLane", () => {
-  it("Should contain user after dropping user element", async () => {
+  it("should contain user after dropping a user element", async () => {
     const laneId = uuidv4();
     const userName = "John Wayne";
     const user = {
