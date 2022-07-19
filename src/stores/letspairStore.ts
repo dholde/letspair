@@ -42,5 +42,7 @@ export const useStore = defineStore({
       return (laneId: string) =>
         state.users.filter((user) => user.laneId === laneId);
     },
+    unassignedUsers: (state) =>
+      state.users.filter((user) => !user.laneId || user.laneId === ""),
   },
 });

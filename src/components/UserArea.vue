@@ -5,7 +5,7 @@ import PairingUser from "./PairingUser.vue";
 
 const store = useStore();
 const users = computed(() => {
-  return store.users;
+  return store.unassignedUsers;
 });
 
 function createUser() {
@@ -17,6 +17,10 @@ function createUser() {
   <div id="userArea">
     Users
     <button @click="createUser">+</button>
-    <PairingUser v-for="user in users" :key="user.id" :user="user" />
+    <ul>
+      <li v-for="user in users" :key="user.id" :user="user">
+        <PairingUser :user="user" />
+      </li>
+    </ul>
   </div>
 </template>

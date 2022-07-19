@@ -44,6 +44,6 @@ describe("UserArea", () => {
     const elementConatainingUserName3 = queryByText(user3.name);
     expect(elementConatainingUserName3?.innerHTML).toBe(user3.name);
     const elementConatainingUserName4 = queryByText(user4.name);
-    expect(elementConatainingUserName4).toBe(user4.name);
+    expect(elementConatainingUserName4?.innerHTML).toBe(user4.name);
   });
 });
