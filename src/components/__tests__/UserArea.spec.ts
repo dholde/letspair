@@ -46,7 +46,7 @@ describe("UserArea", () => {
     expect(elementConatainingUserName4?.innerHTML).toBe(user4.name);
   });
 
-  it("contains the user that was dropped into the drop area", async () => {
+  it("contains a user after dropping the user into the UserArea", async () => {
     const user = { id: uuidv4(), name: "John Wayne", laneId: uuidv4() };
     const { container, queryByText, findByText } = render(UserArea, {
       global: {
@@ -75,9 +75,9 @@ describe("UserArea", () => {
           },
         },
       });
+      await findByText("John Wayne");
     } else {
       assert.fail("The UserArea component was not rendered.");
     }
-    await findByText("John Wayne");
   });
 });

@@ -36,6 +36,12 @@ export const useStore = defineStore({
       );
       this.users[indexOfUpdatedUser].laneId = laneId;
     },
+    async freeUpUser(user: User) {
+      const indexOfUpdatedUser = this.users.findIndex(
+        (existingUser) => existingUser.id === user.id
+      );
+      this.users[indexOfUpdatedUser].laneId = undefined;
+    },
   },
   getters: {
     usersForLaneId: (state) => {
