@@ -45,4 +45,39 @@ describe("UserArea", () => {
     const elementConatainingUserName4 = queryByText(user4.name);
     expect(elementConatainingUserName4?.innerHTML).toBe(user4.name);
   });
+
+  it("contains the user that was dropped into the drop area", async () => {
+    const user = { id: uuidv4(), name: "John Wayne", laneId: uuidv4() };
+    const { container, queryByText, findByText } = render(UserArea, {
+      global: {
+        plugins: [
+          createTestingPinia({
+            stubActions: false,
+            initialState: {
+              letsPair: {
+                users: [user],
+              },
+            },
+          }),
+        ],
+      },
+    });
+    const queryUserNameResult = queryByText("John Wayne");
+    expect(queryUserNameResult).toBeNull;
+    const renderedComponent = container.firstElementChild;
+    if (renderedComponent) {
+      await fireEvent.drop(renderedComponent, {
+        dataTransfer: {
+          getData: function (dataType: string) {
+            if (dataType === "user") {
+              return JSON.stringify(user);
+            }
+          },
+        },
+      });
+    } else {
+      assert.fail("The UserArea component was not rendered.");
+    }
+    await findByText("John Wayne");
+  });
 });
