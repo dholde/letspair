@@ -1,8 +1,13 @@
 <script setup lang="ts">
-defineProps(["user"]);
+const props = defineProps(["user"]);
+function onDragStart(event: DragEvent) {
+  const userAsString = JSON.stringify(props.user);
+  event.dataTransfer?.setData("user", userAsString);
+  console.log("Test");
+}
 </script>
 <template>
-  <div class="user">
+  <div class="user" draggable="true" @dragstart="onDragStart($event)">
     <div class="inner">
       {{ user.name ? user.name : "User Name" }}
     </div>

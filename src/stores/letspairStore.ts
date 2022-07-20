@@ -20,6 +20,7 @@ export const useStore = defineStore({
     async createUser() {
       const { data } = await axios.post("http://localhost:3000/user", {
         order: this.users.length + 1,
+        name: "John Wayne",
       });
       const user = data as User;
       this.users.push(user);
@@ -29,5 +30,25 @@ export const useStore = defineStore({
       const lane = data as Lane;
       this.lanes.push(lane);
     },
+    async addUserToLane(user: User, laneId: string) {
+      const indexOfUpdatedUser = this.users.findIndex(
+        (existingUser) => existingUser.id === user.id
+      );
+      this.users[indexOfUpdatedUser].laneId = laneId;
+    },
+    async freeUpUser(user: User) {
+      const indexOfUpdatedUser = this.users.findIndex(
+        (existingUser) => existingUser.id === user.id
+      );
+      this.users[indexOfUpdatedUser].laneId = undefined;
+    },
+  },
+  getters: {
+    usersForLaneId: (state) => {
+      return (laneId: string) =>
+        state.users.filter((user) => user.laneId === laneId);
+    },
+    unassignedUsers: (state) =>
+      state.users.filter((user) => !user.laneId || user.laneId === ""),
   },
 });

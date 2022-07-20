@@ -1,5 +1,4 @@
-import type { User } from "@/models/User";
-import { rest, type PathParams, type RestContext } from "msw";
+import { rest, type PathParams } from "msw";
 import { v4 as uuidv4 } from "uuid";
 
 interface CreateUserRequestBody {
@@ -32,6 +31,7 @@ export const restHandlers = [
         ctx.json({
           id: `${uuidv4()}`,
           order: order,
+          name: "",
         })
       );
     }
@@ -44,5 +44,8 @@ export const restHandlers = [
         id: `${uuidv4()}`,
       })
     );
+  }),
+  rest.put("http://localhost:3000/user", (req, res, ctx) => {
+    return res(ctx.status(204));
   }),
 ];
