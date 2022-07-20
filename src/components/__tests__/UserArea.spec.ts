@@ -3,7 +3,6 @@ import { render, fireEvent } from "@testing-library/vue";
 import UserArea from "@/components/UserArea.vue";
 import { createTestingPinia } from "@pinia/testing";
 import { v4 as uuidv4 } from "uuid";
-import { debug } from "console";
 
 describe("UserArea", () => {
   it("creates new user when pressing the '+' button", async () => {
@@ -14,7 +13,7 @@ describe("UserArea", () => {
     });
     const createUserButton = getByRole("button", { name: "+" });
     await fireEvent.click(createUserButton);
-    await findByText("Add user name here");
+    await findByText("User Name");
   });
   it("contains only users that are not assigned to any PairingLane", async () => {
     const user1 = { id: uuidv4(), name: "Bruce Wayne", laneId: uuidv4() };

@@ -31,7 +31,7 @@ export const restHandlers = [
         ctx.json({
           id: `${uuidv4()}`,
           order: order,
-          name: "Add user name here",
+          name: "",
         })
       );
     }
