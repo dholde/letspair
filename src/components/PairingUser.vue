@@ -1,9 +1,8 @@
 <script setup lang="ts">
-const props = defineProps(["user"]);
+const props = defineProps(["user", "task"]);
 function onDragStart(event: DragEvent) {
   const userAsString = JSON.stringify(props.user);
   event.dataTransfer?.setData("user", userAsString);
-  console.log("Test");
 }
 </script>
 <template>

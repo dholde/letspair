@@ -13,3 +13,14 @@ describe("PairingUser", () => {
     expect(wrapper.attributes("draggable")).toBe("true");
   });
 });
+it("should call onDrag function when start dragging the element", async () => {
+  const user = { id: uuidv4(), name: "John Wayne" };
+  const wrapper = mount(PairingUser, {
+    props: {
+      user,
+    },
+  });
+  const spy = vi.spyOn(wrapper.vm, "onDragStart");
+  await wrapper.trigger("dragstart");
+  expect(spy).toHaveBeenCalledOnce();
+});
