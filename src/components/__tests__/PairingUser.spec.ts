@@ -26,10 +26,10 @@ it("should call onDrag function when start dragging the element", async () => {
   expect(onDragStart).toBeCalledWith(
     expect.objectContaining({ target: expect.any(HTMLDivElement) })
   );
-  const elementContainingCSSClassNamedUser = expect.objectContaining({
+  const userElement = expect.objectContaining({
     target: expect.objectContaining({
       outerHTML: expect.stringContaining(`class="user"`),
     }),
   });
-  expect(onDragStart).toBeCalledWith(elementContainingCSSClassNamedUser);
+  expect(onDragStart).toBeCalledWith(userElement);
 });
