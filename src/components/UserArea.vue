@@ -37,7 +37,7 @@ async function onDrop(event: DragEvent) {
     <ul class="no-bullets">
       <li v-for="user in users" :key="user.id" :user="user">
         <!-- <PairingUser :user="user" /> -->
-        <DraggableElement :user="user" />
+        <PairingUser :user="user" />
       </li>
     </ul>
   </div>
