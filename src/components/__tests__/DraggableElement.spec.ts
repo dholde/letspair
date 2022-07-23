@@ -21,14 +21,14 @@ describe("DraggableElement", () => {
     expect(onDragStart).toBeCalledWith(
       expect.objectContaining({ target: expect.any(HTMLDivElement) })
     );
-    const userElement = expect.objectContaining({
+    const dragEventFromPairingUserComponent = expect.objectContaining({
       target: expect.objectContaining({
         outerHTML:
           expect.stringContaining(`class="user"`) &&
           expect.stringContaining(user.name),
       }),
     });
-    expect(onDragStart).toBeCalledWith(userElement);
+    expect(onDragStart).toBeCalledWith(dragEventFromPairingUserComponent);
   });
   it("PairingTask.vue component calls the onDrag function in case the 'task' prop is set", async () => {
     const task: Task = {
@@ -46,13 +46,13 @@ describe("DraggableElement", () => {
     expect(onDragStart).toBeCalledWith(
       expect.objectContaining({ target: expect.any(HTMLDivElement) })
     );
-    const taskElement = expect.objectContaining({
+    const dragEventFromPairingTaskComponent = expect.objectContaining({
       target: expect.objectContaining({
         outerHTML:
           expect.stringContaining(`class="task"`) &&
           expect.stringContaining(task.description),
       }),
     });
-    expect(onDragStart).toBeCalledWith(taskElement);
+    expect(onDragStart).toBeCalledWith(dragEventFromPairingTaskComponent);
   });
 });
