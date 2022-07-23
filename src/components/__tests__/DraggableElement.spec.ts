@@ -1,7 +1,7 @@
 import { mount } from "@vue/test-utils";
 import DraggableElement from "@/components/DraggableElement.vue";
 import { v4 as uuidv4 } from "uuid";
-import type Task from "@/models/Task";
+import type { Task } from "@/models/Task";
 
 describe("DraggableElement", () => {
   it("is a draggable element", () => {
@@ -46,13 +46,20 @@ describe("DraggableElement", () => {
     expect(onDragStart).toBeCalledWith(
       expect.objectContaining({ target: expect.any(HTMLDivElement) })
     );
-    const dragEventFromPairingTaskComponent = expect.objectContaining({
-      target: expect.objectContaining({
-        outerHTML:
-          expect.stringContaining(`class="task"`) &&
-          expect.stringContaining(task.description),
-      }),
-    });
-    expect(onDragStart).toBeCalledWith(dragEventFromPairingTaskComponent);
+    expect(onDragStart).toBeCalledWith(
+      expect.objectContaining({
+        target: expect.objectContaining({
+          outerHTML: expect.stringContaining(`class="task"`),
+        }),
+      })
+    );
+
+    expect(onDragStart).toBeCalledWith(
+      expect.objectContaining({
+        target: expect.objectContaining({
+          outerHTML: expect.stringContaining(task.description),
+        }),
+      })
+    );
   });
 });
