@@ -23,8 +23,13 @@ it("should call onDrag function when start dragging the element", async () => {
   const onDragStart = vi.spyOn(wrapper.vm, "onDragStart");
   await wrapper.trigger("dragstart");
   expect(onDragStart).toHaveBeenCalledOnce();
-  const arguments1 = expect(onDragStart).toBeCalledWith(
+  expect(onDragStart).toBeCalledWith(
     expect.objectContaining({ target: expect.any(HTMLDivElement) })
   );
-  const target = arguments1;
+  const elementContainingCSSClassNamedUser = expect.objectContaining({
+    target: expect.objectContaining({
+      outerHTML: expect.stringContaining(`class="user"`),
+    }),
+  });
+  expect(onDragStart).toBeCalledWith(elementContainingCSSClassNamedUser);
 });
