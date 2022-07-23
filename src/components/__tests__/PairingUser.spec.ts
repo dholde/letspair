@@ -28,7 +28,9 @@ it("should call onDrag function when start dragging the element", async () => {
   );
   const userElement = expect.objectContaining({
     target: expect.objectContaining({
-      outerHTML: expect.stringContaining(`class="user"`),
+      outerHTML:
+        expect.stringContaining(`class="user"`) &&
+        expect.stringContaining(user.name),
     }),
   });
   expect(onDragStart).toBeCalledWith(userElement);

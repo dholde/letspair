@@ -4,6 +4,7 @@ import { useStore } from "@/stores/letspairStore";
 import type { User } from "@/models/User";
 import axios from "axios";
 import PairingUser from "./PairingUser.vue";
+import DraggableElement from "./DraggableElement.vue";
 
 const store = useStore();
 const users = computed(() => {
@@ -35,7 +36,8 @@ async function onDrop(event: DragEvent) {
     <button @click="createUser">+</button>
     <ul class="no-bullets">
       <li v-for="user in users" :key="user.id" :user="user">
-        <PairingUser :user="user" />
+        <!-- <PairingUser :user="user" /> -->
+        <DraggableElement :user="user" />
       </li>
     </ul>
   </div>

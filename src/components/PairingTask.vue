@@ -1,8 +1,12 @@
 <script setup lang="ts">
-defineProps(["task"]);
+const props = defineProps(["task"]);
+function onDragStart(event: DragEvent) {
+  const taskAsString = JSON.stringify(props.task);
+  event.dataTransfer?.setData("task", taskAsString);
+}
 </script>
 <template>
-  <div class="task">
+  <div class="task" draggable="true" @dragstart="onDragStart($event)">
     <div class="inner">
       {{
         task.description !== ""
