@@ -1,8 +1,17 @@
 <script setup lang="ts">
-defineProps(["user"]);
+import { computed } from "vue";
+import { dragStartHandler } from "@/utils/dragStartEventHandler";
+const props = defineProps(["user"]);
+const userAsString = computed(() => {
+  return JSON.stringify(props.user);
+});
 </script>
 <template>
-  <div class="user">
+  <div
+    class="user"
+    draggable="true"
+    @dragstart="dragStartHandler('user', userAsString, $event)"
+  >
     <div class="inner">
       {{ user.name ? user.name : "User Name" }}
     </div>
