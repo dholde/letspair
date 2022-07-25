@@ -4,7 +4,7 @@ import { useStore } from "@/stores/letspairStore";
 import PairingTask from "./PairingTask.vue";
 const store = useStore();
 const tasks = computed(() => {
-  return store.tasks;
+  return store.unassignedTasks;
 });
 function createTask() {
   store.createTask();

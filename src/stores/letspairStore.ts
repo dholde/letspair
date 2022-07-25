@@ -60,5 +60,7 @@ export const useStore = defineStore({
       return (laneId: string) =>
         state.tasks.filter((task) => task.laneId === laneId);
     },
+    unassignedTasks: (state) =>
+      state.tasks.filter((task) => !task.laneId || task.laneId === ""),
   },
 });

@@ -4,7 +4,6 @@ import { useStore } from "@/stores/letspairStore";
 import type { User } from "@/models/User";
 import axios from "axios";
 import PairingUser from "./PairingUser.vue";
-import DraggableElement from "./DraggableElement.vue";
 
 const store = useStore();
 const users = computed(() => {
