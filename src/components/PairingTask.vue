@@ -1,8 +1,16 @@
 <script setup lang="ts">
-defineProps(["task"]);
+import { computed } from "vue";
+import { dragStartHandler } from "@/utils/dragStartEventHandler";
+
+const props = defineProps(["task"]);
+const taskAsString = computed(() => JSON.stringify(props.task));
 </script>
 <template>
-  <div class="task">
+  <div
+    class="task"
+    draggable="true"
+    @dragstart="dragStartHandler('task', taskAsString, $event)"
+  >
     <div class="inner">
       {{
         task.description !== ""

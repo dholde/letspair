@@ -22,6 +22,9 @@ export const restHandlers = [
       })
     );
   }),
+  rest.put("http://localhost:3000/task", (req, res, ctx) => {
+    return res(ctx.status(204));
+  }),
   rest.post<CreateUserRequestBody, PathParams<string>, CreateUserResponse>(
     "http://localhost:3000/user",
     (req, res, ctx) => {
