@@ -55,13 +55,19 @@ describe("LaneArea", () => {
       expect(renderedPairingLane1.innerHTML).toContain("John Wayne");
       expect(renderedPairingLane2.innerHTML).not.toContain("John Wayne");
 
+      const dataTransferType = "user";
       await fireEvent.drop(renderedPairingLane2, {
         dataTransfer: {
           getData: function (dataType: string) {
-            if (dataType === "user") {
+            if (dataType === dataTransferType) {
               return JSON.stringify(user);
             }
           },
+          items: [
+            {
+              type: dataTransferType,
+            },
+          ],
         },
       });
       const renderedPairingLane2AsHTMLElement =
