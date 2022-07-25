@@ -35,13 +35,19 @@ describe("PairingLane", () => {
 
     const renderedComponent = container.firstElementChild;
     if (renderedComponent) {
+      const dataTransferType = "user";
       await fireEvent.drop(renderedComponent, {
         dataTransfer: {
           getData: function (dataType: string) {
-            if (dataType === "user") {
+            if (dataType === dataTransferType) {
               return JSON.stringify(user);
             }
           },
+          items: [
+            {
+              type: dataTransferType,
+            },
+          ],
         },
       });
       const userListItems = await findAllByRole("listitem");
@@ -79,13 +85,19 @@ describe("PairingLane", () => {
 
     const renderedComponent = container.firstElementChild;
     if (renderedComponent) {
+      const dataTransferType = "task";
       await fireEvent.drop(renderedComponent, {
         dataTransfer: {
           getData: (dataType: string) => {
-            if (dataType === "task") {
+            if (dataType === dataTransferType) {
               return JSON.stringify(task);
             }
           },
+          items: [
+            {
+              type: dataTransferType,
+            },
+          ],
         },
       });
       const userListItems = await findAllByRole("listitem");

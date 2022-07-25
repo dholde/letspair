@@ -17,6 +17,12 @@ export const useStore = defineStore({
       const task = data as Task;
       this.tasks.push(task);
     },
+    async addTaskToLane(task: Task, laneId: string) {
+      const indexOfUpdatedTask = this.tasks.findIndex(
+        (existingTask) => existingTask.id === task.id
+      );
+      this.tasks[indexOfUpdatedTask].laneId = laneId;
+    },
     async createUser() {
       const { data } = await axios.post("http://localhost:3000/user", {
         order: this.users.length + 1,
@@ -50,5 +56,9 @@ export const useStore = defineStore({
     },
     unassignedUsers: (state) =>
       state.users.filter((user) => !user.laneId || user.laneId === ""),
+    tasksForLaneId: (state) => {
+      return (laneId: string) =>
+        state.tasks.filter((task) => task.laneId === laneId);
+    },
   },
 });

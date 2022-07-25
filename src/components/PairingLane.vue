@@ -2,19 +2,36 @@
 import { computed } from "vue";
 import { useStore } from "@/stores/letspairStore";
 import PairingUser from "./PairingUser.vue";
+import PairingTask from "./PairingTask.vue";
 import axios from "axios";
+import type { User } from "@/models/User";
+import type { Task } from "@/models/Task";
 const props = defineProps(["lane"]);
 const store = useStore();
 const users = computed(() => {
   return store.usersForLaneId(props.lane.id);
 });
+const tasks = computed(() => {
+  return store.tasksForLaneId(props.lane.id);
+});
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function onDrop(event: DragEvent) {
   event.preventDefault();
-  const userAsString: string = event.dataTransfer?.getData("user") as string;
-  const userFromDropEvent = JSON.parse(userAsString);
-  await axios.put("http://localhost:3000/user", userFromDropEvent);
-  store.addUserToLane(userFromDropEvent, props.lane.id);
+  const dataTransfer = event.dataTransfer;
+  if (dataTransfer) {
+    const dataTransferType = dataTransfer?.items[0].type;
+    const dataTransferData = dataTransfer?.getData(dataTransferType) as string;
+
+    if (dataTransferType === "user") {
+      const userFromDropEvent: User = JSON.parse(dataTransferData);
+      await axios.put("http://localhost:3000/user", userFromDropEvent);
+      store.addUserToLane(userFromDropEvent, props.lane.id);
+    } else if (dataTransferType === "task") {
+      const taskFromDropEvent: Task = JSON.parse(dataTransferData);
+      await axios.put("http://localhost:3000/task", taskFromDropEvent);
+      store.addTaskToLane(taskFromDropEvent, props.lane.id);
+    }
+  }
 }
 </script>
 <template>
@@ -32,7 +49,13 @@ async function onDrop(event: DragEvent) {
         </li>
       </ul>
     </div>
-    <div class="tasks"></div>
+    <div class="tasks">
+      <ul class="no-bullets">
+        <li v-for="task in tasks" :key="task.id">
+          <PairingTask :task="task" />
+        </li>
+      </ul>
+    </div>
   </div>
 </template>
 <style scoped>
