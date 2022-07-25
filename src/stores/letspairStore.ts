@@ -23,6 +23,12 @@ export const useStore = defineStore({
       );
       this.tasks[indexOfUpdatedTask].laneId = laneId;
     },
+    async freeUpTask(task: Task) {
+      const indexOfUpdatedTask = this.tasks.findIndex(
+        (existingTask) => existingTask.id === task.id
+      );
+      this.tasks[indexOfUpdatedTask].laneId = undefined;
+    },
     async createUser() {
       const { data } = await axios.post("http://localhost:3000/user", {
         order: this.users.length + 1,

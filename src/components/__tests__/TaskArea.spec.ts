@@ -87,6 +87,7 @@ describe("TaskArea", () => {
               return JSON.stringify(task);
             }
           },
+          items: [{ type: "task" }],
         },
       });
       await findByText(task.description);
