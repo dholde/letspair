@@ -2,11 +2,19 @@ import { mount } from "@vue/test-utils";
 import PairingUser from "@/components/PairingUser.vue";
 import { v4 as uuidv4 } from "uuid";
 import { render } from "@testing-library/vue";
+import { createTestingPinia } from "@pinia/testing";
 
 describe("PairingUser", () => {
   it("shows the user name", () => {
     const user = { id: uuidv4(), name: "John Wayne" };
     const { findByText } = render(PairingUser, {
+      global: {
+        plugins: [
+          createTestingPinia({
+            stubActions: false,
+          }),
+        ],
+      },
       props: {
         user,
       },

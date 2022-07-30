@@ -10,7 +10,10 @@ export const useStore = defineStore({
     tasks: [] as Task[],
     users: [] as User[],
     lanes: [] as Lane[],
-    dragAndDropInfo: null as DragAndDropInfo | null,
+    dragAndDropInfo: {
+      draggedItemId: null,
+      draggedOverItemId: null,
+    } as DragAndDropInfo,
   }),
   actions: {
     async createTask() {
@@ -49,6 +52,11 @@ export const useStore = defineStore({
       );
       this.users[indexOfUpdatedUser].laneId = laneId;
     },
+    async addDraftUserToLane(draggedUserId: string, draggedOverUserId: string) {
+      console.log(
+        `DraggedUserId: ${draggedUserId}::DraggedOverUserId: ${draggedOverUserId}`
+      );
+    },
     async freeUpUser(user: User) {
       const indexOfUpdatedUser = this.users.findIndex(
         (existingUser) => existingUser.id === user.id
@@ -74,6 +82,6 @@ export const useStore = defineStore({
 
 // This isn't located in the 'models' folder as it's a transient data structure
 interface DragAndDropInfo {
-  draggedItemId: string;
-  draggedOverItemId: string;
+  draggedItemId: string | null;
+  draggedOverItemId: string | null;
 }

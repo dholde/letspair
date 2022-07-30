@@ -7,9 +7,25 @@ const props = defineProps(["user"]);
 const userAsString = computed(() => {
   return JSON.stringify(props.user);
 });
+function onDragStart(event: DragEvent) {
+  store.dragAndDropInfo.draggedItemId = props.user.id;
+  dragStartHandler("user", userAsString.value, event);
+}
 function onDragOver(event: DragEvent) {
   const dataTransferItemType = event.dataTransfer?.items[0].type;
   if (dataTransferItemType === "user") {
+    if (
+      store.dragAndDropInfo.draggedOverItemId !== props.user.id &&
+      store.dragAndDropInfo.draggedItemId !== props.user.id
+    ) {
+      store.dragAndDropInfo.draggedOverItemId = props.user.id;
+      if (store.dragAndDropInfo.draggedItemId) {
+        store.addDraftUserToLane(
+          store.dragAndDropInfo.draggedItemId,
+          props.user.id
+        );
+      }
+    }
   }
 }
 </script>
@@ -17,7 +33,7 @@ function onDragOver(event: DragEvent) {
   <div
     class="user"
     draggable="true"
-    @dragstart="dragStartHandler('user', userAsString, $event)"
+    @dragstart="onDragStart($event)"
     @dragover="onDragOver($event)"
   >
     <div class="inner">
