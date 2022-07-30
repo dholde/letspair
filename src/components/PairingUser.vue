@@ -1,16 +1,24 @@
 <script setup lang="ts">
 import { computed } from "vue";
-import { dragStartHandler } from "@/utils/dragStartEventHandler";
+import { useStore } from "@/stores/letspairStore";
+import { dragStartHandler } from "@/utils/dragAndDropEventHandler";
+const store = useStore();
 const props = defineProps(["user"]);
 const userAsString = computed(() => {
   return JSON.stringify(props.user);
 });
+function onDragOver(event: DragEvent) {
+  const dataTransferItemType = event.dataTransfer?.items[0].type;
+  if (dataTransferItemType === "user") {
+  }
+}
 </script>
 <template>
   <div
     class="user"
     draggable="true"
     @dragstart="dragStartHandler('user', userAsString, $event)"
+    @dragover="onDragOver($event)"
   >
     <div class="inner">
       {{ user.name ? user.name : "User Name" }}

@@ -10,6 +10,7 @@ export const useStore = defineStore({
     tasks: [] as Task[],
     users: [] as User[],
     lanes: [] as Lane[],
+    dragAndDropInfo: null as DragAndDropInfo | null,
   }),
   actions: {
     async createTask() {
@@ -70,3 +71,9 @@ export const useStore = defineStore({
       state.tasks.filter((task) => !task.laneId || task.laneId === ""),
   },
 });
+
+// This isn't located in the 'models' folder as it's a transient data structure
+interface DragAndDropInfo {
+  draggedItemId: string;
+  draggedOverItemId: string;
+}

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue";
-import { dragStartHandler } from "@/utils/dragStartEventHandler";
+import { dragStartHandler } from "@/utils/dragAndDropEventHandler";
 
 const props = defineProps(["task"]);
 const taskAsString = computed(() => JSON.stringify(props.task));
