@@ -3,6 +3,7 @@ export class User {
   public order: number;
   public name?: string;
   public laneId?: string;
+  public isDraft?: boolean;
 
   constructor(id: string, order: number) {
     this.id = id;

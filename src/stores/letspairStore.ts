@@ -56,6 +56,21 @@ export const useStore = defineStore({
       console.log(
         `DraggedUserId: ${draggedUserId}::DraggedOverUserId: ${draggedOverUserId}`
       );
+      const draggedUser = this.users.find((user) => user.id === draggedUserId);
+      const draggedOverUser = this.users.find(
+        (user) => (user.id = draggedOverUserId)
+      );
+      // const indexOfDraggedOverUser = this.users.findIndex(
+      //   (user) => user.id === draggedOverUserId
+      // );
+      if (draggedUser && draggedOverUser) {
+        const indexOfDraggedOverUser = this.users.indexOf(draggedOverUser);
+        const draftUser = JSON.parse(JSON.stringify(draggedUser));
+        draftUser.isDraft = true;
+        draftUser.laneId = draggedOverUser.laneId;
+        this.users.splice(indexOfDraggedOverUser, 0, draftUser);
+        console.log("Test");
+      }
     },
     async freeUpUser(user: User) {
       const indexOfUpdatedUser = this.users.findIndex(
