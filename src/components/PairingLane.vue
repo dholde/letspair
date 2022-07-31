@@ -21,6 +21,8 @@ async function onDrop(event: DragEvent) {
   if (dataTransfer) {
     const dataTransferType = dataTransfer?.items[0].type;
     const dataTransferData = dataTransfer?.getData(dataTransferType) as string;
+    store.dragAndDropInfo.draggedItemId = null;
+    store.dragAndDropInfo.draggedOverItemId = null;
 
     if (dataTransferType === "user") {
       const userFromDropEvent: User = JSON.parse(dataTransferData);

@@ -38,7 +38,8 @@ function onDragOver(event: DragEvent) {
     @dragover="onDragOver($event)"
   >
     <div class="inner">
-      {{ user.name ? user.name : "User Name" }}
+      <!-- {{ user.name ? user.name : "User Name" }} -->
+      {{ user.id }}
     </div>
   </div>
 </template>

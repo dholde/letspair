@@ -59,6 +59,7 @@ export const useStore = defineStore({
         this.users.splice(indexOfUpdatedUser, 1);
         this.users[indexOfDraftUser].isDraft = false;
       }
+      console.log("TEst");
     },
     async addDraftUserToLane(draggedUserId: string, draggedOverUserId: string) {
       console.log(
@@ -66,7 +67,7 @@ export const useStore = defineStore({
       );
       const draggedUser = this.users.find((user) => user.id === draggedUserId);
       const draggedOverUser = this.users.find(
-        (user) => (user.id = draggedOverUserId)
+        (user) => user.id === draggedOverUserId
       );
       // const indexOfDraggedOverUser = this.users.findIndex(
       //   (user) => user.id === draggedOverUserId
