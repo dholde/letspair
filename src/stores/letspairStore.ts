@@ -51,13 +51,14 @@ export const useStore = defineStore({
         (existingUser) => existingUser.id === user.id && !existingUser.isDraft
       );
       const indexOfDraftUser = this.users.findIndex(
-        (existingUser) => existingUser.id === user.id && existingUser.isDraft
+        (existingUser) =>
+          existingUser.id === user.id && existingUser.isDraft === true
       );
       if (indexOfDraftUser === -1) {
         this.users[indexOfUpdatedUser].laneId = laneId;
       } else {
-        this.users.splice(indexOfUpdatedUser, 1);
         this.users[indexOfDraftUser].isDraft = false;
+        this.users.splice(indexOfUpdatedUser, 1);
       }
       console.log("TEst");
     },
