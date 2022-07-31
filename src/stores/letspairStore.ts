@@ -60,7 +60,6 @@ export const useStore = defineStore({
         this.users[indexOfDraftUser].isDraft = false;
         this.users.splice(indexOfUpdatedUser, 1);
       }
-      console.log("TEst");
     },
     async addDraftUserToLane(draggedUserId: string, draggedOverUserId: string) {
       const draggedUser = this.users.find((user) => user.id === draggedUserId);
