@@ -62,23 +62,22 @@ export const useStore = defineStore({
       console.log("TEst");
     },
     async addDraftUserToLane(draggedUserId: string, draggedOverUserId: string) {
-      console.log(
-        `DraggedUserId: ${draggedUserId}::DraggedOverUserId: ${draggedOverUserId}`
-      );
       const draggedUser = this.users.find((user) => user.id === draggedUserId);
       const draggedOverUser = this.users.find(
         (user) => user.id === draggedOverUserId
       );
-      // const indexOfDraggedOverUser = this.users.findIndex(
-      //   (user) => user.id === draggedOverUserId
-      // );
       if (draggedUser && draggedOverUser) {
+        const fromerDraftUserIndex = this.users.findIndex(
+          (user) => user.id === draggedUser.id && user.isDraft === true
+        );
+        if (fromerDraftUserIndex != -1) {
+          this.users.splice(fromerDraftUserIndex, 1);
+        }
         const indexOfDraggedOverUser = this.users.indexOf(draggedOverUser);
         const draftUser = JSON.parse(JSON.stringify(draggedUser));
         draftUser.isDraft = true;
         draftUser.laneId = draggedOverUser.laneId;
         this.users.splice(indexOfDraggedOverUser, 0, draftUser);
-        console.log("Test");
       }
     },
     async freeUpUser(user: User) {
