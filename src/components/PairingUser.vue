@@ -32,6 +32,7 @@ function onDragOver(event: DragEvent) {
 <template>
   <div
     class="user"
+    :class="{ draft: user.isDraft }"
     draggable="true"
     @dragstart="onDragStart($event)"
     @dragover="onDragOver($event)"
@@ -54,5 +55,8 @@ function onDragOver(event: DragEvent) {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
+}
+.draft {
+  opacity: 0.2;
 }
 </style>
