@@ -48,9 +48,17 @@ export const useStore = defineStore({
     },
     async addUserToLane(user: User, laneId: string) {
       const indexOfUpdatedUser = this.users.findIndex(
-        (existingUser) => existingUser.id === user.id
+        (existingUser) => existingUser.id === user.id && !existingUser.isDraft
       );
-      this.users[indexOfUpdatedUser].laneId = laneId;
+      const indexOfDraftUser = this.users.findIndex(
+        (existingUser) => existingUser.id === user.id && existingUser.isDraft
+      );
+      if (indexOfDraftUser === -1) {
+        this.users[indexOfUpdatedUser].laneId = laneId;
+      } else {
+        this.users.splice(indexOfUpdatedUser, 1);
+        this.users[indexOfDraftUser].isDraft = false;
+      }
     },
     async addDraftUserToLane(draggedUserId: string, draggedOverUserId: string) {
       console.log(
