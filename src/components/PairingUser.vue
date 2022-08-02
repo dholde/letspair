@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import { useStore } from "@/stores/letspairStore";
 import { dragStartHandler } from "@/utils/dragAndDropEventHandler";
+const userElement = ref<HTMLElement | null>(null);
 const store = useStore();
 const props = defineProps(["user"]);
 const userAsString = computed(() => {
@@ -12,18 +13,26 @@ function onDragStart(event: DragEvent) {
   dragStartHandler("user", userAsString.value, event);
 }
 function onDragOver(event: DragEvent) {
-  const dataTransferItemType = event.dataTransfer?.items[0].type;
-  if (dataTransferItemType === "user") {
-    if (
-      store.dragAndDropInfo.draggedOverItemId !== props.user.id &&
-      store.dragAndDropInfo.draggedItemId !== props.user.id
-    ) {
-      store.dragAndDropInfo.draggedOverItemId = props.user.id;
-      if (store.dragAndDropInfo.draggedItemId) {
-        store.addDraftUserToLane(
-          store.dragAndDropInfo.draggedItemId,
-          props.user.id
-        );
+  const positionY = userElement.value?.getBoundingClientRect().y;
+  const height = userElement.value?.getBoundingClientRect().height;
+  const positionYDraggedElement = event.pageY;
+  if (positionY && height && positionYDraggedElement) {
+    const addAbove =
+      positionY + height / 2 > positionYDraggedElement ? true : false;
+    const dataTransferItemType = event.dataTransfer?.items[0].type;
+    if (dataTransferItemType === "user") {
+      if (
+        store.dragAndDropInfo.draggedOverItemId !== props.user.id &&
+        store.dragAndDropInfo.draggedItemId !== props.user.id
+      ) {
+        store.dragAndDropInfo.draggedOverItemId = props.user.id;
+        if (store.dragAndDropInfo.draggedItemId) {
+          store.addDraftUserToLane(
+            store.dragAndDropInfo.draggedItemId,
+            props.user.id,
+            addAbove
+          );
+        }
       }
     }
   }
@@ -36,6 +45,7 @@ function onDragOver(event: DragEvent) {
     draggable="true"
     @dragstart="onDragStart($event)"
     @dragover="onDragOver($event)"
+    ref="userElement"
   >
     <div class="inner">
       <!-- {{ user.name ? user.name : "User Name" }} -->

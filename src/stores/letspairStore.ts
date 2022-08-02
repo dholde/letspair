@@ -61,7 +61,11 @@ export const useStore = defineStore({
         this.users.splice(indexOfUpdatedUser, 1);
       }
     },
-    async addDraftUserToLane(draggedUserId: string, draggedOverUserId: string) {
+    async addDraftUserToLane(
+      draggedUserId: string,
+      draggedOverUserId: string,
+      addAbove: boolean
+    ) {
       const draggedUser = this.users.find((user) => user.id === draggedUserId);
       const draggedOverUser = this.users.find(
         (user) => user.id === draggedOverUserId
@@ -77,7 +81,10 @@ export const useStore = defineStore({
         const draftUser = JSON.parse(JSON.stringify(draggedUser));
         draftUser.isDraft = true;
         draftUser.laneId = draggedOverUser.laneId;
-        this.users.splice(indexOfDraggedOverUser, 0, draftUser);
+        const indertAtIndex = addAbove
+          ? indexOfDraggedOverUser
+          : indexOfDraggedOverUser + 1;
+        this.users.splice(indertAtIndex, 0, draftUser);
       }
     },
     async freeUpUser(user: User) {
@@ -107,4 +114,5 @@ export const useStore = defineStore({
 interface DragAndDropInfo {
   draggedItemId: string | null;
   draggedOverItemId: string | null;
+  addAbove: boolean | null;
 }
