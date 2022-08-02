@@ -45,18 +45,22 @@ async function onDrop(event: DragEvent) {
     @dragenter.prevent
   >
     <div class="users">
+      <!-- <TransitionGroup name="list" tag="ul"> -->
       <ul class="no-bullets">
         <li v-for="user in users" :key="user.id">
           <PairingUser :user="user" />
         </li>
       </ul>
+      <!-- </TransitionGroup> -->
     </div>
     <div class="tasks">
+      <!-- <TransitionGroup name="list" tag="ul"> -->
       <ul class="no-bullets">
         <li v-for="task in tasks" :key="task.id">
           <PairingTask :task="task" />
         </li>
       </ul>
+      <!-- </TransitionGroup> -->
     </div>
   </div>
 </template>

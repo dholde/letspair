@@ -25,7 +25,9 @@ function onDragOver(event: DragEvent) {
       if (
         (store.dragAndDropInfo.draggedOverItemId !== props.user.id &&
           store.dragAndDropInfo.draggedItemId !== props.user.id) ||
-        (addAboveOriginal !== null && addAboveOriginal !== addAbove)
+        (store.dragAndDropInfo.draggedItemId !== props.user.id &&
+          addAboveOriginal !== null &&
+          addAboveOriginal !== addAbove)
       ) {
         store.dragAndDropInfo.addAbove = addAbove;
         store.dragAndDropInfo.draggedOverItemId = props.user.id;
