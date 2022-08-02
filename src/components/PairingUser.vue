@@ -19,12 +19,15 @@ function onDragOver(event: DragEvent) {
   if (positionY && height && positionYDraggedElement) {
     const addAbove =
       positionY + height / 2 > positionYDraggedElement ? true : false;
+    const addAboveOriginal = store.dragAndDropInfo.addAbove;
     const dataTransferItemType = event.dataTransfer?.items[0].type;
     if (dataTransferItemType === "user") {
       if (
-        store.dragAndDropInfo.draggedOverItemId !== props.user.id &&
-        store.dragAndDropInfo.draggedItemId !== props.user.id
+        (store.dragAndDropInfo.draggedOverItemId !== props.user.id &&
+          store.dragAndDropInfo.draggedItemId !== props.user.id) ||
+        (addAboveOriginal !== null && addAboveOriginal !== addAbove)
       ) {
+        store.dragAndDropInfo.addAbove = addAbove;
         store.dragAndDropInfo.draggedOverItemId = props.user.id;
         if (store.dragAndDropInfo.draggedItemId) {
           store.addDraftUserToLane(
@@ -45,6 +48,7 @@ function onDragOver(event: DragEvent) {
     draggable="true"
     @dragstart="onDragStart($event)"
     @dragover="onDragOver($event)"
+    @dragleave="onDragLeave"
     ref="userElement"
   >
     <div class="inner">

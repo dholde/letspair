@@ -115,4 +115,5 @@ interface DragAndDropInfo {
   draggedItemId: string | null;
   draggedOverItemId: string | null;
   addAbove: boolean | null;
+  addPositionChanged: false;
 }
