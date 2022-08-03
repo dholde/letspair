@@ -2,9 +2,10 @@
 import { computed, ref } from "vue";
 import { useStore } from "@/stores/letspairStore";
 import { dragStartHandler } from "@/utils/dragAndDropEventHandler";
+import type { User } from "@/models/User";
 const userElement = ref<HTMLElement | null>(null);
 const store = useStore();
-const props = defineProps(["user"]);
+const props = defineProps<{ user: User }>();
 const userAsString = computed(() => {
   return JSON.stringify(props.user);
 });
@@ -50,12 +51,11 @@ function onDragOver(event: DragEvent) {
     draggable="true"
     @dragstart="onDragStart($event)"
     @dragover="onDragOver($event)"
-    @dragleave="onDragLeave"
     ref="userElement"
   >
     <div class="inner">
       <!-- {{ user.name ? user.name : "User Name" }} -->
-      {{ user.id }}
+      <input v-model="user.name" placeholder="User Name" />
     </div>
   </div>
 </template>
