@@ -54,8 +54,7 @@ function onDragOver(event: DragEvent) {
     ref="userElement"
   >
     <div class="inner">
-      <!-- {{ user.name ? user.name : "User Name" }} -->
-      <input v-model="user.name" placeholder="User Name" />
+      {{ user.name ? user.name : "User Name" }}
     </div>
   </div>
 </template>
