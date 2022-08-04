@@ -27,6 +27,34 @@ export const useStore = defineStore({
       );
       this.tasks[indexOfUpdatedTask].laneId = laneId;
     },
+    async addDraftTaskToLane(
+      draggedElementId: string,
+      draggedOverElementId: string,
+      addAbove: boolean
+    ) {
+      const draggedTask = this.tasks.find(
+        (task) => task.id === draggedElementId
+      );
+      const draggedOverTask = this.users.find(
+        (task) => task.id === draggedOverElementId
+      );
+      if (draggedTask && draggedOverTask) {
+        const fromerDraftTaskIndex = this.users.findIndex(
+          (task) => task.id === draggedTask.id && task.isDraft === true
+        );
+        if (fromerDraftTaskIndex != -1) {
+          this.users.splice(fromerDraftTaskIndex, 1);
+        }
+        const indexOfDraggedOverTask = this.users.indexOf(draggedOverTask);
+        const draftTask = JSON.parse(JSON.stringify(draggedTask));
+        draftTask.isDraft = true;
+        draftTask.laneId = draggedOverTask.laneId;
+        const indertAtIndex = addAbove
+          ? indexOfDraggedOverTask
+          : indexOfDraggedOverTask + 1;
+        this.users.splice(indertAtIndex, 0, draftTask);
+      }
+    },
     async freeUpTask(task: Task) {
       const indexOfUpdatedTask = this.tasks.findIndex(
         (existingTask) => existingTask.id === task.id

@@ -21,18 +21,24 @@ export function addDraftItemToList(
       ? true
       : false;
   const addAboveOriginal = store.dragAndDropInfo.addAbove;
-  if (draggedElementType === "user") {
-    if (
-      (store.dragAndDropInfo.draggedOverItemId !== draggedOverElementId &&
-        store.dragAndDropInfo.draggedItemId !== draggedOverElementId) ||
-      (store.dragAndDropInfo.draggedItemId !== draggedOverElementId &&
-        addAboveOriginal !== null &&
-        addAboveOriginal !== addAbove)
-    ) {
-      store.dragAndDropInfo.addAbove = addAbove;
-      store.dragAndDropInfo.draggedOverItemId = draggedOverElementId;
-      if (store.dragAndDropInfo.draggedItemId) {
+  if (
+    (store.dragAndDropInfo.draggedOverItemId !== draggedOverElementId &&
+      store.dragAndDropInfo.draggedItemId !== draggedOverElementId) ||
+    (store.dragAndDropInfo.draggedItemId !== draggedOverElementId &&
+      addAboveOriginal !== null &&
+      addAboveOriginal !== addAbove)
+  ) {
+    store.dragAndDropInfo.addAbove = addAbove;
+    store.dragAndDropInfo.draggedOverItemId = draggedOverElementId;
+    if (store.dragAndDropInfo.draggedItemId) {
+      if (draggedElementType === "user") {
         store.addDraftUserToLane(
+          store.dragAndDropInfo.draggedItemId,
+          draggedOverElementId,
+          addAbove
+        );
+      } else if (draggedElementType === "task") {
+        store.addDraftTaskToLane(
           store.dragAndDropInfo.draggedItemId,
           draggedOverElementId,
           addAbove
