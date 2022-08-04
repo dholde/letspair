@@ -4,6 +4,7 @@ export class Task {
   public order: number;
   public laneId?: string;
   public isCurrentlyDragged?: boolean;
+  public isDraft?: boolean;
 
   constructor(id: string, description: string, order: number) {
     this.id = id;
