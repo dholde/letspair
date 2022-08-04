@@ -4,6 +4,7 @@ import { useStore } from "@/stores/letspairStore";
 import { dragStartHandler } from "@/utils/dragAndDropEventHandler";
 import type { User } from "@/models/User";
 const userElement = ref<HTMLElement | null>(null);
+const isDragged = ref<boolean>(false);
 const store = useStore();
 const props = defineProps<{ user: User }>();
 const userAsString = computed(() => {
@@ -12,6 +13,7 @@ const userAsString = computed(() => {
 function onDragStart(event: DragEvent) {
   store.dragAndDropInfo.draggedItemId = props.user.id;
   dragStartHandler("user", userAsString.value, event);
+  isDragged.value = true;
 }
 function onDragOver(event: DragEvent) {
   const positionY = userElement.value?.getBoundingClientRect().y;
@@ -43,14 +45,18 @@ function onDragOver(event: DragEvent) {
     }
   }
 }
+function onDragEnd() {
+  isDragged.value = false;
+}
 </script>
 <template>
   <div
     class="user"
-    :class="{ draft: user.isDraft }"
+    :class="{ draft: user.isDraft, dragged: isDragged }"
     draggable="true"
     @dragstart="onDragStart($event)"
     @dragover="onDragOver($event)"
+    @dragend="onDragEnd"
     ref="userElement"
   >
     <div class="inner">
@@ -71,6 +77,9 @@ function onDragOver(event: DragEvent) {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
+}
+.dragged {
+  opacity: 0.5;
 }
 .draft {
   opacity: 0.2;
