@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import { useStore } from "@/stores/letspairStore";
-import { dragStartHandler } from "@/utils/dragAndDropEventHandler";
+import { dragStartHandler } from "@/utils/dragAndDropUtils";
 import type { User } from "@/models/User";
 const userElement = ref<HTMLElement | null>(null);
 const isDragged = ref<boolean>(false);
