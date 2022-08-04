@@ -18,12 +18,12 @@ function onDragStart(event: DragEvent) {
 function onDragOver(event: DragEvent) {
   const userElementDOMRect = userElement.value?.getBoundingClientRect();
   const positionYDraggedElement = event.pageY;
-  const dataTransferItemType = event.dataTransfer?.items[0].type;
-  if (userElementDOMRect && positionYDraggedElement && dataTransferItemType) {
+  const draggedElementType = event.dataTransfer?.items[0].type;
+  if (userElementDOMRect && positionYDraggedElement && draggedElementType) {
     addDraftItemToList(
       userElementDOMRect,
       positionYDraggedElement,
-      dataTransferItemType,
+      draggedElementType,
       props.user.id
     );
   }
