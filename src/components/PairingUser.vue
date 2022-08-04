@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import { useStore } from "@/stores/letspairStore";
-import { dragStartHandler } from "@/utils/dragAndDropUtils";
+import { dragStartHandler, addDraftItemToList } from "@/utils/dragAndDropUtils";
 import type { User } from "@/models/User";
 const userElement = ref<HTMLElement | null>(null);
 const isDragged = ref<boolean>(false);
@@ -16,33 +16,16 @@ function onDragStart(event: DragEvent) {
   isDragged.value = true;
 }
 function onDragOver(event: DragEvent) {
-  const positionY = userElement.value?.getBoundingClientRect().y;
-  const height = userElement.value?.getBoundingClientRect().height;
+  const userElementDOMRect = userElement.value?.getBoundingClientRect();
   const positionYDraggedElement = event.pageY;
-  if (positionY && height && positionYDraggedElement) {
-    const addAbove =
-      positionY + height / 2 > positionYDraggedElement ? true : false;
-    const addAboveOriginal = store.dragAndDropInfo.addAbove;
-    const dataTransferItemType = event.dataTransfer?.items[0].type;
-    if (dataTransferItemType === "user") {
-      if (
-        (store.dragAndDropInfo.draggedOverItemId !== props.user.id &&
-          store.dragAndDropInfo.draggedItemId !== props.user.id) ||
-        (store.dragAndDropInfo.draggedItemId !== props.user.id &&
-          addAboveOriginal !== null &&
-          addAboveOriginal !== addAbove)
-      ) {
-        store.dragAndDropInfo.addAbove = addAbove;
-        store.dragAndDropInfo.draggedOverItemId = props.user.id;
-        if (store.dragAndDropInfo.draggedItemId) {
-          store.addDraftUserToLane(
-            store.dragAndDropInfo.draggedItemId,
-            props.user.id,
-            addAbove
-          );
-        }
-      }
-    }
+  const dataTransferItemType = event.dataTransfer?.items[0].type;
+  if (userElementDOMRect && positionYDraggedElement && dataTransferItemType) {
+    addDraftItemToList(
+      userElementDOMRect,
+      positionYDraggedElement,
+      dataTransferItemType,
+      props.user.id
+    );
   }
 }
 function onDragEnd() {
