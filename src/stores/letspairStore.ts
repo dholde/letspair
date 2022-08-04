@@ -47,19 +47,7 @@ export const useStore = defineStore({
       this.lanes.push(lane);
     },
     async addUserToLane(user: User, laneId: string) {
-      const indexOfUpdatedUser = this.users.findIndex(
-        (existingUser) => existingUser.id === user.id && !existingUser.isDraft
-      );
-      const indexOfDraftUser = this.users.findIndex(
-        (existingUser) =>
-          existingUser.id === user.id && existingUser.isDraft === true
-      );
-      if (indexOfDraftUser === -1) {
-        this.users[indexOfUpdatedUser].laneId = laneId;
-      } else {
-        this.users[indexOfDraftUser].isDraft = false;
-        this.users.splice(indexOfUpdatedUser, 1);
-      }
+      updateLaneForUser(user.id, laneId, this.users);
     },
     async addDraftUserToLane(
       draggedUserId: string,
@@ -88,10 +76,7 @@ export const useStore = defineStore({
       }
     },
     async freeUpUser(user: User) {
-      const indexOfUpdatedUser = this.users.findIndex(
-        (existingUser) => existingUser.id === user.id
-      );
-      this.users[indexOfUpdatedUser].laneId = undefined;
+      updateLaneForUser(user.id, undefined, this.users);
     },
   },
   getters: {
@@ -117,3 +102,23 @@ interface DragAndDropInfo {
   addAbove: boolean | null;
   addPositionChanged: false;
 }
+
+const updateLaneForUser = (
+  userId: string,
+  laneId: string | undefined,
+  users: User[]
+) => {
+  const indexOfUpdatedUser = users.findIndex(
+    (existingUser) => existingUser.id === userId && !existingUser.isDraft
+  );
+  const indexOfDraftUser = users.findIndex(
+    (existingUser) =>
+      existingUser.id === userId && existingUser.isDraft === true
+  );
+  if (indexOfDraftUser === -1) {
+    users[indexOfUpdatedUser].laneId = laneId;
+  } else {
+    users[indexOfDraftUser].isDraft = false;
+    users.splice(indexOfUpdatedUser, 1);
+  }
+};
