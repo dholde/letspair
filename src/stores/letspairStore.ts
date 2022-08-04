@@ -22,10 +22,7 @@ export const useStore = defineStore({
       this.tasks.push(task);
     },
     async addTaskToLane(task: Task, laneId: string) {
-      const indexOfUpdatedTask = this.tasks.findIndex(
-        (existingTask) => existingTask.id === task.id
-      );
-      this.tasks[indexOfUpdatedTask].laneId = laneId;
+      updateLaneForElement(task.id, laneId, this.tasks);
     },
     async addDraftTaskToLane(
       draggedElementId: string,
@@ -35,24 +32,24 @@ export const useStore = defineStore({
       const draggedTask = this.tasks.find(
         (task) => task.id === draggedElementId
       );
-      const draggedOverTask = this.users.find(
+      const draggedOverTask = this.tasks.find(
         (task) => task.id === draggedOverElementId
       );
       if (draggedTask && draggedOverTask) {
-        const fromerDraftTaskIndex = this.users.findIndex(
+        const fromerDraftTaskIndex = this.tasks.findIndex(
           (task) => task.id === draggedTask.id && task.isDraft === true
         );
         if (fromerDraftTaskIndex != -1) {
-          this.users.splice(fromerDraftTaskIndex, 1);
+          this.tasks.splice(fromerDraftTaskIndex, 1);
         }
-        const indexOfDraggedOverTask = this.users.indexOf(draggedOverTask);
+        const indexOfDraggedOverTask = this.tasks.indexOf(draggedOverTask);
         const draftTask = JSON.parse(JSON.stringify(draggedTask));
         draftTask.isDraft = true;
         draftTask.laneId = draggedOverTask.laneId;
-        const indertAtIndex = addAbove
+        const insertAtIndex = addAbove
           ? indexOfDraggedOverTask
           : indexOfDraggedOverTask + 1;
-        this.users.splice(indertAtIndex, 0, draftTask);
+        this.tasks.splice(insertAtIndex, 0, draftTask);
       }
     },
     async freeUpTask(task: Task) {
@@ -75,7 +72,7 @@ export const useStore = defineStore({
       this.lanes.push(lane);
     },
     async addUserToLane(user: User, laneId: string) {
-      updateLaneForUser(user.id, laneId, this.users);
+      updateLaneForElement(user.id, laneId, this.users);
     },
     async addDraftUserToLane(
       draggedUserId: string,
@@ -104,7 +101,7 @@ export const useStore = defineStore({
       }
     },
     async freeUpUser(user: User) {
-      updateLaneForUser(user.id, undefined, this.users);
+      updateLaneForElement(user.id, undefined, this.users);
     },
   },
   getters: {
@@ -131,22 +128,23 @@ interface DragAndDropInfo {
   addPositionChanged: false;
 }
 
-const updateLaneForUser = (
-  userId: string,
+const updateLaneForElement = (
+  elementId: string,
   laneId: string | undefined,
-  users: User[]
+  elements: User[] | Task[]
 ) => {
-  const indexOfUpdatedUser = users.findIndex(
-    (existingUser) => existingUser.id === userId && !existingUser.isDraft
+  const indexOfUpdatedUser = elements.findIndex(
+    (existingElement) =>
+      existingElement.id === elementId && !existingElement.isDraft
   );
-  const indexOfDraftUser = users.findIndex(
-    (existingUser) =>
-      existingUser.id === userId && existingUser.isDraft === true
+  const indexOfDraftElement = elements.findIndex(
+    (existingElement) =>
+      existingElement.id === elementId && existingElement.isDraft === true
   );
-  if (indexOfDraftUser === -1) {
-    users[indexOfUpdatedUser].laneId = laneId;
+  if (indexOfDraftElement === -1) {
+    elements[indexOfUpdatedUser].laneId = laneId;
   } else {
-    users[indexOfDraftUser].isDraft = false;
-    users.splice(indexOfUpdatedUser, 1);
+    elements[indexOfDraftElement].isDraft = false;
+    elements.splice(indexOfUpdatedUser, 1);
   }
 };
