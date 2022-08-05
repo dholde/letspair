@@ -131,20 +131,20 @@ interface DragAndDropInfo {
 const updateLaneForElement = (
   elementId: string,
   laneId: string | undefined,
-  elements: User[] | Task[]
+  items: User[] | Task[]
 ) => {
-  const indexOfUpdatedUser = elements.findIndex(
+  const indexOfUpdatedUser = items.findIndex(
     (existingElement) =>
       existingElement.id === elementId && !existingElement.isDraft
   );
-  const indexOfDraftElement = elements.findIndex(
+  const indexOfDraftElement = items.findIndex(
     (existingElement) =>
       existingElement.id === elementId && existingElement.isDraft === true
   );
   if (indexOfDraftElement === -1) {
-    elements[indexOfUpdatedUser].laneId = laneId;
+    items[indexOfUpdatedUser].laneId = laneId;
   } else {
-    elements[indexOfDraftElement].isDraft = false;
-    elements.splice(indexOfUpdatedUser, 1);
+    items[indexOfDraftElement].isDraft = false;
+    items.splice(indexOfUpdatedUser, 1);
   }
 };
