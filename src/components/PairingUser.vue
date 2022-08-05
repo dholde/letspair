@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { useStore } from "@/stores/letspairStore";
 import { addDraftItemToList } from "@/utils/dragAndDropUtils";
 import type { User } from "@/models/User";
 import { useOnDragStart } from "@/composables/dragAndDrop";

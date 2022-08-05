@@ -18,17 +18,9 @@ export function useOnDragStart(
     oldValue?.removeEventListener("dragstart", onDragStart);
     value?.addEventListener("dragstart", onDragStart);
   });
-  //   onMounted(() => {
-  //     if (target) {
-  //       target.addEventListener("dragstart", onDragStart);
-  //     }
-  //   });
-  onUnmounted(() => {
-    // if (target) {
-    //   target.removeEventListener("dragstart", onDragStart);
-    // }
-    unref(target)?.removeEventListener("dragstart", onDragStart);
-  });
+  onUnmounted(() =>
+    unref(target)?.removeEventListener("dragstart", onDragStart)
+  );
 
   return isDragged;
 }
