@@ -1,18 +1,17 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { addDraftItemToList, dragStartHandler } from "@/utils/dragAndDropUtils";
-import { useStore } from "@/stores/letspairStore";
+import { addDraftItemToList } from "@/utils/dragAndDropUtils";
+import { useOnDragStart } from "@/composables/dragAndDrop";
 
 const props = defineProps(["task"]);
 const taskAsString = computed(() => JSON.stringify(props.task));
-const store = useStore();
-const isDragged = ref<boolean>(false);
 const taskElement = ref<HTMLElement | null>(null);
-function onDragStart(event: DragEvent) {
-  store.dragAndDropInfo.draggedItemId = props.task.id;
-  dragStartHandler("task", taskAsString.value, event);
-  isDragged.value = true;
-}
+const isDragged = useOnDragStart(
+  props.task.id,
+  "task",
+  taskAsString.value,
+  taskElement
+);
 function onDragOver(event: DragEvent) {
   const userElementDOMRect = taskElement.value?.getBoundingClientRect();
   const positionYDraggedElement = event.pageY;
@@ -35,7 +34,6 @@ function onDragEnd() {
     class="task"
     draggable="true"
     :class="{ draft: task.isDraft, dragged: isDragged }"
-    @dragstart="onDragStart($event)"
     @dragover="onDragOver($event)"
     @dragend="onDragEnd"
     ref="taskElement"
