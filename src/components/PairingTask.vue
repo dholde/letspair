@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import { addDraftItemToList } from "@/utils/dragAndDropUtils";
-import { useOnDragStart } from "@/composables/dragAndDrop";
+import { useDragStartAndDragEnd } from "@/composables/dragAndDrop";
 
 const props = defineProps(["task"]);
 const taskAsString = computed(() => JSON.stringify(props.task));
 const taskElement = ref<HTMLElement | null>(null);
-const isDragged = useOnDragStart(
+const isDragged = useDragStartAndDragEnd(
   props.task.id,
   "task",
   taskAsString.value,
@@ -25,9 +25,6 @@ function onDragOver(event: DragEvent) {
     );
   }
 }
-function onDragEnd() {
-  isDragged.value = false;
-}
 </script>
 <template>
   <div
@@ -35,7 +32,6 @@ function onDragEnd() {
     draggable="true"
     :class="{ draft: task.isDraft, dragged: isDragged }"
     @dragover="onDragOver($event)"
-    @dragend="onDragEnd"
     ref="taskElement"
   >
     <div class="inner">
