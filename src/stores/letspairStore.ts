@@ -3,6 +3,7 @@ import { defineStore } from "pinia";
 import axios from "axios";
 import type { User } from "@/models/User";
 import type { Lane } from "@/models/Lane";
+import type { Draggable } from "@/models/Draggable";
 
 export const useStore = defineStore({
   id: "letsPair",
@@ -25,32 +26,16 @@ export const useStore = defineStore({
       updateLaneForElement(task.id, laneId, this.tasks);
     },
     async addDraftTaskToLane(
-      draggedElementId: string,
-      draggedOverElementId: string,
+      draggedTaskId: string,
+      draggedOverTaskId: string,
       addAbove: boolean
     ) {
-      const draggedTask = this.tasks.find(
-        (task) => task.id === draggedElementId
+      addDraftItemToLane(
+        draggedTaskId,
+        draggedOverTaskId,
+        addAbove,
+        this.tasks
       );
-      const draggedOverTask = this.tasks.find(
-        (task) => task.id === draggedOverElementId
-      );
-      if (draggedTask && draggedOverTask) {
-        const fromerDraftTaskIndex = this.tasks.findIndex(
-          (task) => task.id === draggedTask.id && task.isDraft === true
-        );
-        if (fromerDraftTaskIndex != -1) {
-          this.tasks.splice(fromerDraftTaskIndex, 1);
-        }
-        const indexOfDraggedOverTask = this.tasks.indexOf(draggedOverTask);
-        const draftTask = JSON.parse(JSON.stringify(draggedTask));
-        draftTask.isDraft = true;
-        draftTask.laneId = draggedOverTask.laneId;
-        const insertAtIndex = addAbove
-          ? indexOfDraggedOverTask
-          : indexOfDraggedOverTask + 1;
-        this.tasks.splice(insertAtIndex, 0, draftTask);
-      }
     },
     async freeUpTask(task: Task) {
       const indexOfUpdatedTask = this.tasks.findIndex(
@@ -79,26 +64,12 @@ export const useStore = defineStore({
       draggedOverUserId: string,
       addAbove: boolean
     ) {
-      const draggedUser = this.users.find((user) => user.id === draggedUserId);
-      const draggedOverUser = this.users.find(
-        (user) => user.id === draggedOverUserId
+      addDraftItemToLane(
+        draggedUserId,
+        draggedOverUserId,
+        addAbove,
+        this.users
       );
-      if (draggedUser && draggedOverUser) {
-        const fromerDraftUserIndex = this.users.findIndex(
-          (user) => user.id === draggedUser.id && user.isDraft === true
-        );
-        if (fromerDraftUserIndex != -1) {
-          this.users.splice(fromerDraftUserIndex, 1);
-        }
-        const indexOfDraggedOverUser = this.users.indexOf(draggedOverUser);
-        const draftUser = JSON.parse(JSON.stringify(draggedUser));
-        draftUser.isDraft = true;
-        draftUser.laneId = draggedOverUser.laneId;
-        const indertAtIndex = addAbove
-          ? indexOfDraggedOverUser
-          : indexOfDraggedOverUser + 1;
-        this.users.splice(indertAtIndex, 0, draftUser);
-      }
     },
     async freeUpUser(user: User) {
       updateLaneForElement(user.id, undefined, this.users);
@@ -127,6 +98,32 @@ interface DragAndDropInfo {
   addAbove: boolean | null;
   addPositionChanged: false;
 }
+
+const addDraftItemToLane = (
+  draggedItemId: string,
+  draggedOverItemId: string,
+  addAbove: boolean,
+  items: Draggable[]
+) => {
+  const draggedItem = items.find((item) => item.id === draggedItemId);
+  const draggedOverItem = items.find((item) => item.id === draggedOverItemId);
+  if (draggedItem && draggedOverItem) {
+    const fromerDraftItemIndex = items.findIndex(
+      (item) => item.id === draggedItem.id && item.isDraft === true
+    );
+    if (fromerDraftItemIndex != -1) {
+      items.splice(fromerDraftItemIndex, 1);
+    }
+    const indexOfDraggedOverItem = items.indexOf(draggedOverItem);
+    const draftItem = JSON.parse(JSON.stringify(draggedItem));
+    draftItem.isDraft = true;
+    draftItem.laneId = draggedOverItem.laneId;
+    const indertAtIndex = addAbove
+      ? indexOfDraggedOverItem
+      : indexOfDraggedOverItem + 1;
+    items.splice(indertAtIndex, 0, draftItem);
+  }
+};
 
 const updateLaneForElement = (
   elementId: string,
