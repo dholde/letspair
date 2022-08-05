@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { addDraftItemToList } from "@/utils/dragAndDropUtils";
 import { useDragAndDrop } from "@/composables/dragAndDrop";
 
 const props = defineProps(["task"]);
