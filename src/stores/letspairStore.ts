@@ -23,7 +23,7 @@ export const useStore = defineStore({
       this.tasks.push(task);
     },
     async addTaskToLane(task: Task, laneId: string) {
-      updateLaneForElement(task.id, laneId, this.tasks);
+      updateLaneForItem(task.id, laneId, this.tasks);
     },
     async addDraftTaskToLane(
       draggedTaskId: string,
@@ -38,10 +38,7 @@ export const useStore = defineStore({
       );
     },
     async freeUpTask(task: Task) {
-      const indexOfUpdatedTask = this.tasks.findIndex(
-        (existingTask) => existingTask.id === task.id
-      );
-      this.tasks[indexOfUpdatedTask].laneId = undefined;
+      updateLaneForItem(task.id, undefined, this.tasks);
     },
     async createUser() {
       const { data } = await axios.post("http://localhost:3000/user", {
@@ -57,7 +54,7 @@ export const useStore = defineStore({
       this.lanes.push(lane);
     },
     async addUserToLane(user: User, laneId: string) {
-      updateLaneForElement(user.id, laneId, this.users);
+      updateLaneForItem(user.id, laneId, this.users);
     },
     async addDraftUserToLane(
       draggedUserId: string,
@@ -72,7 +69,7 @@ export const useStore = defineStore({
       );
     },
     async freeUpUser(user: User) {
-      updateLaneForElement(user.id, undefined, this.users);
+      updateLaneForItem(user.id, undefined, this.users);
     },
   },
   getters: {
@@ -125,23 +122,22 @@ const addDraftItemToLane = (
   }
 };
 
-const updateLaneForElement = (
-  elementId: string,
+const updateLaneForItem = (
+  itemId: string,
   laneId: string | undefined,
-  items: User[] | Task[]
+  items: Draggable[]
 ) => {
-  const indexOfUpdatedUser = items.findIndex(
-    (existingElement) =>
-      existingElement.id === elementId && !existingElement.isDraft
+  const indexOfUpdatedItem = items.findIndex(
+    (existingItem) => existingItem.id === itemId && !existingItem.isDraft
   );
-  const indexOfDraftElement = items.findIndex(
-    (existingElement) =>
-      existingElement.id === elementId && existingElement.isDraft === true
+  const indexOfDraftItem = items.findIndex(
+    (existingItem) =>
+      existingItem.id === itemId && existingItem.isDraft === true
   );
-  if (indexOfDraftElement === -1) {
-    items[indexOfUpdatedUser].laneId = laneId;
+  if (indexOfDraftItem === -1) {
+    items[indexOfUpdatedItem].laneId = laneId;
   } else {
-    items[indexOfDraftElement].isDraft = false;
-    items.splice(indexOfUpdatedUser, 1);
+    items[indexOfDraftItem].isDraft = false;
+    items.splice(indexOfUpdatedItem, 1);
   }
 };
