@@ -3,6 +3,7 @@ import { defineStore } from "pinia";
 import axios from "axios";
 import type { User } from "@/models/User";
 import type { Lane } from "@/models/Lane";
+import type { Draggable } from "@/models/Draggable";
 
 export const useStore = defineStore({
   id: "letsPair",
@@ -10,6 +11,10 @@ export const useStore = defineStore({
     tasks: [] as Task[],
     users: [] as User[],
     lanes: [] as Lane[],
+    dragAndDropInfo: {
+      draggedItemId: null,
+      draggedOverItemId: null,
+    } as DragAndDropInfo,
   }),
   actions: {
     async createTask() {
@@ -18,16 +23,22 @@ export const useStore = defineStore({
       this.tasks.push(task);
     },
     async addTaskToLane(task: Task, laneId: string) {
-      const indexOfUpdatedTask = this.tasks.findIndex(
-        (existingTask) => existingTask.id === task.id
+      updateLaneForItem(task.id, laneId, this.tasks);
+    },
+    async addDraftTaskToLane(
+      draggedTaskId: string,
+      draggedOverTaskId: string,
+      addAbove: boolean
+    ) {
+      addDraftItemToLane(
+        draggedTaskId,
+        draggedOverTaskId,
+        addAbove,
+        this.tasks
       );
-      this.tasks[indexOfUpdatedTask].laneId = laneId;
     },
     async freeUpTask(task: Task) {
-      const indexOfUpdatedTask = this.tasks.findIndex(
-        (existingTask) => existingTask.id === task.id
-      );
-      this.tasks[indexOfUpdatedTask].laneId = undefined;
+      updateLaneForItem(task.id, undefined, this.tasks);
     },
     async createUser() {
       const { data } = await axios.post("http://localhost:3000/user", {
@@ -43,16 +54,22 @@ export const useStore = defineStore({
       this.lanes.push(lane);
     },
     async addUserToLane(user: User, laneId: string) {
-      const indexOfUpdatedUser = this.users.findIndex(
-        (existingUser) => existingUser.id === user.id
+      updateLaneForItem(user.id, laneId, this.users);
+    },
+    async addDraftUserToLane(
+      draggedUserId: string,
+      draggedOverUserId: string,
+      addAbove: boolean
+    ) {
+      addDraftItemToLane(
+        draggedUserId,
+        draggedOverUserId,
+        addAbove,
+        this.users
       );
-      this.users[indexOfUpdatedUser].laneId = laneId;
     },
     async freeUpUser(user: User) {
-      const indexOfUpdatedUser = this.users.findIndex(
-        (existingUser) => existingUser.id === user.id
-      );
-      this.users[indexOfUpdatedUser].laneId = undefined;
+      updateLaneForItem(user.id, undefined, this.users);
     },
   },
   getters: {
@@ -70,3 +87,57 @@ export const useStore = defineStore({
       state.tasks.filter((task) => !task.laneId || task.laneId === ""),
   },
 });
+
+// This isn't located in the 'models' folder as it's a transient data structure
+interface DragAndDropInfo {
+  draggedItemId: string | null;
+  draggedOverItemId: string | null;
+  addAbove: boolean | null;
+  addPositionChanged: false;
+}
+
+const addDraftItemToLane = (
+  draggedItemId: string,
+  draggedOverItemId: string,
+  addAbove: boolean,
+  items: Draggable[]
+) => {
+  const draggedItem = items.find((item) => item.id === draggedItemId);
+  const draggedOverItem = items.find((item) => item.id === draggedOverItemId);
+  if (draggedItem && draggedOverItem) {
+    const fromerDraftItemIndex = items.findIndex(
+      (item) => item.id === draggedItem.id && item.isDraft === true
+    );
+    if (fromerDraftItemIndex != -1) {
+      items.splice(fromerDraftItemIndex, 1);
+    }
+    const indexOfDraggedOverItem = items.indexOf(draggedOverItem);
+    const draftItem = JSON.parse(JSON.stringify(draggedItem));
+    draftItem.isDraft = true;
+    draftItem.laneId = draggedOverItem.laneId;
+    const indertAtIndex = addAbove
+      ? indexOfDraggedOverItem
+      : indexOfDraggedOverItem + 1;
+    items.splice(indertAtIndex, 0, draftItem);
+  }
+};
+
+const updateLaneForItem = (
+  itemId: string,
+  laneId: string | undefined,
+  items: Draggable[]
+) => {
+  const indexOfUpdatedItem = items.findIndex(
+    (existingItem) => existingItem.id === itemId && !existingItem.isDraft
+  );
+  const indexOfDraftItem = items.findIndex(
+    (existingItem) =>
+      existingItem.id === itemId && existingItem.isDraft === true
+  );
+  if (indexOfDraftItem === -1) {
+    items[indexOfUpdatedItem].laneId = laneId;
+  } else {
+    items[indexOfDraftItem].isDraft = false;
+    items.splice(indexOfUpdatedItem, 1);
+  }
+};

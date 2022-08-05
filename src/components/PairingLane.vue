@@ -21,6 +21,8 @@ async function onDrop(event: DragEvent) {
   if (dataTransfer) {
     const dataTransferType = dataTransfer?.items[0].type;
     const dataTransferData = dataTransfer?.getData(dataTransferType) as string;
+    store.dragAndDropInfo.draggedItemId = null;
+    store.dragAndDropInfo.draggedOverItemId = null;
 
     if (dataTransferType === "user") {
       const userFromDropEvent: User = JSON.parse(dataTransferData);
@@ -43,18 +45,22 @@ async function onDrop(event: DragEvent) {
     @dragenter.prevent
   >
     <div class="users">
+      <!-- <TransitionGroup name="list" tag="ul"> -->
       <ul class="no-bullets">
         <li v-for="user in users" :key="user.id">
           <PairingUser :user="user" />
         </li>
       </ul>
+      <!-- </TransitionGroup> -->
     </div>
     <div class="tasks">
+      <!-- <TransitionGroup name="list" tag="ul"> -->
       <ul class="no-bullets">
         <li v-for="task in tasks" :key="task.id">
           <PairingTask :task="task" />
         </li>
       </ul>
+      <!-- </TransitionGroup> -->
     </div>
   </div>
 </template>
