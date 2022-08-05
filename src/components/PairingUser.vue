@@ -1,45 +1,24 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { useStore } from "@/stores/letspairStore";
-import { dragStartHandler, addDraftItemToList } from "@/utils/dragAndDropUtils";
 import type { User } from "@/models/User";
+import { useDragAndDrop } from "@/composables/dragAndDrop";
 const userElement = ref<HTMLElement | null>(null);
-const isDragged = ref<boolean>(false);
-const store = useStore();
 const props = defineProps<{ user: User }>();
 const userAsString = computed(() => {
   return JSON.stringify(props.user);
 });
-function onDragStart(event: DragEvent) {
-  store.dragAndDropInfo.draggedItemId = props.user.id;
-  dragStartHandler("user", userAsString.value, event);
-  isDragged.value = true;
-}
-function onDragOver(event: DragEvent) {
-  const userElementDOMRect = userElement.value?.getBoundingClientRect();
-  const positionYDraggedElement = event.pageY;
-  const draggedElementType = event.dataTransfer?.items[0].type;
-  if (userElementDOMRect && positionYDraggedElement && draggedElementType) {
-    addDraftItemToList(
-      userElementDOMRect,
-      positionYDraggedElement,
-      draggedElementType,
-      props.user.id
-    );
-  }
-}
-function onDragEnd() {
-  isDragged.value = false;
-}
+const isDragged = useDragAndDrop(
+  props.user.id,
+  "user",
+  userAsString.value,
+  userElement
+);
 </script>
 <template>
   <div
     class="user"
     :class="{ draft: user.isDraft, dragged: isDragged }"
     draggable="true"
-    @dragstart="onDragStart($event)"
-    @dragover="onDragOver($event)"
-    @dragend="onDragEnd"
     ref="userElement"
   >
     <div class="inner">
