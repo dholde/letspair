@@ -19,6 +19,13 @@ ul.no-bullets {
   padding: 0;
 }
 
+.dragged {
+  opacity: 0.5;
+}
+.draft {
+  opacity: 0.2;
+}
+
 /* 1. declare transition */
 .list-move,
 .list-enter-active,

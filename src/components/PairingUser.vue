@@ -61,10 +61,4 @@ function onDragEnd() {
   top: 50%;
   transform: translateY(-50%);
 }
-.dragged {
-  opacity: 0.5;
-}
-.draft {
-  opacity: 0.2;
-}
 </style>
