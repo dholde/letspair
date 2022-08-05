@@ -1,39 +1,24 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { addDraftItemToList } from "@/utils/dragAndDropUtils";
 import type { User } from "@/models/User";
-import { useDragStartAndDragEnd } from "@/composables/dragAndDrop";
+import { useDragAndDrop } from "@/composables/dragAndDrop";
 const userElement = ref<HTMLElement | null>(null);
 const props = defineProps<{ user: User }>();
 const userAsString = computed(() => {
   return JSON.stringify(props.user);
 });
-const isDragged = useDragStartAndDragEnd(
+const isDragged = useDragAndDrop(
   props.user.id,
   "user",
   userAsString.value,
   userElement
 );
-function onDragOver(event: DragEvent) {
-  const userElementDOMRect = userElement.value?.getBoundingClientRect();
-  const positionYDraggedElement = event.pageY;
-  const draggedElementType = event.dataTransfer?.items[0].type;
-  if (userElementDOMRect && positionYDraggedElement && draggedElementType) {
-    addDraftItemToList(
-      userElementDOMRect,
-      positionYDraggedElement,
-      draggedElementType,
-      props.user.id
-    );
-  }
-}
 </script>
 <template>
   <div
     class="user"
     :class="{ draft: user.isDraft, dragged: isDragged }"
     draggable="true"
-    @dragover="onDragOver($event)"
     ref="userElement"
   >
     <div class="inner">
