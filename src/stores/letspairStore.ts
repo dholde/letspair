@@ -4,6 +4,7 @@ import axios from "axios";
 import type { User } from "@/models/User";
 import type { Lane } from "@/models/Lane";
 import type { Draggable } from "@/models/Draggable";
+import { STATEMENT_OR_BLOCK_KEYS } from "@babel/types";
 
 export const useStore = defineStore({
   id: "letsPair",
@@ -71,6 +72,13 @@ export const useStore = defineStore({
     async freeUpUser(user: User) {
       updateLaneForItem(user.id, undefined, this.users);
     },
+    // removeDraftItem(itemType: string) {
+    //   if (itemType === "user") {
+    //     this.users = this.users.filter((user) => !user.isDraft);
+    //   } else if (itemType === "task") {
+    //     this.tasks = this.tasks.filter((task) => !task.isDraft);
+    //   }
+    // },
   },
   getters: {
     usersForLaneId: (state) => {
@@ -94,6 +102,7 @@ interface DragAndDropInfo {
   draggedOverItemId: string | null;
   addAbove: boolean | null;
   addPositionChanged: false;
+  currentLaneId: string | null;
 }
 
 const addDraftItemToLane = (
@@ -138,6 +147,7 @@ const updateLaneForItem = (
     items[indexOfUpdatedItem].laneId = laneId;
   } else {
     items[indexOfDraftItem].isDraft = false;
+    items[indexOfDraftItem].laneId = laneId;
     items.splice(indexOfUpdatedItem, 1);
   }
 };
