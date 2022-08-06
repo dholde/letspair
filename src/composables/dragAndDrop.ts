@@ -1,5 +1,28 @@
 import { useStore } from "@/stores/letspairStore";
 import { ref, onUnmounted, unref, watch, type Ref } from "vue";
+
+export function useDragStartEvent(
+  draggedItemId: string,
+  dataTransferType: string,
+  dataTransferData: string,
+  target: Ref<HTMLElement | null>
+) {
+  const isDragStarted = ref<boolean>(false);
+  const store = useStore();
+  function onDragStart(event: DragEvent) {
+    store.dragAndDropInfo.draggedItemId = draggedItemId;
+    event.dataTransfer?.setData(dataTransferType, dataTransferData);
+    isDragStarted.value = true;
+  }
+  watch(target, (value, oldValue) => {
+    oldValue?.removeEventListener("dragstart", onDragStart);
+    value?.addEventListener("dragstart", onDragStart);
+  });
+  onUnmounted(() => {
+    unref(target)?.removeEventListener("dragstart", onDragStart);
+  });
+  return isDragStarted;
+}
 export function useDragAndDrop(
   draggedItemId: string,
   dataTransferType: string,
