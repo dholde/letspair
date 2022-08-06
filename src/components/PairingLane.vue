@@ -36,29 +36,22 @@ async function onDrop(event: DragEvent) {
   }
 }
 
-// function onDragEnter(event: DragEvent) {
-//   if (store.dragAndDropInfo.currentLaneId !== props.lane.id) {
-//     store.dragAndDropInfo.currentLaneId = props.lane.id;
-//     const dataTransferType = event.dataTransfer?.items[0].type;
-//     if (dataTransferType) {
-//       store.removeDraftItem(dataTransferType);
-//     }
-//   }
-// }
+function onDragEnter(event: DragEvent) {
+  if (store.dragAndDropInfo.currentLaneId !== props.lane.id) {
+    store.dragAndDropInfo.currentLaneId = props.lane.id;
+    const dataTransferType = event.dataTransfer?.items[0].type;
+    if (dataTransferType) {
+      store.removeDraftItem(dataTransferType);
+    }
+  }
+}
 </script>
 <template>
-  <!-- <div
-    :id="lane.id"
-    class="pairing-lane"
-    @drop="onDrop($event)"
-    @dragenter="onDragEnter($event)"
-    @dragover.prevent
-    @dragenter.prevent
-  > -->
   <div
     :id="lane.id"
     class="pairing-lane"
     @drop="onDrop($event)"
+    @dragenter="onDragEnter($event)"
     @dragover.prevent
     @dragenter.prevent
   >

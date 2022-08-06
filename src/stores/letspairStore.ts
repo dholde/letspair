@@ -4,7 +4,6 @@ import axios from "axios";
 import type { User } from "@/models/User";
 import type { Lane } from "@/models/Lane";
 import type { Draggable } from "@/models/Draggable";
-import { STATEMENT_OR_BLOCK_KEYS } from "@babel/types";
 
 export const useStore = defineStore({
   id: "letsPair",
@@ -72,13 +71,13 @@ export const useStore = defineStore({
     async freeUpUser(user: User) {
       updateLaneForItem(user.id, undefined, this.users);
     },
-    // removeDraftItem(itemType: string) {
-    //   if (itemType === "user") {
-    //     this.users = this.users.filter((user) => !user.isDraft);
-    //   } else if (itemType === "task") {
-    //     this.tasks = this.tasks.filter((task) => !task.isDraft);
-    //   }
-    // },
+    removeDraftItem(itemType: string) {
+      if (itemType === "user") {
+        this.users = this.users.filter((user) => !user.isDraft);
+      } else if (itemType === "task") {
+        this.tasks = this.tasks.filter((task) => !task.isDraft);
+      }
+    },
   },
   getters: {
     usersForLaneId: (state) => {
