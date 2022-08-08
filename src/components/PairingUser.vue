@@ -2,7 +2,6 @@
 import { computed, ref } from "vue";
 import type { User } from "@/models/User";
 import {
-  useDragAndDrop,
   useDragEndEvent,
   useDragOverEvent,
   useDragStartEvent,
