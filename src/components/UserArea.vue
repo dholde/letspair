@@ -22,12 +22,6 @@ async function onDrop(event: DragEvent) {
   await axios.put("http://localhost:3000/user", userFromDropEvent);
   store.freeUpUser(userFromDropEvent);
 }
-
-function onDragOver(event: DragEvent) {
-  const draggedElement = event.target as HTMLElement;
-  const positionYDraggedElement = draggedElement.getBoundingClientRect().y;
-  console.log(`Y1: ${event.pageY}`);
-}
 </script>
 
 <template>
@@ -36,7 +30,6 @@ function onDragOver(event: DragEvent) {
     @dragenter.prevent
     @dragover.prevent
     @drop="onDrop($event)"
-    @dragover="onDragOver($event)"
   >
     Users
     <button @click="createUser">+</button>
