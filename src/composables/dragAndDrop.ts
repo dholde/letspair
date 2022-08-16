@@ -1,5 +1,5 @@
 import { useStore } from "@/stores/letspairStore";
-import { ref, onUnmounted, unref, watch, type Ref } from "vue";
+import type { Ref } from "vue";
 import { useDragEventListener } from "./event";
 export function useDragStartEvent(
   draggedItemId: string,
