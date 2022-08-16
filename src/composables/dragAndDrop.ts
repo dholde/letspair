@@ -1,6 +1,10 @@
 import { useStore } from "@/stores/letspairStore";
 import type { Ref } from "vue";
 import { useDragEventListener } from "./event";
+import axios from "axios";
+import type { Draggable } from "@/models/Draggable";
+import type { Task } from "@/models/Task";
+
 export function useDragStartEvent(
   draggedItemId: string,
   dataTransferType: string,
@@ -84,4 +88,27 @@ export function useDragOverEvent(
       }
     }
   }
+}
+
+export function useDropEvent(
+  target: Ref<HTMLElement | null>,
+  url: string,
+  dataTransferType: "task" | "user"
+) {
+  async function onDrop(event: DragEvent) {
+    event.preventDefault();
+    const dataTransfer = event.dataTransfer;
+    if (dataTransfer) {
+      const dataTransferType = dataTransfer.items[0].type;
+      const elementAsString: string = event.dataTransfer?.getData(
+        dataTransferType
+      ) as string;
+      const elementFromDropEvent = JSON.parse(elementAsString) as Draggable;
+      elementFromDropEvent.laneId = undefined;
+      await axios.put(url, elementFromDropEvent);
+      const store = useStore();
+      store.freeUpTask(elementFromDropEvent as Task);
+    }
+  }
+  useDragEventListener(target, "drop", onDrop);
 }
