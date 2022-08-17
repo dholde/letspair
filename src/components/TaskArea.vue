@@ -14,7 +14,7 @@ function createTask() {
   store.createTask();
 }
 
-useDropEvent(taskAreaElement, "http://localhost:3000/task", "task");
+useDropEvent(taskAreaElement, "http://localhost:3000/task");
 
 // async function onDrop(event: DragEvent) {
 //   event.preventDefault();

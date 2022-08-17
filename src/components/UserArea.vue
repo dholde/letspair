@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import { useStore } from "@/stores/letspairStore";
 import type { User } from "@/models/User";
 import axios from "axios";
 import PairingUser from "./PairingUser.vue";
+import { useDropEvent } from "@/composables/dragAndDrop";
 
 const store = useStore();
+const userAreaElement = ref<HTMLElement | null>(null);
 const users = computed(() => {
   return store.unassignedUsers;
 });
@@ -14,14 +16,7 @@ function createUser() {
   store.createUser();
 }
 
-async function onDrop(event: DragEvent) {
-  event.preventDefault();
-  const userAsString: string = event.dataTransfer?.getData("user") as string;
-  const userFromDropEvent = JSON.parse(userAsString) as User;
-  userFromDropEvent.laneId = undefined;
-  await axios.put("http://localhost:3000/user", userFromDropEvent);
-  store.freeUpUser(userFromDropEvent);
-}
+useDropEvent(userAreaElement, "http://localhost:3000/user");
 </script>
 
 <template>
@@ -30,6 +25,7 @@ async function onDrop(event: DragEvent) {
     @dragenter.prevent
     @dragover.prevent
     @drop="onDrop($event)"
+    ref="userAreaElement"
   >
     Users
     <button @click="createUser">+</button>

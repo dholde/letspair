@@ -1,4 +1,4 @@
-import type { Task } from "@/models/Task";
+import { Task } from "@/models/Task";
 import { defineStore } from "pinia";
 import axios from "axios";
 import type { User } from "@/models/User";
@@ -39,6 +39,13 @@ export const useStore = defineStore({
     },
     async freeUpTask(task: Task) {
       updateLaneForItem(task.id, undefined, this.tasks);
+    },
+    async removeElementFromLane(
+      element: Task | User,
+      dataTransferType: string
+    ) {
+      const elementList = dataTransferType === "task" ? this.tasks : this.users;
+      updateLaneForItem(element.id, undefined, elementList);
     },
     async createUser() {
       const { data } = await axios.post("http://localhost:3000/user", {
