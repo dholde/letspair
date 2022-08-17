@@ -1,4 +1,4 @@
-import { Task } from "@/models/Task";
+import type { Task } from "@/models/Task";
 import { defineStore } from "pinia";
 import axios from "axios";
 import type { User } from "@/models/User";

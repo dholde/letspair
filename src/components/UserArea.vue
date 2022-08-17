@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import { useStore } from "@/stores/letspairStore";
-import type { User } from "@/models/User";
-import axios from "axios";
 import PairingUser from "./PairingUser.vue";
 import { useDropEvent } from "@/composables/dragAndDrop";
 
@@ -20,13 +18,7 @@ useDropEvent(userAreaElement, "http://localhost:3000/user");
 </script>
 
 <template>
-  <div
-    id="userArea"
-    @dragenter.prevent
-    @dragover.prevent
-    @drop="onDrop($event)"
-    ref="userAreaElement"
-  >
+  <div id="userArea" @dragenter.prevent @dragover.prevent ref="userAreaElement">
     Users
     <button @click="createUser">+</button>
     <ul class="no-bullets">
