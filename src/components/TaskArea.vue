@@ -12,7 +12,7 @@ function createTask() {
   store.createTask();
 }
 
-useDropEvent(taskAreaElement, "http://localhost:3000/task");
+useDropEvent(taskAreaElement, undefined);
 </script>
 <template>
   <div id="taskArea" @dragenter.prevent @dragover.prevent ref="taskAreaElement">

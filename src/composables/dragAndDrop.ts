@@ -91,7 +91,10 @@ export function useDragOverEvent(
   }
 }
 
-export function useDropEvent(target: Ref<HTMLElement | null>, url: string) {
+export function useDropEvent(
+  target: Ref<HTMLElement | null>,
+  laneId: string | undefined
+) {
   async function onDrop(event: DragEvent) {
     event.preventDefault();
     const dataTransfer = event.dataTransfer;
@@ -101,10 +104,18 @@ export function useDropEvent(target: Ref<HTMLElement | null>, url: string) {
         dataTransferType
       ) as string;
       const elementFromDropEvent = JSON.parse(elementAsString);
-      elementFromDropEvent.laneId = undefined;
+      elementFromDropEvent.laneId = laneId;
+      const url =
+        dataTransferType === "task"
+          ? "http://localhost:3000/task"
+          : "http://localhost:3000/user";
       await axios.put(url, elementFromDropEvent);
       const store = useStore();
-      store.removeElementFromLane(elementFromDropEvent, dataTransferType);
+      store.updateLaneForItem(
+        elementFromDropEvent.id,
+        dataTransferType,
+        laneId
+      );
     }
   }
   useDragEventListener(target, "drop", onDrop);

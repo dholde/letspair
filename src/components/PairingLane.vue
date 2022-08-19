@@ -1,12 +1,14 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import { useStore } from "@/stores/letspairStore";
 import PairingUser from "./PairingUser.vue";
 import PairingTask from "./PairingTask.vue";
 import axios from "axios";
 import type { User } from "@/models/User";
 import type { Task } from "@/models/Task";
+import { useDropEvent } from "@/composables/dragAndDrop";
 const props = defineProps(["lane"]);
+const laneElement = ref<HTMLElement | null>(null);
 const store = useStore();
 const users = computed(() => {
   return store.usersForLaneId(props.lane.id);
@@ -14,27 +16,8 @@ const users = computed(() => {
 const tasks = computed(() => {
   return store.tasksForLaneId(props.lane.id);
 });
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function onDrop(event: DragEvent) {
-  event.preventDefault();
-  const dataTransfer = event.dataTransfer;
-  if (dataTransfer) {
-    const dataTransferType = dataTransfer?.items[0].type;
-    const dataTransferData = dataTransfer?.getData(dataTransferType) as string;
-    store.dragAndDropInfo.draggedItemId = null;
-    store.dragAndDropInfo.draggedOverItemId = null;
 
-    if (dataTransferType === "user") {
-      const userFromDropEvent: User = JSON.parse(dataTransferData);
-      await axios.put("http://localhost:3000/user", userFromDropEvent);
-      store.addUserToLane(userFromDropEvent, props.lane.id);
-    } else if (dataTransferType === "task") {
-      const taskFromDropEvent: Task = JSON.parse(dataTransferData);
-      await axios.put("http://localhost:3000/task", taskFromDropEvent);
-      store.addTaskToLane(taskFromDropEvent, props.lane.id);
-    }
-  }
-}
+useDropEvent(laneElement, props.lane.id);
 
 function onDragEnter(event: DragEvent) {
   if (store.dragAndDropInfo.currentLaneId !== props.lane.id) {
@@ -47,10 +30,19 @@ function onDragEnter(event: DragEvent) {
 }
 </script>
 <template>
+  <!-- <div
+    :id="lane.id"
+    class="pairing-lane"
+    ref="laneElement"
+    @drop="onDrop($event)"
+    @dragenter="onDragEnter($event)"
+    @dragover.prevent
+    @dragenter.prevent
+  > -->
   <div
     :id="lane.id"
     class="pairing-lane"
-    @drop="onDrop($event)"
+    ref="laneElement"
     @dragenter="onDragEnter($event)"
     @dragover.prevent
     @dragenter.prevent
