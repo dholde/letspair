@@ -22,9 +22,6 @@ export const useStore = defineStore({
       const task = data as Task;
       this.tasks.push(task);
     },
-    async addTaskToLane(task: Task, laneId: string) {
-      updateLaneForItem(task.id, laneId, this.tasks);
-    },
     async addDraftTaskToLane(
       draggedTaskId: string,
       draggedOverTaskId: string,
@@ -36,13 +33,6 @@ export const useStore = defineStore({
         addAbove,
         this.tasks
       );
-    },
-    async removeElementFromLane(
-      element: Task | User,
-      dataTransferType: string
-    ) {
-      const elementList = dataTransferType === "task" ? this.tasks : this.users;
-      updateLaneForItem(element.id, undefined, elementList);
     },
     async createUser() {
       const { data } = await axios.post("http://localhost:3000/user", {
@@ -56,9 +46,6 @@ export const useStore = defineStore({
       const { data } = await axios.post("http://localhost:3000/lane");
       const lane = data as Lane;
       this.lanes.push(lane);
-    },
-    async addUserToLane(user: User, laneId: string) {
-      updateLaneForItem(user.id, laneId, this.users);
     },
     async addDraftUserToLane(
       draggedUserId: string,
@@ -77,6 +64,27 @@ export const useStore = defineStore({
         this.users = this.users.filter((user) => !user.isDraft);
       } else if (itemType === "task") {
         this.tasks = this.tasks.filter((task) => !task.isDraft);
+      }
+    },
+    updateLaneForItem(
+      itemId: string,
+      itemType: string,
+      laneId: string | undefined
+    ) {
+      const items = itemType === "task" ? this.tasks : this.users;
+      const indexOfUpdatedItem = items.findIndex(
+        (existingItem) => existingItem.id === itemId && !existingItem.isDraft
+      );
+      const indexOfDraftItem = items.findIndex(
+        (existingItem) =>
+          existingItem.id === itemId && existingItem.isDraft === true
+      );
+      if (indexOfDraftItem === -1) {
+        items[indexOfUpdatedItem].laneId = laneId;
+      } else {
+        items[indexOfDraftItem].isDraft = false;
+        items[indexOfDraftItem].laneId = laneId;
+        items.splice(indexOfUpdatedItem, 1);
       }
     },
   },
@@ -128,26 +136,5 @@ const addDraftItemToLane = (
       ? indexOfDraggedOverItem
       : indexOfDraggedOverItem + 1;
     items.splice(indertAtIndex, 0, draftItem);
-  }
-};
-
-const updateLaneForItem = (
-  itemId: string,
-  laneId: string | undefined,
-  items: Draggable[]
-) => {
-  const indexOfUpdatedItem = items.findIndex(
-    (existingItem) => existingItem.id === itemId && !existingItem.isDraft
-  );
-  const indexOfDraftItem = items.findIndex(
-    (existingItem) =>
-      existingItem.id === itemId && existingItem.isDraft === true
-  );
-  if (indexOfDraftItem === -1) {
-    items[indexOfUpdatedItem].laneId = laneId;
-  } else {
-    items[indexOfDraftItem].isDraft = false;
-    items[indexOfDraftItem].laneId = laneId;
-    items.splice(indexOfUpdatedItem, 1);
   }
 };

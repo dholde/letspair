@@ -14,7 +14,7 @@ function createUser() {
   store.createUser();
 }
 
-useDropEvent(userAreaElement, "http://localhost:3000/user");
+useDropEvent(userAreaElement, undefined);
 </script>
 
 <template>
