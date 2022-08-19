@@ -17,7 +17,7 @@ useDragStartEvent(
   taskElement,
   isDragged
 );
-useDragEndEvent(taskElement, isDragged);
+useDragEndEvent(taskElement, isDragged, "task");
 useDragOverEvent(props.task.id, taskElement);
 </script>
 <template>

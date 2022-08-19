@@ -20,7 +20,7 @@ useDragStartEvent(
   userElement,
   isDragged
 );
-useDragEndEvent(userElement, isDragged);
+useDragEndEvent(userElement, isDragged, "user");
 useDragOverEvent(props.user.id, userElement);
 </script>
 <template>
