@@ -21,10 +21,13 @@ export function useDragStartEvent(
 
 export function useDragEndEvent(
   target: Ref<HTMLElement | null>,
-  isDragged: Ref<boolean>
+  isDragged: Ref<boolean>,
+  itemType: "task" | "user"
 ) {
+  const store = useStore();
   function onDragEnd() {
     isDragged.value = false;
+    store.removeDraftItem(itemType);
   }
   useDragEventListener(target, "dragend", onDragEnd);
 }
