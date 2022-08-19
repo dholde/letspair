@@ -1,18 +1,27 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import type { User } from "@/models/User";
-import { useDragAndDrop } from "@/composables/dragAndDrop";
+import {
+  useDragEndEvent,
+  useDragOverEvent,
+  useDragStartEvent,
+} from "@/composables/dragAndDrop";
 const userElement = ref<HTMLElement | null>(null);
 const props = defineProps<{ user: User }>();
 const userAsString = computed(() => {
   return JSON.stringify(props.user);
 });
-const isDragged = useDragAndDrop(
+var isDragged = ref<boolean>(false);
+
+useDragStartEvent(
   props.user.id,
   "user",
   userAsString.value,
-  userElement
+  userElement,
+  isDragged
 );
+useDragEndEvent(userElement, isDragged);
+useDragOverEvent(props.user.id, userElement);
 </script>
 <template>
   <div

@@ -1,19 +1,38 @@
 import { useStore } from "@/stores/letspairStore";
-import { ref, onUnmounted, unref, watch, type Ref } from "vue";
-export function useDragAndDrop(
+import type { Ref } from "vue";
+import { useDragEventListener } from "./event";
+import axios from "axios";
+
+export function useDragStartEvent(
   draggedItemId: string,
   dataTransferType: string,
   dataTransferData: string,
-  target: Ref<HTMLElement | null>
+  target: Ref<HTMLElement | null>,
+  isDragged: Ref<boolean>
 ) {
-  const isDragged = ref<boolean>(false);
   const store = useStore();
   function onDragStart(event: DragEvent) {
     store.dragAndDropInfo.draggedItemId = draggedItemId;
     event.dataTransfer?.setData(dataTransferType, dataTransferData);
     isDragged.value = true;
   }
+  useDragEventListener(target, "dragstart", onDragStart);
+}
 
+export function useDragEndEvent(
+  target: Ref<HTMLElement | null>,
+  isDragged: Ref<boolean>
+) {
+  function onDragEnd() {
+    isDragged.value = false;
+  }
+  useDragEventListener(target, "dragend", onDragEnd);
+}
+
+export function useDragOverEvent(
+  draggedItemId: string,
+  target: Ref<HTMLElement | null>
+) {
   function onDragOver(event: DragEvent) {
     const userElementDOMRect = target.value?.getBoundingClientRect();
     const positionYDraggedElement = event.pageY;
@@ -27,7 +46,7 @@ export function useDragAndDrop(
       );
     }
   }
-
+  useDragEventListener(target, "dragover", onDragOver);
   function addDraftItemToList(
     draggedOverElementDOMRect: DOMRect,
     draggedElementYPosition: number,
@@ -67,23 +86,23 @@ export function useDragAndDrop(
       }
     }
   }
+}
 
-  function onDragEnd() {
-    isDragged.value = false;
+export function useDropEvent(target: Ref<HTMLElement | null>, url: string) {
+  async function onDrop(event: DragEvent) {
+    event.preventDefault();
+    const dataTransfer = event.dataTransfer;
+    if (dataTransfer) {
+      const dataTransferType = dataTransfer.items[0].type;
+      const elementAsString: string = event.dataTransfer?.getData(
+        dataTransferType
+      ) as string;
+      const elementFromDropEvent = JSON.parse(elementAsString);
+      elementFromDropEvent.laneId = undefined;
+      await axios.put(url, elementFromDropEvent);
+      const store = useStore();
+      store.removeElementFromLane(elementFromDropEvent, dataTransferType);
+    }
   }
-  watch(target, (value, oldValue) => {
-    oldValue?.removeEventListener("dragstart", onDragStart);
-    oldValue?.removeEventListener("dragend", onDragEnd);
-    oldValue?.removeEventListener("dragover", onDragOver);
-    value?.addEventListener("dragstart", onDragStart);
-    value?.addEventListener("dragend", onDragEnd);
-    value?.addEventListener("dragover", onDragOver);
-  });
-  onUnmounted(() => {
-    unref(target)?.removeEventListener("dragstart", onDragStart);
-    unref(target)?.removeEventListener("dragend", onDragEnd);
-    unref(target)?.removeEventListener("dragover", onDragOver);
-  });
-
-  return isDragged;
+  useDragEventListener(target, "drop", onDrop);
 }

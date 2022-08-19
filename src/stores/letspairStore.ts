@@ -37,8 +37,12 @@ export const useStore = defineStore({
         this.tasks
       );
     },
-    async freeUpTask(task: Task) {
-      updateLaneForItem(task.id, undefined, this.tasks);
+    async removeElementFromLane(
+      element: Task | User,
+      dataTransferType: string
+    ) {
+      const elementList = dataTransferType === "task" ? this.tasks : this.users;
+      updateLaneForItem(element.id, undefined, elementList);
     },
     async createUser() {
       const { data } = await axios.post("http://localhost:3000/user", {
@@ -67,9 +71,6 @@ export const useStore = defineStore({
         addAbove,
         this.users
       );
-    },
-    async freeUpUser(user: User) {
-      updateLaneForItem(user.id, undefined, this.users);
     },
     removeDraftItem(itemType: string) {
       if (itemType === "user") {
