@@ -12,6 +12,7 @@ const userAsString = computed(() => {
   return JSON.stringify(props.user);
 });
 var isDragged = ref<boolean>(false);
+const userNameInput = ref<string | undefined>(props.user.name);
 
 useDragStartEvent(
   props.user.id,
@@ -31,7 +32,7 @@ useDragOverEvent(props.user.id, userElement);
     ref="userElement"
   >
     <div class="inner">
-      {{ user.name ? user.name : "User Name" }}
+      <input v-model="userNameInput" placeholder="User Name" />
     </div>
   </div>
 </template>
