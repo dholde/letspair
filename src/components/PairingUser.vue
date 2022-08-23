@@ -54,12 +54,30 @@ function updateUserName(event: Event) {
   height: 2em;
   position: relative;
   background-color: var(--bg-color-task);
-  margin: 5px;
+  margin: 3px;
 }
 .inner {
-  margin: 0;
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
+  height: 100%;
+  width: 100%;
+}
+
+input {
+  position: relative;
+  border-width: 0px;
+  border: none;
+  background-color: transparent;
+  padding: 5px;
+  height: 100%;
+  width: 100%;
+  -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+  -moz-box-sizing: border-box; /* Firefox, other Gecko */
+  box-sizing: border-box; /* Opera/IE 8+ */
+}
+
+input:focus {
+  outline: 3px solid var(--input-focus-color);
 }
 </style>
