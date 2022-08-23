@@ -42,7 +42,7 @@ function updateUserName(event: Event) {
     <div class="inner">
       <input
         :value="props.user.name"
-        @input="updateUserName"
+        @focusout="updateUserName"
         placeholder="User Name"
       />
     </div>
