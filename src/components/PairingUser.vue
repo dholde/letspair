@@ -1,18 +1,19 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import type { User } from "@/models/User";
+import { useStore } from "@/stores/letspairStore";
 import {
   useDragEndEvent,
   useDragOverEvent,
   useDragStartEvent,
 } from "@/composables/dragAndDrop";
+const store = useStore();
 const userElement = ref<HTMLElement | null>(null);
 const props = defineProps<{ user: User }>();
 const userAsString = computed(() => {
   return JSON.stringify(props.user);
 });
 var isDragged = ref<boolean>(false);
-const userNameInput = ref<string | undefined>(props.user.name);
 
 useDragStartEvent(
   props.user.id,
@@ -23,6 +24,13 @@ useDragStartEvent(
 );
 useDragEndEvent(userElement, isDragged, "user");
 useDragOverEvent(props.user.id, userElement);
+
+function updateUserName(event: InputEvent) {
+  const userName = (event.target as HTMLInputElement).value;
+  if (userName) {
+    store.updateUserName(props.user.id, userName);
+  }
+}
 </script>
 <template>
   <div
@@ -32,7 +40,11 @@ useDragOverEvent(props.user.id, userElement);
     ref="userElement"
   >
     <div class="inner">
-      <input v-model="userNameInput" placeholder="User Name" />
+      <input
+        :value="props.user.name"
+        @input="updateUserName"
+        placeholder="User Name"
+      />
     </div>
   </div>
 </template>
