@@ -25,7 +25,7 @@ useDragStartEvent(
 useDragEndEvent(userElement, isDragged, "user");
 useDragOverEvent(props.user.id, userElement);
 
-function updateUserName(event: InputEvent) {
+function updateUserName(event: Event) {
   const userName = (event.target as HTMLInputElement).value;
   if (userName) {
     store.updateUserName(props.user.id, userName);
