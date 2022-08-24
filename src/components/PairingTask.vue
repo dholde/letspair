@@ -133,7 +133,6 @@ input {
   position: relative;
   height: 50px;
   margin: 2px;
-  /* border-width: 0px; */
   border: none;
   background-color: transparent;
   padding: 8px;
