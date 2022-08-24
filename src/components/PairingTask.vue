@@ -128,4 +128,21 @@ function closeModal() {
 input:hover {
   background-color: var(--bg-color-main);
 }
+
+input {
+  position: relative;
+  height: 50px;
+  margin: 2px;
+  /* border-width: 0px; */
+  border: none;
+  background-color: transparent;
+  padding: 8px;
+  width: 98%;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+input:focus {
+  outline: 2px solid var(--input-focus-color);
+}
 </style>
