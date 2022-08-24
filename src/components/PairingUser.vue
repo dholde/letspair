@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import type { User } from "@/models/User";
+import { useStore } from "@/stores/letspairStore";
 import {
   useDragEndEvent,
   useDragOverEvent,
   useDragStartEvent,
 } from "@/composables/dragAndDrop";
+const store = useStore();
 const userElement = ref<HTMLElement | null>(null);
 const props = defineProps<{ user: User }>();
 const userAsString = computed(() => {
@@ -22,6 +24,13 @@ useDragStartEvent(
 );
 useDragEndEvent(userElement, isDragged, "user");
 useDragOverEvent(props.user.id, userElement);
+
+function updateUserName(event: Event) {
+  const userName = (event.target as HTMLInputElement).value;
+  if (userName) {
+    store.updateUserName(props.user.id, userName);
+  }
+}
 </script>
 <template>
   <div
@@ -31,7 +40,11 @@ useDragOverEvent(props.user.id, userElement);
     ref="userElement"
   >
     <div class="inner">
-      {{ user.name ? user.name : "User Name" }}
+      <input
+        :value="props.user.name"
+        @focusout="updateUserName"
+        placeholder="User Name"
+      />
     </div>
   </div>
 </template>
@@ -41,12 +54,30 @@ useDragOverEvent(props.user.id, userElement);
   height: 2em;
   position: relative;
   background-color: var(--bg-color-task);
-  margin: 5px;
+  margin: 3px;
 }
 .inner {
-  margin: 0;
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
+  height: 100%;
+  width: 100%;
+}
+
+input {
+  position: relative;
+  border-width: 0px;
+  border: none;
+  background-color: transparent;
+  padding: 5px;
+  height: 100%;
+  width: 100%;
+  -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+  -moz-box-sizing: border-box; /* Firefox, other Gecko */
+  box-sizing: border-box; /* Opera/IE 8+ */
+}
+
+input:focus {
+  outline: 3px solid var(--input-focus-color);
 }
 </style>

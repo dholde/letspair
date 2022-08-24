@@ -42,6 +42,13 @@ export const useStore = defineStore({
       const user = data as User;
       this.users.push(user);
     },
+    async updateUserName(userId: string, userName: string) {
+      const user = this.users.find((user) => user.id === userId);
+      if (user) {
+        user.name = userName;
+        await axios.put("http://localhost:3000/user", JSON.stringify(user));
+      }
+    },
     async createLane() {
       const { data } = await axios.post("http://localhost:3000/lane");
       const lane = data as Lane;
