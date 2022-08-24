@@ -49,7 +49,20 @@ function closeModal() {
     <!-- Modal content -->
     <div class="modal-content">
       <span class="close" @click="closeModal">&times;</span>
-      <p>Some text in the Modal..</p>
+      <div class="modal-content-wrapper">
+        <label>Description: </label>
+        <input
+          :value="props.task.decription"
+          placeholder="Add the task description here"
+        />
+        <label>Link: </label>
+        <input :value="props.task.decription" placeholder="Add the link here" />
+        <label>Link text: </label>
+        <input
+          :value="props.task.decription"
+          placeholder="Add the link text here"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -83,6 +96,11 @@ function closeModal() {
   background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
 }
 
+/*Will properly align labels and input fields regardless the close button*/
+.modal-content-wrapper {
+  overflow: auto;
+}
+
 /* Modal Content */
 .modal-content {
   background-color: #fefefe;
@@ -105,5 +123,9 @@ function closeModal() {
   color: #000;
   text-decoration: none;
   cursor: pointer;
+}
+
+input:hover {
+  background-color: var(--bg-color-main);
 }
 </style>
