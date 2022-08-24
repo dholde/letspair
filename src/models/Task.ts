@@ -4,6 +4,8 @@ export class Task implements Draggable {
   public id: string;
   public description: string;
   public order: number;
+  public link?: string;
+  public linkText?: string;
   public laneId?: string;
   public isCurrentlyDragged?: boolean;
   public isDraft?: boolean;
