@@ -56,6 +56,7 @@ function onSaveDescription(value: string) {
       <span class="close" @click="closeModal">&times;</span>
       <div class="modal-content-wrapper">
         <TextInput
+          input-type="multiLine"
           label-text="Description"
           :input-value="props.task.decription"
           placeholder="Add the task description here"

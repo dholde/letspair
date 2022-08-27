@@ -3,6 +3,7 @@ import { ref } from "vue";
 defineProps<{
   labelText: string;
   inputValue: string;
+  inputType: "singleLine" | "multiLine";
   placeholder: string;
 }>();
 const emit = defineEmits<{
@@ -12,22 +13,49 @@ const emit = defineEmits<{
 const isEdit = ref<boolean>(false);
 const inputElement = ref<HTMLInputElement | null>(null);
 function onFocus() {
+  const inputDOMElement = inputElement.value;
+  if (inputDOMElement) {
+    inputDOMElement.addEventListener("blur", onBlur);
+  }
   isEdit.value = true;
 }
 function onSave() {
-  isEdit.value = false;
-  if (inputElement.value) {
-    emit("save", inputElement.value.value);
+  const inputDOMElement = inputElement.value;
+  if (inputDOMElement) {
+    inputDOMElement.removeEventListener("blur", onBlur);
+    inputDOMElement.blur();
+    emit("save", inputDOMElement.value);
   }
+  isEdit.value = false;
 }
 function onCancel() {
+  const inputDOMElement = inputElement.value;
+  if (inputDOMElement) {
+    inputDOMElement.removeEventListener("blur", onBlur);
+    inputDOMElement.blur();
+  }
   isEdit.value = false;
 }
+
+//Only loose focus on save and cancel
+const onBlur = (event: Event) => {
+  (event.target as HTMLInputElement).focus();
+};
 </script>
 <template>
-  <div class="textInput">
+  <div class="textInputWrapper">
     <label>{{ labelText }}: </label>
     <input
+      class="input"
+      v-if="inputType === 'singleLine'"
+      ref="inputElement"
+      :value="inputValue"
+      :placeholder="placeholder"
+      @focus="onFocus"
+    />
+    <textarea
+      class="input"
+      v-if="inputType === 'multiLine'"
       ref="inputElement"
       :value="inputValue"
       :placeholder="placeholder"
@@ -41,7 +69,7 @@ function onCancel() {
 </template>
 
 <style>
-.textInput {
+.textInputWrapper {
   display: block;
   margin-bottom: 15px;
 }
@@ -49,7 +77,7 @@ input:hover {
   background-color: var(--bg-color-main);
 }
 
-input {
+.input {
   position: relative;
   height: 50px;
   margin: 2px;
@@ -61,7 +89,7 @@ input {
   -moz-box-sizing: border-box;
   box-sizing: border-box;
 }
-input:focus {
+.input:focus {
   outline: 2px solid var(--input-focus-color);
 }
 </style>
