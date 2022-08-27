@@ -29,6 +29,10 @@ function editTask() {
 function closeModal() {
   modalDisplay.value = "none";
 }
+
+function onSaveDescription(value: string) {
+  console.log(`Received in parent: ${value}`);
+}
 </script>
 <template>
   <div
@@ -55,6 +59,7 @@ function closeModal() {
           label-text="Description"
           :input-value="props.task.decription"
           placeholder="Add the task description here"
+          @save="onSaveDescription"
         />
         <!-- <label>Description: </label>
         <input

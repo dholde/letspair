@@ -5,12 +5,18 @@ defineProps<{
   inputValue: string;
   placeholder: string;
 }>();
+const emit = defineEmits(["save"]);
+
 const isEdit = ref<boolean>(false);
+const inputElement = ref<HTMLInputElement | null>(null);
 function onFocus() {
   isEdit.value = true;
 }
 function onSave() {
   isEdit.value = false;
+  if (inputElement.value) {
+    emit("save", inputElement.value.value);
+  }
 }
 function onCancel() {
   isEdit.value = false;
@@ -19,7 +25,12 @@ function onCancel() {
 <template>
   <div class="textInput">
     <label>{{ labelText }}: </label>
-    <input :value="inputValue" :placeholder="placeholder" @focus="onFocus" />
+    <input
+      ref="inputElement"
+      :value="inputValue"
+      :placeholder="placeholder"
+      @focus="onFocus"
+    />
     <div v-if="isEdit">
       <button @click="onSave">Save</button>
       <button @click="onCancel">Cancel</button>
