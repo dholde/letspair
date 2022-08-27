@@ -6,14 +6,23 @@ defineProps<{
   placeholder: string;
 }>();
 const isEdit = ref<boolean>(false);
+function onFocus() {
+  isEdit.value = true;
+}
+function onSave() {
+  isEdit.value = false;
+}
+function onCancel() {
+  isEdit.value = false;
+}
 </script>
 <template>
   <div class="textInput">
     <label>{{ labelText }}: </label>
-    <input :value="inputValue" :placeholder="placeholder" />
+    <input :value="inputValue" :placeholder="placeholder" @focus="onFocus" />
     <div v-if="isEdit">
-      <button>Save</button>
-      <button>Cancel</button>
+      <button @click="onSave">Save</button>
+      <button @click="onCancel">Cancel</button>
     </div>
   </div>
 </template>
