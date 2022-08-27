@@ -5,7 +5,9 @@ defineProps<{
   inputValue: string;
   placeholder: string;
 }>();
-const emit = defineEmits(["save"]);
+const emit = defineEmits<{
+  (e: "save", value: string): void;
+}>();
 
 const isEdit = ref<boolean>(false);
 const inputElement = ref<HTMLInputElement | null>(null);

@@ -31,7 +31,7 @@ function closeModal() {
 }
 
 function onSaveDescription(value: string) {
-  console.log(`Received in parent: ${value}`);
+  console.log(`Task description: ${value}`);
 }
 </script>
 <template>
@@ -61,11 +61,6 @@ function onSaveDescription(value: string) {
           placeholder="Add the task description here"
           @save="onSaveDescription"
         />
-        <!-- <label>Description: </label>
-        <input
-          :value="props.task.decription"
-          placeholder="Add the task description here"
-        /> -->
         <label>Link: </label>
         <input :value="props.task.decription" placeholder="Add the link here" />
         <label>Link text: </label>
