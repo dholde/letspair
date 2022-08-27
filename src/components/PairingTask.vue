@@ -5,6 +5,7 @@ import {
   useDragOverEvent,
   useDragStartEvent,
 } from "@/composables/dragAndDrop";
+import TextInput from "@/components/TextInput.vue";
 
 const props = defineProps(["task"]);
 const taskAsString = computed(() => JSON.stringify(props.task));
@@ -50,11 +51,16 @@ function closeModal() {
     <div class="modal-content">
       <span class="close" @click="closeModal">&times;</span>
       <div class="modal-content-wrapper">
-        <label>Description: </label>
+        <TextInput
+          label-text="Description"
+          :input-value="props.task.decription"
+          placeholder="Add the task description here"
+        />
+        <!-- <label>Description: </label>
         <input
           :value="props.task.decription"
           placeholder="Add the task description here"
-        />
+        /> -->
         <label>Link: </label>
         <input :value="props.task.decription" placeholder="Add the link here" />
         <label>Link text: </label>
