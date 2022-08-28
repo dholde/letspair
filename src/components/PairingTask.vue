@@ -33,6 +33,14 @@ function closeModal() {
 function onSaveDescription(value: string) {
   console.log(`Task description: ${value}`);
 }
+
+function onSaveLink(value: string) {
+  console.log(`Link: ${value}`);
+}
+
+function onSaveLinkText(value: string) {
+  console.log(`Link text: ${value}`);
+}
 </script>
 <template>
   <div
@@ -56,18 +64,25 @@ function onSaveDescription(value: string) {
       <span class="close" @click="closeModal">&times;</span>
       <div class="modal-content-wrapper">
         <TextInput
-          input-type="multiLine"
+          input-type="singleLine"
           label-text="Description"
           :input-value="props.task.decription"
           placeholder="Add the task description here"
           @save="onSaveDescription"
         />
-        <label>Link: </label>
-        <input :value="props.task.decription" placeholder="Add the link here" />
-        <label>Link text: </label>
-        <input
-          :value="props.task.decription"
+        <TextInput
+          input-type="singleLine"
+          label-text="Link"
+          :input-value="props.task.link"
+          placeholder="Add the link here"
+          @save="onSaveLink"
+        />
+        <TextInput
+          input-type="singleLine"
+          label-text="Link text"
+          :input-value="props.task.linkText"
           placeholder="Add the link text here"
+          @save="onSaveLinkText"
         />
       </div>
     </div>
