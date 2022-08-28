@@ -34,7 +34,7 @@ function closeModal() {
 }
 
 function onSaveDescription(value: string) {
-  //const task = structuredClone(props.task);
+  const task = { ...props.task };
   task.description = value;
   store.updateTask(task);
 }
