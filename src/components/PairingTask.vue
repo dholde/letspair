@@ -6,8 +6,11 @@ import {
   useDragStartEvent,
 } from "@/composables/dragAndDrop";
 import TextInput from "@/components/TextInput.vue";
+import { useStore } from "@/stores/letspairStore";
+import type { Task } from "@/models/Task";
 
-const props = defineProps(["task"]);
+const store = useStore();
+const props = defineProps<{ task: Task }>();
 const taskAsString = computed(() => JSON.stringify(props.task));
 const taskElement = ref<HTMLElement | null>(null);
 const isDragged = ref<boolean>(false);
@@ -31,7 +34,9 @@ function closeModal() {
 }
 
 function onSaveDescription(value: string) {
-  console.log(`Task description: ${value}`);
+  //const task = structuredClone(props.task);
+  task.description = value;
+  store.updateTask(task);
 }
 
 function onSaveLink(value: string) {
@@ -66,7 +71,7 @@ function onSaveLinkText(value: string) {
         <TextInput
           input-type="singleLine"
           label-text="Description"
-          :input-value="props.task.decription"
+          :input-value="props.task.description"
           placeholder="Add the task description here"
           @save="onSaveDescription"
         />

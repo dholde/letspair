@@ -2,7 +2,7 @@
 import { ref } from "vue";
 defineProps<{
   labelText: string;
-  inputValue: string;
+  inputValue: string | undefined;
   inputType: "singleLine" | "multiLine";
   placeholder: string;
 }>();
