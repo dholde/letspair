@@ -40,11 +40,15 @@ function onSaveDescription(value: string) {
 }
 
 function onSaveLink(value: string) {
-  console.log(`Link: ${value}`);
+  const task = { ...props.task };
+  task.link = value;
+  store.updateTask(task);
 }
 
 function onSaveLinkText(value: string) {
-  console.log(`Link text: ${value}`);
+  const task = { ...props.task };
+  task.linkText = value;
+  store.updateTask(task);
 }
 </script>
 <template>
