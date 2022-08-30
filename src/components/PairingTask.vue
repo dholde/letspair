@@ -42,6 +42,9 @@ function onSaveDescription(value: string) {
 function onSaveLink(value: string) {
   const task = { ...props.task };
   task.link = value;
+  if (!task.linkText || task.linkText === "") {
+    task.linkText = "link";
+  }
   store.updateTask(task);
 }
 
@@ -60,11 +63,16 @@ function onSaveLinkText(value: string) {
     @click="editTask"
   >
     <div class="inner">
-      {{
-        task.description !== ""
-          ? task.description
-          : "Add a task decription here"
-      }}
+      <div v-if="task.link">
+        <a href="{{task.link}}">{{ task.linkText }}</a>
+      </div>
+      <div>
+        {{
+          task.description !== ""
+            ? task.description
+            : "Add a task decription here"
+        }}
+      </div>
     </div>
   </div>
   <div id="myModal" class="modal" :style="{ display: modalDisplay }">
