@@ -40,11 +40,9 @@ function updateUserName(event: Event) {
     ref="userElement"
   >
     <div class="inner">
-      <input
-        :value="props.user.name"
-        @focusout="updateUserName"
-        placeholder="User Name"
-      />
+      <div class="inner">
+        {{ user.name ? user.name : "User Name" }}
+      </div>
     </div>
   </div>
 </template>
