@@ -42,10 +42,22 @@ function onSaveDescription(value: string) {
 function onSaveLink(value: string) {
   const task = { ...props.task };
   task.link = value;
-  if (!task.linkText || task.linkText === "") {
-    task.linkText = "link";
+  task.link = prependProtocol(task.link);
+  if (!hasLinkText(task)) {
+    task.linkText = value;
   }
   store.updateTask(task);
+}
+
+function hasLinkText(task: Task): boolean {
+  return task.linkText != null && task.linkText !== "";
+}
+
+function prependProtocol(taskLink: string) {
+  if (!taskLink.startsWith("http") && !taskLink.startsWith("https")) {
+    taskLink = `https://${taskLink}`;
+  }
+  return taskLink;
 }
 
 function onSaveLinkText(value: string) {
@@ -64,7 +76,7 @@ function onSaveLinkText(value: string) {
   >
     <div class="inner">
       <div v-if="task.link">
-        <a href="{{task.link}}">{{ task.linkText }}</a>
+        <a :href="task.link">{{ task.linkText }}</a>
       </div>
       <div>
         {{
