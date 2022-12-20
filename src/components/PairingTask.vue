@@ -76,7 +76,7 @@ function onSaveLinkText(value: string) {
   >
     <div class="inner">
       <div v-if="task.link">
-        <a :href="task.link">{{ task.linkText }}</a>
+        <a :href="task.link" target="_blank">{{ task.linkText }}</a>
       </div>
       <div>
         {{
