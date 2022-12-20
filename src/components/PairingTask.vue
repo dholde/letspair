@@ -120,16 +120,12 @@ function onSaveLinkText(value: string) {
 
 <style scoped>
 .task {
-  height: 2em;
-  position: relative;
+  min-height: 2em;
   background-color: var(--bg-color-task);
   margin: 5px;
 }
 .inner {
-  margin: 0;
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
+  padding: 0.5em;
 }
 
 /* The Modal (background) */
