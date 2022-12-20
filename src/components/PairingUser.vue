@@ -47,7 +47,7 @@ function updateUserName(event: Event) {
   </div>
 </template>
 
-<style>
+<style scoped>
 .user {
   height: 2em;
   position: relative;

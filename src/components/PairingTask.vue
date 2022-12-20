@@ -118,7 +118,7 @@ function onSaveLinkText(value: string) {
   </div>
 </template>
 
-<style>
+<style scoped>
 .task {
   height: 2em;
   position: relative;
