@@ -22,6 +22,13 @@ export const useStore = defineStore({
       const task = data as Task;
       this.tasks.push(task);
     },
+    async updateTask(task: Task) {
+      await axios.put("http://localhost:3000/task", JSON.stringify(task));
+      const taskToUpdate = this.tasks.find(
+        (existingTask) => existingTask.id === task.id
+      );
+      Object.assign(taskToUpdate, task);
+    },
     async addDraftTaskToLane(
       draggedTaskId: string,
       draggedOverTaskId: string,

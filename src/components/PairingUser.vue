@@ -40,16 +40,14 @@ function updateUserName(event: Event) {
     ref="userElement"
   >
     <div class="inner">
-      <input
-        :value="props.user.name"
-        @focusout="updateUserName"
-        placeholder="User Name"
-      />
+      <div class="inner">
+        {{ user.name ? user.name : "User Name" }}
+      </div>
     </div>
   </div>
 </template>
 
-<style>
+<style scoped>
 .user {
   height: 2em;
   position: relative;
@@ -64,7 +62,7 @@ function updateUserName(event: Event) {
   width: 100%;
 }
 
-input {
+/* input {
   position: relative;
   border-width: 0px;
   border: none;
@@ -72,12 +70,11 @@ input {
   padding: 5px;
   height: 100%;
   width: 100%;
-  -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
-  -moz-box-sizing: border-box; /* Firefox, other Gecko */
-  box-sizing: border-box; /* Opera/IE 8+ */
-}
+  -webkit-box-sizing: border-box; 
+  -moz-box-sizing: border-box; 
+} */
 
-input:focus {
+/* input:focus {
   outline: 3px solid var(--input-focus-color);
-}
+} */
 </style>

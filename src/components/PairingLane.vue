@@ -3,9 +3,6 @@ import { computed, ref } from "vue";
 import { useStore } from "@/stores/letspairStore";
 import PairingUser from "./PairingUser.vue";
 import PairingTask from "./PairingTask.vue";
-import axios from "axios";
-import type { User } from "@/models/User";
-import type { Task } from "@/models/Task";
 import { useDropEvent } from "@/composables/dragAndDrop";
 const props = defineProps(["lane"]);
 const laneElement = ref<HTMLElement | null>(null);
@@ -30,15 +27,6 @@ function onDragEnter(event: DragEvent) {
 }
 </script>
 <template>
-  <!-- <div
-    :id="lane.id"
-    class="pairing-lane"
-    ref="laneElement"
-    @drop="onDrop($event)"
-    @dragenter="onDragEnter($event)"
-    @dragover.prevent
-    @dragenter.prevent
-  > -->
   <div
     :id="lane.id"
     class="pairing-lane"
@@ -48,22 +36,18 @@ function onDragEnter(event: DragEvent) {
     @dragenter.prevent
   >
     <div class="users">
-      <!-- <TransitionGroup name="list" tag="ul"> -->
       <ul class="no-bullets">
         <li v-for="user in users" :key="user.id">
           <PairingUser :user="user" />
         </li>
       </ul>
-      <!-- </TransitionGroup> -->
     </div>
     <div class="tasks">
-      <!-- <TransitionGroup name="list" tag="ul"> -->
       <ul class="no-bullets">
         <li v-for="task in tasks" :key="task.id">
           <PairingTask :task="task" />
         </li>
       </ul>
-      <!-- </TransitionGroup> -->
     </div>
   </div>
 </template>
