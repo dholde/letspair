@@ -107,8 +107,8 @@ export function useDropEvent(
       elementFromDropEvent.laneId = laneId;
       const url =
         dataTransferType === "task"
-          ? "http://localhost:5173/task"
-          : "http://localhost:5173/user";
+          ? "http://localhost:5173/tasks"
+          : "http://localhost:5173/users";
       await axios.put(url, elementFromDropEvent);
       const store = useStore();
       store.updateLaneForItem(
