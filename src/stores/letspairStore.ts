@@ -18,12 +18,12 @@ export const useStore = defineStore({
   }),
   actions: {
     async createTask() {
-      const { data } = await axios.post("http://localhost:3000/task");
+      const { data } = await axios.post("http://localhost:5173/task");
       const task = data as Task;
       this.tasks.push(task);
     },
     async updateTask(task: Task) {
-      await axios.put("http://localhost:3000/task", JSON.stringify(task));
+      await axios.put("http://localhost:5173/task", JSON.stringify(task));
       const taskToUpdate = this.tasks.find(
         (existingTask) => existingTask.id === task.id
       );
@@ -42,7 +42,7 @@ export const useStore = defineStore({
       );
     },
     async createUser() {
-      const { data } = await axios.post("http://localhost:3000/user", {
+      const { data } = await axios.post("http://localhost:5173/user", {
         order: this.users.length + 1,
         name: "John Wayne",
       });
@@ -53,11 +53,11 @@ export const useStore = defineStore({
       const user = this.users.find((user) => user.id === userId);
       if (user) {
         user.name = userName;
-        await axios.put("http://localhost:3000/user", JSON.stringify(user));
+        await axios.put("http://localhost:5173/user", JSON.stringify(user));
       }
     },
     async createLane() {
-      const { data } = await axios.post("http://localhost:3000/lane");
+      const { data } = await axios.post("http://localhost:5173/lane");
       const lane = data as Lane;
       this.lanes.push(lane);
     },

@@ -12,7 +12,7 @@ interface CreateUserResponse {
 }
 
 export const restHandlers = [
-  rest.post("http://localhost:3000/task", (req, res, ctx) => {
+  rest.post("http://localhost:5173/task", (req, res, ctx) => {
     return res(
       ctx.status(201),
       ctx.json({
@@ -22,11 +22,11 @@ export const restHandlers = [
       })
     );
   }),
-  rest.put("http://localhost:3000/task", (req, res, ctx) => {
+  rest.put("http://localhost:5173/task", (req, res, ctx) => {
     return res(ctx.status(204));
   }),
   rest.post<CreateUserRequestBody, PathParams<string>, CreateUserResponse>(
-    "http://localhost:3000/user",
+    "http://localhost:5173/user",
     (req, res, ctx) => {
       const { order } = req.body;
       return res(
@@ -40,7 +40,7 @@ export const restHandlers = [
     }
   ),
 
-  rest.post("http://localhost:3000/lane", (req, res, ctx) => {
+  rest.post("http://localhost:5173/lane", (req, res, ctx) => {
     return res(
       ctx.status(201),
       ctx.json({
@@ -48,7 +48,7 @@ export const restHandlers = [
       })
     );
   }),
-  rest.put("http://localhost:3000/user", (req, res, ctx) => {
+  rest.put("http://localhost:5173/user", (req, res, ctx) => {
     return res(ctx.status(204));
   }),
 ];
