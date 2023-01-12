@@ -100,21 +100,30 @@ export const useStore = defineStore({
         items[indexOfDraftItem].laneId = laneId;
         items.splice(indexOfUpdatedItem, 1);
       }
+      updateOrder(items, itemType);
     },
   },
   getters: {
     usersForLaneId: (state) => {
       return (laneId: string) =>
-        state.users.filter((user) => user.laneId === laneId);
+        state.users
+          .filter((user) => user.laneId === laneId)
+          .sort((user1, user2) => (user1.order < user2.order ? 1 : -1));
     },
     unassignedUsers: (state) =>
-      state.users.filter((user) => !user.laneId || user.laneId === ""),
+      state.users
+        .filter((user) => !user.laneId || user.laneId === "")
+        .sort((user1, user2) => (user1.order < user2.order ? 1 : -1)),
     tasksForLaneId: (state) => {
       return (laneId: string) =>
-        state.tasks.filter((task) => task.laneId === laneId);
+        state.tasks
+          .filter((task) => task.laneId === laneId)
+          .sort((task1, task2) => (task1.order < task2.order ? 1 : -1));
     },
     unassignedTasks: (state) =>
-      state.tasks.filter((task) => !task.laneId || task.laneId === ""),
+      state.tasks
+        .filter((task) => !task.laneId || task.laneId === "")
+        .sort((task1, task2) => (task1.order < task2.order ? 1 : -1)),
   },
 });
 
@@ -146,9 +155,18 @@ const addDraftItemToLane = (
     const draftItem = JSON.parse(JSON.stringify(draggedItem));
     draftItem.isDraft = true;
     draftItem.laneId = draggedOverItem.laneId;
-    const indertAtIndex = addAbove
+    const insertAtIndex = addAbove
       ? indexOfDraggedOverItem
       : indexOfDraggedOverItem + 1;
-    items.splice(indertAtIndex, 0, draftItem);
+    items.splice(insertAtIndex, 0, draftItem);
+  }
+};
+
+const updateOrder = (items: Task[] | User[], itemType: string) => {
+  items.forEach((item, index) => (item.order = index));
+  if (itemType === "task") {
+    //Update list of tasks in backend
+  } else {
+    //Update list of users in backend
   }
 };
