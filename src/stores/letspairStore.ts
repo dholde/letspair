@@ -1,4 +1,4 @@
-import type { Task } from "@/models/Task";
+import { Task } from "@/models/Task";
 import { defineStore } from "pinia";
 import axios from "axios";
 import type { User } from "@/models/User";
@@ -18,9 +18,15 @@ export const useStore = defineStore({
   }),
   actions: {
     async createTask() {
-      const { data } = await axios.post("http://localhost:5173/tasks");
-      const task = data as Task;
-      this.tasks.push(task);
+      const unassignedTaskListLength = this.tasks.filter(
+        (task) => task.laneId == null
+      ).length;
+      const newTask = new Task(unassignedTaskListLength);
+      const response = (await axios.post(
+        "http://localhost:5173/tasks",
+        newTask
+      )) as Task;
+      this.tasks.push(response);
     },
     async updateTask(task: Task) {
       await axios.put("http://localhost:5173/tasks", JSON.stringify(task));
