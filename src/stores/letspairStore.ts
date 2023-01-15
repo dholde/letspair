@@ -22,16 +22,13 @@ export const useStore = defineStore({
         (task) => task.laneId == null
       ).length;
       const newTask = new Task(unassignedTaskListLength);
-      const response = (await axios.post(
-        "http://localhost:5173/tasks",
-        newTask
-      )) as Task;
-      this.tasks.push(response);
+      const response = await axios.post("http://localhost:5173/tasks", newTask);
+      this.tasks.push(response.data);
     },
     async updateTask(task: Task) {
       // Have to access properties via data field as props are proxies in vue3
       await axios.put(
-        `http://localhost:5173/tasks/${task.data.id}`,
+        `http://localhost:5173/tasks/${task.id}`,
         JSON.stringify(task)
       );
       const taskToUpdate = this.tasks.find(
