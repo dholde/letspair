@@ -29,7 +29,11 @@ export const useStore = defineStore({
       this.tasks.push(response);
     },
     async updateTask(task: Task) {
-      await axios.put("http://localhost:5173/tasks", JSON.stringify(task));
+      // Have to access properties via data field as props are proxies in vue3
+      await axios.put(
+        `http://localhost:5173/tasks/${task.data.id}`,
+        JSON.stringify(task)
+      );
       const taskToUpdate = this.tasks.find(
         (existingTask) => existingTask.id === task.id
       );
