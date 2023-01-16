@@ -12,7 +12,7 @@ export const db = factory({
   },
   task: {
     id: primaryKey(faker.datatype.uuid),
-    description: String,
+    description: nullable(String),
     order: Number,
     laneId: nullable(String),
     link: String,
