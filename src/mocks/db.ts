@@ -26,48 +26,41 @@ export const db = factory({
 });
 
 export const customHandlers = [
-  rest.post("http://localhost:5173/tasks/reorder", (req, res, ctx) => {
-    const tasks = JSON.parse(req.body) as Task[];
-    tasks.forEach((task) => {
-      db.task.update({
+  rest.post(
+    "http://localhost:5173/tasks/handle-lane-id-update",
+    (req, res, ctx) => {
+      const updatedTask = JSON.parse(req.body) as Task;
+      // Update laneId
+      const tasks: Task[] = db.task.findMany({
         where: {
-          id: {
-            equals: task.id,
+          laneId: {
+            equals: updatedTask.laneId,
           },
         },
-        data: {
-          order: task.order,
-        },
       });
-    });
-    // const tasks: Task[] = db.task.findMany({
-    //   where: {
-    //     laneId: {
-    //       equals: updatedTask.laneId,
-    //     },
-    //   },
-    // });
-    // tasks
-    //   .map((task) => {
-    //     if (task.order >= updatedTask.order) {
-    //       task.order = task.order + 1;
-    //       return task;
-    //     }
-    //   })
-    //   .splice(updatedTask.order, 0, updatedTask)
-    //   .forEach((task) => {
-    //     db.task.update({
-    //       where: {
-    //         id: {
-    //           equals: task!.id,
-    //         },
-    //       },
-    //       data: {
-    //         ...task,
-    //       },
-    //     });
-    //   });
-  }),
+      // Update order
+      tasks
+        .map((task) => {
+          if (task.order >= updatedTask.order) {
+            task.order = task.order + 1;
+            return task;
+          }
+        })
+        .splice(updatedTask.order, 0, updatedTask)
+        .forEach((task) => {
+          db.task.update({
+            where: {
+              id: {
+                equals: task!.id,
+              },
+            },
+            data: {
+              ...task,
+            },
+          });
+        });
+    }
+  ),
 ];
 
 export const handlers = [
