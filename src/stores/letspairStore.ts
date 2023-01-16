@@ -19,7 +19,7 @@ export const useStore = defineStore({
   actions: {
     async createTask() {
       const unassignedTaskListLength = this.tasks.filter(
-        (task) => task.laneId == null
+        (task) => task.laneId == null || task.laneId === ""
       ).length;
       const newTask = new Task(unassignedTaskListLength);
       const response = await axios.post("http://localhost:5173/tasks", newTask);
@@ -87,7 +87,7 @@ export const useStore = defineStore({
         this.tasks = this.tasks.filter((task) => !task.isDraft);
       }
     },
-    updateLaneForItem(
+    async updateLaneForItem(
       itemId: string,
       itemType: string,
       laneId: string | undefined
@@ -107,7 +107,22 @@ export const useStore = defineStore({
         items[indexOfDraftItem].laneId = laneId;
         items.splice(indexOfUpdatedItem, 1);
       }
-      updateOrder(items, itemType);
+
+      const subPath = itemType === "task" ? "tasks" : "users";
+      try {
+        const response = await axios.post(
+          `http://localhost:5173/${subPath}/handle-lane-id-update`,
+          items[indexOfDraftItem]
+        );
+        // TODO: Check for response code to be success, otherwise throw
+        const responseWithListOfItems = await axios.get(
+          `http://localhost:5173/${subPath}`
+        );
+        const itemss = responseWithListOfItems.data;
+        console.log("Hello");
+      } catch {
+        console.error("Something went wrong"); //TODO: Display error
+      }
     },
   },
   getters: {
@@ -130,7 +145,7 @@ export const useStore = defineStore({
     unassignedTasks: (state) =>
       state.tasks
         .filter((task) => !task.laneId || task.laneId === "")
-        .sort((task1, task2) => (task1.order < task2.order ? 1 : -1)),
+        .sort((task1, task2) => (task1.order < task2.order ? -1 : 1)),
   },
 });
 
@@ -166,14 +181,5 @@ const addDraftItemToLane = (
       ? indexOfDraggedOverItem
       : indexOfDraggedOverItem + 1;
     items.splice(insertAtIndex, 0, draftItem);
-  }
-};
-
-const updateOrder = (items: Task[] | User[], itemType: string) => {
-  items.forEach((item, index) => (item.order = index));
-  if (itemType === "task") {
-    //Update list of tasks in backend
-  } else {
-    //Update list of users in backend
   }
 };

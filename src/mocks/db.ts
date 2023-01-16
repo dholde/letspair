@@ -29,19 +29,20 @@ export const customHandlers = [
   rest.post(
     "http://localhost:5173/tasks/handle-lane-id-update",
     (req, res, ctx) => {
-      const updatedTask = JSON.parse(req.body) as Task;
-      // Update laneId
+      const updatedTask = req.body as Task;
+      updatedTask.laneId = updatedTask.laneId == null ? "" : updatedTask.laneId;
+      // Query all tasks with laneId
       const tasks: Task[] = db.task.findMany({
         where: {
           laneId: {
-            equals: updatedTask.laneId,
+            in: [updatedTask.laneId, ""],
           },
         },
       });
       // Update order
       tasks
         .map((task) => {
-          if (task.order >= updatedTask.order) {
+          if (task.order >= updatedTask.order && task.id !== updatedTask.id) {
             task.order = task.order + 1;
             return task;
           }
@@ -59,6 +60,7 @@ export const customHandlers = [
             },
           });
         });
+      return res(ctx.status(201), ctx.json({ status: "ok" }));
     }
   ),
 ];
