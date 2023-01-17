@@ -19,7 +19,7 @@ export const useStore = defineStore({
   actions: {
     async createTask() {
       const unassignedTaskListLength = this.tasks.filter(
-        (task) => task.laneId == null
+        (task) => task.laneId == null || task.laneId == ""
       ).length;
       const newTask = new Task(unassignedTaskListLength);
       const response = await axios.post("http://localhost:5173/tasks", newTask);
@@ -115,8 +115,6 @@ export const useStore = defineStore({
         const responseWithListOfItems = await axios.get(
           `http://localhost:5173/${subPath}`
         );
-        const itemss = responseWithListOfItems.data;
-        console.log("Hello");
       } catch {
         console.error("Something went wrong"); //TODO: Display error
       }
@@ -142,7 +140,7 @@ export const useStore = defineStore({
     unassignedTasks: (state) =>
       state.tasks
         .filter((task) => !task.laneId || task.laneId === "")
-        .sort((task1, task2) => (task1.order < task2.order ? -1 : 1)),
+        .sort((task1, task2) => task1.order - task2.order),
   },
 });
 
@@ -177,6 +175,8 @@ const addDraftItemToLane = (
     const insertAtIndex = addAbove
       ? indexOfDraggedOverItem
       : indexOfDraggedOverItem + 1;
+    draftItem.order = insertAtIndex;
+
     items.splice(insertAtIndex, 0, draftItem);
   }
 };
