@@ -99,27 +99,33 @@ export const useStore = defineStore({
       );
       const itemToUpdate = items[indexOfDraftItem];
       if (indexOfDraftItem === -1) {
-        items[indexOfUpdatedItem].laneId = laneId;
+        itemToUpdate.laneId = laneId;
       } else {
         itemToUpdate.isDraft = false;
         itemToUpdate.laneId = laneId;
         items.splice(indexOfUpdatedItem, 1);
       }
       itemToUpdate.order = items.findIndex((item) => item.id === itemId);
-
+      const oldIndexOfUpdatedItem = isDraftItemInsertedBeforeOriginalItem(
+        indexOfDraftItem,
+        indexOfUpdatedItem
+      )
+        ? indexOfUpdatedItem - 1
+        : indexOfUpdatedItem;
       const subPath = itemType === "task" ? "tasks" : "users";
       try {
         const response = await axios.post(
           `http://localhost:5173/${subPath}/handle-lane-id-update`,
           {
-            updatedTask: itemToUpdate,
-            oldIndexOfUpdatedTask: indexOfUpdatedItem,
+            updatedItem: itemToUpdate,
+            oldIndexOfUpdatedTask: oldIndexOfUpdatedItem,
           }
         );
         // TODO: Check for response code to be success, otherwise throw
         const responseWithListOfItems = await axios.get(
           `http://localhost:5173/${subPath}`
         );
+        this.tasks = responseWithListOfItems.data as Task[];
       } catch {
         console.error("Something went wrong"); //TODO: Display error
       }
@@ -185,3 +191,7 @@ const addDraftItemToLane = (
     items.splice(insertAtIndex, 0, draftItem);
   }
 };
+const isDraftItemInsertedBeforeOriginalItem = (
+  indexOfDraftItem: number,
+  indexOfOriginalItem: number
+) => indexOfDraftItem < indexOfOriginalItem;
