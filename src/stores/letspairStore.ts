@@ -91,25 +91,30 @@ export const useStore = defineStore({
     ) {
       const items = itemType === "task" ? this.tasks : this.users;
       const indexOfUpdatedItem = items.findIndex(
-        (existingItem) => existingItem.id === itemId && !existingItem.isDraft
+        (item) => item.id === itemId && !item.isDraft
       );
       const indexOfDraftItem = items.findIndex(
         (existingItem) =>
           existingItem.id === itemId && existingItem.isDraft === true
       );
+      const itemToUpdate = items[indexOfDraftItem];
       if (indexOfDraftItem === -1) {
         items[indexOfUpdatedItem].laneId = laneId;
       } else {
-        items[indexOfDraftItem].isDraft = false;
-        items[indexOfDraftItem].laneId = laneId;
+        itemToUpdate.isDraft = false;
+        itemToUpdate.laneId = laneId;
         items.splice(indexOfUpdatedItem, 1);
       }
+      itemToUpdate.order = items.findIndex((item) => item.id === itemId);
 
       const subPath = itemType === "task" ? "tasks" : "users";
       try {
         const response = await axios.post(
           `http://localhost:5173/${subPath}/handle-lane-id-update`,
-          items[indexOfDraftItem]
+          {
+            updatedTask: itemToUpdate,
+            oldIndexOfUpdatedTask: indexOfUpdatedItem,
+          }
         );
         // TODO: Check for response code to be success, otherwise throw
         const responseWithListOfItems = await axios.get(

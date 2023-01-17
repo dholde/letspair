@@ -29,7 +29,10 @@ export const customHandlers = [
   rest.post(
     "http://localhost:5173/tasks/handle-lane-id-update",
     (req, res, ctx) => {
-      const updatedTask = req.body as Task;
+      const { updatedTask, oldIndexOfUpdatedTask } = { ...req.body } as {
+        updatedTask: Task;
+        oldIndexOfUpdatedTask: number;
+      };
       updatedTask.laneId = updatedTask.laneId == null ? "" : updatedTask.laneId;
       // Query all tasks with laneId
       const tasks: Task[] = db.task.findMany({
@@ -42,12 +45,22 @@ export const customHandlers = [
       // Update order
       tasks
         .map((task) => {
-          if (task.order >= updatedTask.order && task.id !== updatedTask.id) {
-            task.order = task.order + 1;
-            return task;
+          if (task.id === updatedTask.id) {
+            task = updatedTask;
+          } else if (
+            task.order < updatedTask.order &&
+            task.order > oldIndexOfUpdatedTask
+          ) {
+            task.order = task.order - 1; // updatedTask moved from below to above the task
+          } else if (
+            task.order > updatedTask.order &&
+            task.order < oldIndexOfUpdatedTask
+          ) {
+            task.order = task.order + 1; // updatedTask moved from above to below the task
           }
+          return task;
         })
-        .splice(updatedTask.order, 0, updatedTask)
+        //.splice(updatedTask.order, 0, updatedTask)
         .forEach((task) => {
           db.task.update({
             where: {
