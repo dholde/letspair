@@ -186,9 +186,11 @@ const addDraftItemToLane = (
     const insertAtIndex = addAbove
       ? indexOfDraggedOverItem
       : indexOfDraggedOverItem + 1;
-    draftItem.order = insertAtIndex;
+    // draftItem.order = insertAtIndex;
 
     items.splice(insertAtIndex, 0, draftItem);
+    items.forEach((item, index) => (item.order = index));
+    console.log("sf");
   }
 };
 const isDraftItemInsertedBeforeOriginalItem = (
