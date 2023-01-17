@@ -148,10 +148,14 @@ export const useStore = defineStore({
           .filter((task) => task.laneId === laneId)
           .sort((task1, task2) => (task1.order < task2.order ? 1 : -1));
     },
-    unassignedTasks: (state) =>
-      state.tasks
+    unassignedTasks: (state) => {
+      const t = state.tasks
         .filter((task) => !task.laneId || task.laneId === "")
-        .sort((task1, task2) => task1.order - task2.order),
+        .sort((task1, task2) => task1.order - task2.order);
+      console.log(t);
+      state.tasks = t;
+      return state.tasks;
+    },
   },
 });
 
