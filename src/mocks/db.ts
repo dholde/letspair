@@ -76,6 +76,9 @@ export const customHandlers = [
       return res(ctx.status(201), ctx.json({ status: "ok" }));
     }
   ),
+  // rest.post("http://localhost:5173/lanes", (req, res, ctx) => {
+  //   return res(ctx.status(201), ctx.json({ status: "ok" }));
+  // }),
 ];
 
 export const handlers = [
