@@ -22,12 +22,22 @@ export const useStore = defineStore({
         (task) => task.laneId == null || task.laneId == ""
       ).length;
       const newTask = new Task(unassignedTaskListLength);
-      const response = await axios.post("http://localhost:5173/tasks", newTask);
-      this.tasks.push(response.data);
+      try {
+        const response = await axios.post(
+          "http://localhost:5173/tasks",
+          newTask
+        );
+        this.tasks.push(response.data);
+      } catch (err) {
+        console.error(err);
+      }
     },
     async updateTask(task: Task) {
-      // Have to access properties via data field as props are proxies in vue3
-      await axios.put(`http://localhost:5173/tasks/${task.id}`, task);
+      try {
+        await axios.put(`http://localhost:5173/tasks/${task.id}`, task);
+      } catch (err) {
+        console.error(err);
+      }
       const taskToUpdate = this.tasks.find(
         (existingTask) => existingTask.id === task.id
       );
@@ -46,24 +56,36 @@ export const useStore = defineStore({
       );
     },
     async createUser() {
-      const { data } = await axios.post("http://localhost:5173/users", {
-        order: this.users.length + 1,
-        name: "John Wayne",
-      });
-      const user = data as User;
-      this.users.push(user);
+      try {
+        const { data } = await axios.post("http://localhost:5173/users", {
+          order: this.users.length + 1,
+          name: "John Wayne",
+        });
+        const user = data as User;
+        this.users.push(user);
+      } catch (err) {
+        console.error(err);
+      }
     },
     async updateUserName(userId: string, userName: string) {
       const user = this.users.find((user) => user.id === userId);
       if (user) {
         user.name = userName;
-        await axios.put("http://localhost:5173/users", JSON.stringify(user));
+        try {
+          await axios.put("http://localhost:5173/users", JSON.stringify(user));
+        } catch (err) {
+          console.error(err);
+        }
       }
     },
     async createLane() {
-      const { data } = await axios.post("http://localhost:5173/lanes");
-      const lane = data as Lane;
-      this.lanes.push(lane);
+      try {
+        const { data } = await axios.post("http://localhost:5173/lanes");
+        const lane = data as Lane;
+        this.lanes.push(lane);
+      } catch (err) {
+        console.error(err);
+      }
     },
     async addDraftUserToLane(
       draggedUserId: string,
@@ -114,7 +136,7 @@ export const useStore = defineStore({
         : indexOfUpdatedItem;
       const subPath = itemType === "task" ? "tasks" : "users";
       try {
-        const response = await axios.post(
+        await axios.post(
           `http://localhost:5173/${subPath}/handle-lane-id-update`,
           {
             updatedItem: itemToUpdate,
@@ -126,8 +148,8 @@ export const useStore = defineStore({
           `http://localhost:5173/${subPath}`
         );
         this.tasks = responseWithListOfItems.data as Task[];
-      } catch {
-        console.error("Something went wrong"); //TODO: Display error
+      } catch (err) {
+        console.error(err); //TODO: Display error
       }
     },
   },
