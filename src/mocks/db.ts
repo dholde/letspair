@@ -82,8 +82,8 @@ export const customHandlers = [
 ];
 
 export const handlers = [
-  ...db.user.toHandlers("rest"),
-  ...db.task.toHandlers("rest"),
-  ...db.lane.toHandlers("rest"),
+  ...db.user.toHandlers("rest", "http://localhost:5173"),
+  ...db.task.toHandlers("rest", "http://localhost:5173"),
+  ...db.lane.toHandlers("rest", "http://localhost:5173"),
   ...customHandlers,
 ];
