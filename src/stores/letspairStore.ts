@@ -119,8 +119,9 @@ export const useStore = defineStore({
         (existingItem) =>
           existingItem.id === itemId && existingItem.isDraft === true
       );
-      const itemToUpdate = items[indexOfDraftItem];
+      let itemToUpdate = items[indexOfDraftItem];
       if (indexOfDraftItem === -1) {
+        itemToUpdate = items[indexOfUpdatedItem];
         itemToUpdate.laneId = laneId;
       } else {
         itemToUpdate.isDraft = false;
@@ -134,6 +135,7 @@ export const useStore = defineStore({
       )
         ? indexOfUpdatedItem - 1
         : indexOfUpdatedItem;
+
       const subPath = itemType === "task" ? "tasks" : "users";
       try {
         await axios.post(

@@ -1,7 +1,6 @@
 import { useStore } from "@/stores/letspairStore";
 import type { Ref } from "vue";
 import { useDragEventListener } from "./event";
-import axios from "axios";
 
 export function useDragStartEvent(
   draggedItemId: string,

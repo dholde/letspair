@@ -35,33 +35,78 @@ export const customHandlers = [
       };
       updatedItem.laneId = updatedItem.laneId == null ? "" : updatedItem.laneId;
       // Query all tasks with laneId
-      const tasks: Task[] = db.task.findMany({
+      const originalTask: Task = db.task.findFirst({
         where: {
-          laneId: {
-            in: [updatedItem.laneId, ""],
+          id: {
+            equals: updatedItem.id,
           },
         },
       });
-      // Update order
-      tasks
-        .map((task) => {
-          if (task.id === updatedItem.id) {
-            task = updatedItem;
-          } else if (
-            task.order <= updatedItem.order &&
-            task.order > oldIndexOfUpdatedTask
-          ) {
-            task.order = task.order - 1; // updatedTask moved from below to above the task
-          } else if (
-            task.order >= updatedItem.order &&
-            task.order < oldIndexOfUpdatedTask
-          ) {
-            task.order = task.order + 1; // updatedTask moved from above to below the task
+      const tasks: Task[] = db.task.findMany({
+        where: {
+          laneId: {
+            in: [updatedItem.laneId],
+          },
+        },
+      });
+      if (originalTask.laneId === updatedItem.laneId) {
+        // Update order
+        tasks
+          .map((task) => {
+            if (task.id === updatedItem.id) {
+              task = updatedItem;
+            } else if (
+              task.order <= updatedItem.order &&
+              task.order > oldIndexOfUpdatedTask
+            ) {
+              task.order = task.order - 1; // updatedTask moved from below to above the task
+            } else if (
+              task.order >= updatedItem.order &&
+              task.order < oldIndexOfUpdatedTask
+            ) {
+              task.order = task.order + 1; // updatedTask moved from above to below the task
+            }
+            return task;
+          })
+          //.splice(updatedTask.order, 0, updatedTask)
+          .forEach((task) => {
+            db.task.update({
+              where: {
+                id: {
+                  equals: task!.id,
+                },
+              },
+              data: {
+                ...task,
+              },
+            });
+          });
+      } else {
+        //Update new lane orders
+        tasks.map((task) => {
+          if (task.order >= updatedItem.order) {
+            task.order = task.order + 1;
           }
           return task;
-        })
-        //.splice(updatedTask.order, 0, updatedTask)
-        .forEach((task) => {
+        });
+        //Update old lane orders
+        const tasksFormerLane: Task[] = db.task.findMany({
+          where: {
+            laneId: {
+              equals: originalTask.laneId,
+            },
+          },
+        });
+        tasksFormerLane.forEach((task) => {
+          if (task.id === updatedItem.id) {
+            task.laneId = updatedItem.laneId;
+            task.order = updatedItem.order;
+          } else if (task.order >= oldIndexOfUpdatedTask) {
+            task.order = task.order - 1;
+          }
+        });
+        const allTasks = [...tasks, ...tasksFormerLane];
+        allTasks.forEach((task) => {
           db.task.update({
             where: {
               id: {
@@ -73,12 +118,10 @@ export const customHandlers = [
             },
           });
         });
+      }
       return res(ctx.status(201), ctx.json({ status: "ok" }));
     }
   ),
-  // rest.post("http://localhost:5173/lanes", (req, res, ctx) => {
-  //   return res(ctx.status(201), ctx.json({ status: "ok" }));
-  // }),
 ];
 
 export const handlers = [
