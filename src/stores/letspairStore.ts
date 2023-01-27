@@ -150,6 +150,7 @@ export const useStore = defineStore({
           `http://localhost:5173/${subPath}`
         );
         this.tasks = responseWithListOfItems.data as Task[];
+        console.log(this.tasks);
       } catch (err) {
         console.error(err); //TODO: Display error
       }
@@ -167,19 +168,16 @@ export const useStore = defineStore({
         .filter((user) => !user.laneId || user.laneId === "")
         .sort((user1, user2) => (user1.order < user2.order ? 1 : -1)),
     tasksForLaneId: (state) => {
-      return (laneId: string) =>
+      const tasks = (laneId: string) =>
         state.tasks
           .filter((task) => task.laneId === laneId)
           .sort((task1, task2) => (task1.order < task2.order ? 1 : -1));
+      return tasks;
     },
-    unassignedTasks: (state) => {
-      const t = state.tasks
+    unassignedTasks: (state) =>
+      state.tasks
         .filter((task) => !task.laneId || task.laneId === "")
-        .sort((task1, task2) => task1.order - task2.order);
-      console.log(t);
-      state.tasks = t;
-      return state.tasks;
-    },
+        .sort((task1, task2) => task1.order - task2.order),
   },
 });
 
