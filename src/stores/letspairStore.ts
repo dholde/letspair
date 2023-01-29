@@ -112,12 +112,9 @@ export const useStore = defineStore({
       laneId: string | undefined
     ) {
       const items = itemType === "task" ? this.tasks : this.users;
-      const indexOfUpdatedItem = items.findIndex(
-        (item) => item.id === itemId && !item.isDraft
-      );
-      const indexOfDraftItem = items.findIndex(
-        (existingItem) =>
-          existingItem.id === itemId && existingItem.isDraft === true
+      const { indexOfUpdatedItem, indexOfDraftItem } = getIndexes(
+        items,
+        itemId
       );
       let itemToUpdate = items[indexOfDraftItem];
       if (indexOfDraftItem === -1) {
@@ -150,7 +147,6 @@ export const useStore = defineStore({
           `http://localhost:5173/${subPath}`
         );
         this.tasks = responseWithListOfItems.data as Task[];
-        console.log(this.tasks);
       } catch (err) {
         console.error(err); //TODO: Display error
       }
@@ -223,3 +219,17 @@ const isDraftItemInsertedBeforeOriginalItem = (
   indexOfDraftItem: number,
   indexOfOriginalItem: number
 ) => indexOfDraftItem < indexOfOriginalItem;
+
+const getIndexes = (
+  items: Task[] | User[],
+  itemId: string
+): { indexOfUpdatedItem: number; indexOfDraftItem: number } => {
+  const indexOfUpdatedItem = items.findIndex(
+    (item) => item.id === itemId && !item.isDraft
+  );
+  const indexOfDraftItem = items.findIndex(
+    (existingItem) =>
+      existingItem.id === itemId && existingItem.isDraft === true
+  );
+  return { indexOfUpdatedItem, indexOfDraftItem };
+};
