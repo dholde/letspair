@@ -116,22 +116,19 @@ export const useStore = defineStore({
         items,
         itemId
       );
-      let itemToUpdate = items[indexOfDraftItem];
-      if (indexOfDraftItem === -1) {
-        itemToUpdate = items[indexOfUpdatedItem];
-        itemToUpdate.laneId = laneId;
-      } else {
-        itemToUpdate.isDraft = false;
-        itemToUpdate.laneId = laneId;
+      let itemToUpdate;
+      if (draftItemExists(indexOfDraftItem)) {
+        itemToUpdate = items[indexOfDraftItem];
         items.splice(indexOfUpdatedItem, 1);
+      } else {
+        itemToUpdate = items[indexOfUpdatedItem];
       }
-      itemToUpdate.order = items.findIndex((item) => item.id === itemId);
-      const oldIndexOfUpdatedItem = isDraftItemInsertedBeforeOriginalItem(
+      updateItemFields(itemToUpdate, laneId, itemId, items);
+
+      const oldIndexOfUpdatedItem = getOldIndexOfItemToUpdate(
         indexOfDraftItem,
         indexOfUpdatedItem
-      )
-        ? indexOfUpdatedItem - 1
-        : indexOfUpdatedItem;
+      );
 
       const subPath = itemType === "task" ? "tasks" : "users";
       try {
@@ -232,4 +229,31 @@ const getIndexes = (
       existingItem.id === itemId && existingItem.isDraft === true
   );
   return { indexOfUpdatedItem, indexOfDraftItem };
+};
+
+const getOldIndexOfItemToUpdate = (
+  indexOfDraftItem: number,
+  indexOfUpdatedItem: number
+): number => {
+  return isDraftItemInsertedBeforeOriginalItem(
+    indexOfDraftItem,
+    indexOfUpdatedItem
+  )
+    ? indexOfUpdatedItem - 1
+    : indexOfUpdatedItem;
+};
+
+const draftItemExists = (indexOfDraftItem: number): boolean => {
+  return indexOfDraftItem !== -1;
+};
+
+const updateItemFields = (
+  itemToUpdate: Draggable,
+  laneId: string,
+  itemId: string,
+  items: Task[] | User[]
+): void => {
+  itemToUpdate.isDraft = false;
+  itemToUpdate.laneId = laneId;
+  itemToUpdate.order = items.findIndex((item) => item.id === itemId);
 };
