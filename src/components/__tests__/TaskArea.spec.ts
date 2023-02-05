@@ -1,5 +1,5 @@
 import { describe, it } from "vitest";
-import { render, fireEvent } from "@testing-library/vue";
+import { render, fireEvent, waitFor } from "@testing-library/vue";
 import TaskArea from "@/components/TaskArea.vue";
 import { createTestingPinia } from "@pinia/testing";
 import { v4 as uuidv4 } from "uuid";
@@ -62,25 +62,28 @@ describe("TaskArea", () => {
       order: 1,
       laneId: uuidv4(),
     };
-    const { container, queryByText, findByText } = render(TaskArea, {
-      global: {
-        plugins: [
-          createTestingPinia({
-            stubActions: false,
-            initialState: {
-              letsPair: {
-                tasks: [task],
+    const { container, queryByText, findByText, getByTestId } = render(
+      TaskArea,
+      {
+        global: {
+          plugins: [
+            createTestingPinia({
+              stubActions: false,
+              initialState: {
+                letsPair: {
+                  tasks: [task],
+                },
               },
-            },
-          }),
-        ],
-      },
-    });
+            }),
+          ],
+        },
+      }
+    );
     const querytaskNameResult = queryByText(task.description);
     expect(querytaskNameResult).toBeNull;
-    const renderedComponent = container.firstElementChild;
-    if (renderedComponent) {
-      await fireEvent.drop(renderedComponent, {
+    const dropZone = container.firstElementChild;
+    if (dropZone) {
+      await fireEvent.drop(dropZone, {
         dataTransfer: {
           getData: function (dataType: string) {
             if (dataType === "task") {
@@ -90,7 +93,9 @@ describe("TaskArea", () => {
           items: [{ type: "task" }],
         },
       });
-      await findByText(task.description);
+      await waitFor(() => {
+        findByText(task.description);
+      });
     } else {
       assert.fail("The taskArea component was not rendered.");
     }
