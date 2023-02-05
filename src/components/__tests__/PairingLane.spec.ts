@@ -1,8 +1,8 @@
 import { describe, it } from "vitest";
-import { render, fireEvent } from "@testing-library/vue";
+import { render, fireEvent, waitFor } from "@testing-library/vue";
 import { createTestingPinia } from "@pinia/testing";
 import PairingLane from "@/components/PairingLane.vue";
-import { debug } from "console";
+import { nextTick } from "vue";
 import { v4 as uuidv4 } from "uuid";
 import type { Task } from "@/models/Task";
 
@@ -36,6 +36,7 @@ describe("PairingLane", () => {
     const renderedComponent = container.firstElementChild;
     if (renderedComponent) {
       const dataTransferType = "user";
+      await nextTick(); // Waiting for the next render cycle is necessary because the events handlers are registered via the watch function
       await fireEvent.drop(renderedComponent, {
         dataTransfer: {
           getData: function (dataType: string) {
@@ -50,7 +51,9 @@ describe("PairingLane", () => {
           ],
         },
       });
-      const userListItems = await findAllByRole("listitem");
+      const userListItems = await waitFor(
+        async () => await findAllByRole("listitem")
+      );
       const userListItem = userListItems[0];
       expect(userListItem.innerHTML).toContain(userName);
     } else {
@@ -86,6 +89,7 @@ describe("PairingLane", () => {
     const renderedComponent = container.firstElementChild;
     if (renderedComponent) {
       const dataTransferType = "task";
+      await nextTick(); // Waiting for the next render cycle is necessary because the events handlers are registered via the watch function
       await fireEvent.drop(renderedComponent, {
         dataTransfer: {
           getData: (dataType: string) => {
@@ -100,7 +104,9 @@ describe("PairingLane", () => {
           ],
         },
       });
-      const userListItems = await findAllByRole("listitem");
+      const userListItems = await waitFor(
+        async () => await findAllByRole("listitem")
+      );
       const userListItem = userListItems[0];
       expect(userListItem.innerHTML).toContain(task.description);
     } else {

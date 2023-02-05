@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
-import { render, fireEvent, within } from "@testing-library/vue";
+import { render, fireEvent, within, waitFor } from "@testing-library/vue";
 import LaneArea from "@/components/LaneArea.vue";
+import { nextTick } from "vue";
 import { createTestingPinia } from "@pinia/testing";
 import { retry } from "./Utils";
 import { v4 as uuidv4 } from "uuid";
@@ -56,6 +57,7 @@ describe("LaneArea", () => {
       expect(renderedPairingLane2.innerHTML).not.toContain("John Wayne");
 
       const dataTransferType = "user";
+      await nextTick(); // Waiting for the next render cycle is necessary because the events handlers are registered via the watch function
       await fireEvent.drop(renderedPairingLane2, {
         dataTransfer: {
           getData: function (dataType: string) {
@@ -74,7 +76,7 @@ describe("LaneArea", () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         renderedPairingLane2 as any as HTMLElement;
       const { findByText } = within(renderedPairingLane2AsHTMLElement);
-      await findByText("John Wayne");
+      await waitFor(async () => await findByText("John Wayne"));
       expect(renderedPairingLane1.innerHTML).not.toContain("John Wayne");
     } else {
       assert.fail(

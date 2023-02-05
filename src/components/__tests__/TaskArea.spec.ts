@@ -1,6 +1,7 @@
 import { describe, it } from "vitest";
-import { render, fireEvent, waitFor } from "@testing-library/vue";
+import { render, fireEvent } from "@testing-library/vue";
 import TaskArea from "@/components/TaskArea.vue";
+import { nextTick } from "vue";
 import { createTestingPinia } from "@pinia/testing";
 import { v4 as uuidv4 } from "uuid";
 import type { Task } from "@/models/Task";
@@ -62,27 +63,25 @@ describe("TaskArea", () => {
       order: 1,
       laneId: uuidv4(),
     };
-    const { container, queryByText, findByText, getByTestId } = render(
-      TaskArea,
-      {
-        global: {
-          plugins: [
-            createTestingPinia({
-              stubActions: false,
-              initialState: {
-                letsPair: {
-                  tasks: [task],
-                },
+    const { container, queryByText, findByText } = render(TaskArea, {
+      global: {
+        plugins: [
+          createTestingPinia({
+            stubActions: false,
+            initialState: {
+              letsPair: {
+                tasks: [task],
               },
-            }),
-          ],
-        },
-      }
-    );
+            },
+          }),
+        ],
+      },
+    });
     const querytaskNameResult = queryByText(task.description);
     expect(querytaskNameResult).toBeNull;
     const dropZone = container.firstElementChild;
     if (dropZone) {
+      await nextTick(); // Waiting for the next render cycle is necessary because the events handlers are registered via the watch function
       await fireEvent.drop(dropZone, {
         dataTransfer: {
           getData: function (dataType: string) {
@@ -93,9 +92,7 @@ describe("TaskArea", () => {
           items: [{ type: "task" }],
         },
       });
-      await waitFor(() => {
-        findByText(task.description);
-      });
+      await findByText(task.description);
     } else {
       assert.fail("The taskArea component was not rendered.");
     }

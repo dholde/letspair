@@ -1,5 +1,6 @@
 import { describe, it } from "vitest";
 import { render, fireEvent } from "@testing-library/vue";
+import { nextTick } from "vue";
 import UserArea from "@/components/UserArea.vue";
 import { createTestingPinia } from "@pinia/testing";
 import { v4 as uuidv4 } from "uuid";
@@ -66,6 +67,7 @@ describe("UserArea", () => {
     expect(queryUserNameResult).toBeNull;
     const renderedComponent = container.firstElementChild;
     if (renderedComponent) {
+      await nextTick(); // Waiting for the next render cycle is necessary because the events handlers are registered via the watch function
       await fireEvent.drop(renderedComponent, {
         dataTransfer: {
           getData: function (dataType: string) {

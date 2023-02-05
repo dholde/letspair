@@ -104,6 +104,7 @@ export function useDropEvent(
       ) as string;
       const elementFromDropEvent = JSON.parse(elementAsString);
       elementFromDropEvent.laneId = laneId;
+      console.log(`Element from drop: ${JSON.stringify(elementFromDropEvent)}`);
       const store = useStore();
       store.updateLaneForItem(
         elementFromDropEvent.id,
