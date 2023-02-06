@@ -16,6 +16,9 @@ describe("PairingTask", () => {
       laneId: "",
     };
     const { container } = render(PairingTask, {
+      props: {
+        task,
+      },
       global: {
         plugins: [
           createTestingPinia({
@@ -34,39 +37,7 @@ describe("PairingTask", () => {
       await nextTick();
       await fireEvent.dragStart(taskComponent);
       const store = useStore();
-      expect(store.$state.dragAndDropInfo.draggedItemId).toEqual("123");
+      expect(store.$state.dragAndDropInfo.draggedItemId).toEqual(task.id);
     }
   });
-  // it("should call onDrag function when start dragging the element", async () => {
-  //   const task: Task = {
-  //     id: uuidv4(),
-  //     description: "This is an important task",
-  //     order: 1,
-  //   };
-  //   const dataTransferType = "task";
-  //   const dataTransferData = JSON.stringify(task);
-  //   const wrapper = mount(PairingTask, {
-  //     props: {
-  //       task,
-  //     },
-  //   });
-  //   const onDragStart = vi.spyOn(wrapper.vm, "dragStartHandler");
-  //   await wrapper.trigger("dragstart");
-  //   expect(onDragStart).toHaveBeenCalledOnce();
-  //   expect(onDragStart).toBeCalledWith(
-  //     dataTransferType,
-  //     dataTransferData,
-  //     expect.objectContaining({ target: expect.any(HTMLDivElement) })
-  //   );
-  //   const taskElement = expect.objectContaining({
-  //     target: expect.objectContaining({
-  //       outerHTML: expect.stringContaining(task.description),
-  //     }),
-  //   });
-  //   expect(onDragStart).toBeCalledWith(
-  //     dataTransferType,
-  //     dataTransferData,
-  //     taskElement
-  //   );
-  // });
 });
