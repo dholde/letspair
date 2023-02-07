@@ -15,6 +15,40 @@ describe("PairingTask", () => {
       order: 1,
       laneId: "",
     };
+    const wrapper = mount(PairingTask, {
+      props: {
+        task,
+      },
+      global: {
+        plugins: [
+          createTestingPinia({
+            stubActions: false,
+            initialState: {
+              letsPair: {
+                tasks: [task],
+              },
+            },
+          }),
+        ],
+      },
+    });
+    if (wrapper) {
+      await nextTick();
+
+      await wrapper.vm.$nextTick();
+      const draggedTask = wrapper.find('[data-test="task"]');
+      draggedTask.trigger("dragstart");
+      await wrapper.vm.$nextTick();
+      expect(draggedTask.classes()).toContain("dragged");
+    }
+  });
+  it("should set 'draggedItemId' in store model to the id of the dragged task", async () => {
+    const task: Task = {
+      id: uuidv4(),
+      description: "Task 1",
+      order: 1,
+      laneId: "",
+    };
     const { container } = render(PairingTask, {
       props: {
         task,

@@ -68,6 +68,7 @@ function onSaveLinkText(value: string) {
 </script>
 <template>
   <div
+    data-test="task"
     class="task"
     draggable="true"
     :class="{ draft: task.isDraft, dragged: isDragged }"
