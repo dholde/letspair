@@ -1,8 +1,11 @@
 import { mount } from "@vue/test-utils";
 import PairingUser from "@/components/PairingUser.vue";
 import { v4 as uuidv4 } from "uuid";
-import { render } from "@testing-library/vue";
+import { render, fireEvent } from "@testing-library/vue";
 import { createTestingPinia } from "@pinia/testing";
+import { nextTick } from "vue";
+import type { User } from "@/models/User";
+import { useStore } from "@/stores/letspairStore";
 
 describe("PairingUser", () => {
   it("shows the user name", () => {
@@ -30,32 +33,68 @@ describe("PairingUser", () => {
     });
     expect(wrapper.attributes("draggable")).toBe("true");
   });
-  it("should call onDrag function when start dragging the element", async () => {
-    const user = { id: uuidv4(), name: "John Wayne" };
-    const dataTransferType = "user";
-    const dataTransferData = JSON.stringify(user);
+  it("should set 'isDragged' prop to ture when start dragging it", async () => {
+    const user: User = {
+      id: uuidv4(),
+      order: 1,
+      laneId: "",
+    };
     const wrapper = mount(PairingUser, {
       props: {
         user,
       },
+      global: {
+        plugins: [
+          createTestingPinia({
+            stubActions: false,
+            initialState: {
+              letsPair: {
+                users: [user],
+              },
+            },
+          }),
+        ],
+      },
     });
-    const onDragStart = vi.spyOn(wrapper.vm, "dragStartHandler");
-    await wrapper.trigger("dragstart");
-    expect(onDragStart).toHaveBeenCalledOnce();
-    expect(onDragStart).toBeCalledWith(
-      dataTransferType,
-      dataTransferData,
-      expect.objectContaining({ target: expect.any(HTMLDivElement) })
-    );
-    const userElement = expect.objectContaining({
-      target: expect.objectContaining({
-        outerHTML: expect.stringContaining(`John Wayne`),
-      }),
+    if (wrapper) {
+      await nextTick();
+
+      await wrapper.vm.$nextTick();
+      const draggedTask = wrapper.find('[data-test="user"]');
+      draggedTask.trigger("dragstart");
+      await wrapper.vm.$nextTick();
+      expect(draggedTask.classes()).toContain("dragged");
+    }
+  });
+  it("should set 'draggedItemId' in store model to the id of the dragged task", async () => {
+    const user: User = {
+      id: uuidv4(),
+      order: 1,
+      laneId: "",
+    };
+    const { container } = render(PairingUser, {
+      props: {
+        user,
+      },
+      global: {
+        plugins: [
+          createTestingPinia({
+            stubActions: false,
+            initialState: {
+              letsPair: {
+                users: [user],
+              },
+            },
+          }),
+        ],
+      },
     });
-    expect(onDragStart).toBeCalledWith(
-      dataTransferType,
-      dataTransferData,
-      userElement
-    );
+    const taskComponent = container.firstElementChild;
+    if (taskComponent) {
+      await nextTick();
+      await fireEvent.dragStart(taskComponent);
+      const store = useStore();
+      expect(store.$state.dragAndDropInfo.draggedItemId).toEqual(user.id);
+    }
   });
 });

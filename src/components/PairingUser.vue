@@ -34,6 +34,7 @@ function updateUserName(event: Event) {
 </script>
 <template>
   <div
+    data-test="user"
     class="user"
     :class="{ draft: user.isDraft, dragged: isDragged }"
     draggable="true"
