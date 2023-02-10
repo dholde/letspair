@@ -41,7 +41,7 @@ export const useStore = defineStore({
       const taskToUpdate = this.tasks.find(
         (existingTask) => existingTask.id === task.id
       );
-      Object.assign(taskToUpdate, task);
+      Object.assign(taskToUpdate as Task, task);
     },
     async addDraftTaskToLane(
       draggedTaskId: string,
@@ -56,10 +56,12 @@ export const useStore = defineStore({
       );
     },
     async createUser() {
+      const unassignedUserListLength = this.users.filter(
+        (user) => user.laneId == null || user.laneId == ""
+      ).length;
       try {
         const { data } = await axios.post("http://localhost:5173/users", {
-          order: this.users.length + 1,
-          name: "John Wayne",
+          order: unassignedUserListLength,
         });
         const user = data as User;
         this.users.push(user);
