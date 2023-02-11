@@ -186,7 +186,7 @@ const handleNoLaneChange = (
   updatedItem: Task | User,
   oldIndexOfUpdatedItem: number
 ) => {
-  const items: Task[] | User[] = items.map((item) => {
+  const itemsWithUpdatedOrders: Task[] | User[] = items.map((item) => {
     if (item.id === updatedItem.id) {
       item = updatedItem;
     } else if (
@@ -203,7 +203,7 @@ const handleNoLaneChange = (
     return item;
   });
   if (itemType === "task") {
-    items.forEach((task) => {
+    itemsWithUpdatedOrders.forEach((task) => {
       db.task.update({
         where: {
           id: {
@@ -248,37 +248,12 @@ const handleDraggableItemLaneIdUpdate = (
   );
 
   if (originalTask.laneId === updatedItem.laneId) {
-    // Update order
-    tasks
-      .map((task) => {
-        if (task.id === updatedItem.id) {
-          task = updatedItem;
-        } else if (
-          task.order <= updatedItem.order &&
-          task.order > oldIndexOfUpdatedTask
-        ) {
-          task.order = task.order - 1; // updatedTask moved from below to above the task
-        } else if (
-          task.order >= updatedItem.order &&
-          task.order < oldIndexOfUpdatedTask
-        ) {
-          task.order = task.order + 1; // updatedTask moved from above to below the task
-        }
-        return task;
-      })
-      //.splice(updatedTask.order, 0, updatedTask)
-      .forEach((task) => {
-        db.task.update({
-          where: {
-            id: {
-              equals: task!.id,
-            },
-          },
-          data: {
-            ...task,
-          },
-        });
-      });
+    handleNoLaneChange(
+      updatedItemType,
+      items,
+      updatedItem.id,
+      oldIndexOfUpdatedTask
+    );
   } else {
     //Update new lane orders
     tasks.map((task) => {
