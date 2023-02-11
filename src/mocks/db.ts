@@ -207,7 +207,7 @@ const handleNoLaneChange = (
       db.task.update({
         where: {
           id: {
-            equals: task!.id,
+            equals: task?.id,
           },
         },
         data: {
@@ -220,7 +220,7 @@ const handleNoLaneChange = (
       db.user.update({
         where: {
           id: {
-            equals: user!.id,
+            equals: user?.id,
           },
         },
         data: {
