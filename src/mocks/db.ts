@@ -126,16 +126,16 @@ export const customHandlers = [
   rest.post(
     "http://localhost:5173/users/handle-lane-id-update",
     (req, res, ctx) => {
-      const { updatedTask, oldIndexOfUpdatedTask } = {
+      const { updatedItem, oldIndexOfUpdatedItem } = {
         ...req.body,
       } as {
-        updatedTask: Task;
-        oldIndexOfUpdatedTask: number;
+        updatedItem: User;
+        oldIndexOfUpdatedItem: number;
       };
       handleDraggableItemLaneIdUpdate(
-        "task",
-        updatedTask,
-        oldIndexOfUpdatedTask
+        "user",
+        updatedItem,
+        oldIndexOfUpdatedItem
       );
       return res(ctx.status(201), ctx.json({ status: "ok" }));
     }
