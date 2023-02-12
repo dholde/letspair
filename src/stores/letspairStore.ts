@@ -138,14 +138,18 @@ export const useStore = defineStore({
           `http://localhost:5173/${subPath}/handle-lane-id-update`,
           {
             updatedItem: itemToUpdate,
-            oldIndexOfUpdatedTask: oldIndexOfUpdatedItem,
+            oldIndexOfUpdatedItem: oldIndexOfUpdatedItem,
           }
         );
         // TODO: Check for response code to be success, otherwise throw
         const responseWithListOfItems = await axios.get(
           `http://localhost:5173/${subPath}`
         );
-        this.tasks = responseWithListOfItems.data as Task[];
+        if (itemType === "task") {
+          this.tasks = responseWithListOfItems.data as Task[];
+        } else {
+          this.users = responseWithListOfItems.data as User[];
+        }
       } catch (err) {
         console.error(err); //TODO: Display error
       }
