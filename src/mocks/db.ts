@@ -2,9 +2,7 @@ import { factory, primaryKey, nullable } from "@mswjs/data";
 import { faker } from "@faker-js/faker";
 import { rest } from "msw";
 import type { Task } from "@/models/Task";
-import type { Entity } from "@mswjs/data/lib/glossary";
 import type { User } from "@/models/User";
-import { userInfo } from "os";
 
 export const db = factory({
   user: {
@@ -144,7 +142,7 @@ export const customHandlers = [
   ),
 ];
 
-const findOridinalItem = (
+const findOriginalItem = (
   itemType: "task" | "user",
   itemId: string
 ): Task | User => {
@@ -231,6 +229,82 @@ const handleNoLaneChange = (
   }
 };
 
+const handleLaneChange = (
+  itemsCurrentLane: Task[] | User[],
+  itemType: "task" | "user",
+  updatedItem: Task | User,
+  originalItem: Task | User,
+  oldIndexOfUpdatedItem: number
+) => {
+  //Update new lane orders
+  itemsCurrentLane.map((item) => {
+    if (item.order >= updatedItem.order) {
+      item.order = item.order + 1;
+    }
+    return item;
+  });
+  //Update old lane orders
+  if (itemType === "task") {
+    const itemsFormerLane = db.task.findMany({
+      where: {
+        laneId: {
+          equals: originalItem.laneId,
+        },
+      },
+    });
+    itemsFormerLane.forEach((item) => {
+      if (item.id === updatedItem.id) {
+        item.laneId = updatedItem.laneId;
+        item.order = updatedItem.order;
+      } else if (item.order >= oldIndexOfUpdatedItem) {
+        item.order = item.order - 1;
+      }
+    });
+    const allItems = [...itemsCurrentLane, ...itemsFormerLane];
+    allItems.forEach((item) => {
+      db.task.update({
+        where: {
+          id: {
+            equals: item!.id,
+          },
+        },
+        data: {
+          ...item,
+        },
+      });
+    });
+  } else {
+    const itemsFormerLane = db.user.findMany({
+      where: {
+        laneId: {
+          equals: originalItem.laneId,
+        },
+      },
+    });
+    itemsFormerLane.forEach((item) => {
+      if (item.id === updatedItem.id) {
+        item.laneId = updatedItem.laneId;
+        item.order = updatedItem.order;
+      } else if (item.order >= oldIndexOfUpdatedItem) {
+        item.order = item.order - 1;
+      }
+    });
+    const allItems = [...itemsCurrentLane, ...itemsFormerLane];
+    allItems.forEach((item) => {
+      db.user.update({
+        where: {
+          id: {
+            equals: item!.id,
+          },
+        },
+        data: {
+          ...item,
+        },
+      });
+    });
+  }
+};
+
 const handleDraggableItemLaneIdUpdate = (
   updatedItemType: "task" | "user",
   updatedItem: Task | User,
@@ -238,59 +312,32 @@ const handleDraggableItemLaneIdUpdate = (
 ) => {
   updatedItem.laneId = updatedItem.laneId == null ? "" : updatedItem.laneId;
   // Query all tasks with laneId
-  const originalTask: Task | User = findOridinalItem(
+  const originalItem: Task | User = findOriginalItem(
     updatedItemType,
     updatedItem.id
   );
-  const items: Task[] | User[] = findItemsForLaneId(
+  const itemsCurrentLane: Task[] | User[] = findItemsForLaneId(
     updatedItemType,
     updatedItem.laneId
   );
 
-  if (originalTask.laneId === updatedItem.laneId) {
+  if (originalItem.laneId === updatedItem.laneId) {
     handleNoLaneChange(
       updatedItemType,
-      items,
-      updatedItem.id,
+      itemsCurrentLane,
+      updatedItem,
+      originalItem,
       oldIndexOfUpdatedTask
     );
   } else {
     //Update new lane orders
-    tasks.map((task) => {
-      if (task.order >= updatedItem.order) {
-        task.order = task.order + 1;
-      }
-      return task;
-    });
-    //Update old lane orders
-    const tasksFormerLane: Task[] = db.task.findMany({
-      where: {
-        laneId: {
-          equals: originalTask.laneId,
-        },
-      },
-    });
-    tasksFormerLane.forEach((task) => {
-      if (task.id === updatedItem.id) {
-        task.laneId = updatedItem.laneId;
-        task.order = updatedItem.order;
-      } else if (task.order >= oldIndexOfUpdatedTask) {
-        task.order = task.order - 1;
-      }
-    });
-    const allTasks = [...tasks, ...tasksFormerLane];
-    allTasks.forEach((task) => {
-      db.task.update({
-        where: {
-          id: {
-            equals: task!.id,
-          },
-        },
-        data: {
-          ...task,
-        },
-      });
-    });
+    handleLaneChange(
+      itemsCurrentLane,
+      updatedItemType,
+      updatedItem,
+      originalItem,
+      oldIndexOfUpdatedTask
+    );
   }
 };
 
