@@ -74,7 +74,10 @@ export const useStore = defineStore({
       if (user) {
         user.name = userName;
         try {
-          await axios.put("http://localhost:5173/users", JSON.stringify(user));
+          await axios.put(
+            `http://localhost:5173/users/${userId}`,
+            JSON.stringify(user)
+          );
         } catch (err) {
           console.error(err);
         }
