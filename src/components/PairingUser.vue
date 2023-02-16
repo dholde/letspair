@@ -42,6 +42,7 @@ function updateUserName(event: Event) {
   >
     <div class="inner">
       <input
+        :value="user.name"
         type="text"
         placeholder="Name"
         class="input"

@@ -74,10 +74,7 @@ export const useStore = defineStore({
       if (user) {
         user.name = userName;
         try {
-          await axios.put(
-            `http://localhost:5173/users/${userId}`,
-            JSON.stringify(user)
-          );
+          await axios.put(`http://localhost:5173/users/${userId}`, user);
         } catch (err) {
           console.error(err);
         }
@@ -152,6 +149,7 @@ export const useStore = defineStore({
           this.tasks = responseWithListOfItems.data as Task[];
         } else {
           this.users = responseWithListOfItems.data as User[];
+          console.log(this.users);
         }
       } catch (err) {
         console.error(err); //TODO: Display error
