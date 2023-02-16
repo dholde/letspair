@@ -11,6 +11,17 @@ export function useDragStartEvent(
 ) {
   const store = useStore();
   function onDragStart(event: DragEvent) {
+    if (target.value) {
+      const children = target.value.children;
+      Array.from(children).forEach((child) => {
+        Array.from(child.children).forEach((subChild) => {
+          console.log(`TagName: ${subChild.tagName}`);
+          if (subChild.tagName === "INPUT") {
+            (subChild as HTMLFormElement).disabled = true;
+          }
+        });
+      });
+    }
     store.dragAndDropInfo.draggedItemId = draggedItemId;
     event.dataTransfer?.setData(dataTransferType, dataTransferData);
     isDragged.value = true;
