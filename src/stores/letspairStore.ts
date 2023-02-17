@@ -19,10 +19,30 @@ export const useStore = defineStore({
   actions: {
     async deleteItem(itemType: string, itemId: string) {
       if (itemType === "task") {
-        console.log("Delete task");
-        return;
+        try {
+          const response = await axios.delete(
+            `http://localhost:5173/tasks/${itemId}`
+          );
+          if (response.statusText === "OK") {
+            const response = await axios.get("http://localhost:5173/tasks/");
+            this.tasks = response.data as Task[];
+          }
+        } catch (err) {
+          console.error(err);
+        }
+      } else {
+        try {
+          const response = await axios.delete(
+            `http://localhost:5173/users/${itemId}`
+          );
+          if (response.statusText === "OK") {
+            const response = await axios.get("http://localhost:5173/users/");
+            this.users = response.data as User[];
+          }
+        } catch (err) {
+          console.error(err);
+        }
       }
-      console.log("Delete user");
     },
     async createTask() {
       const unassignedTaskListLength = this.tasks.filter(
