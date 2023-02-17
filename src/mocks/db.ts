@@ -27,6 +27,68 @@ export const db = factory({
 });
 
 export const customHandlers = [
+  rest.post("http://localhost:5173/delete-item", (req, res, ctx) => {
+    const { itemType, itemId, order } = { ...req.body } as {
+      itemType: string;
+      itemId: string;
+      order: number;
+    };
+    if (itemType === "task") {
+      db.task.delete({
+        where: {
+          id: {
+            equals: itemId,
+          },
+        },
+      });
+      const tasksWithGreaterOrder = db.task.findMany({
+        where: {
+          order: {
+            gt: order,
+          },
+        },
+      });
+      db.task.updateMany({
+        where: {
+          id: {
+            in: tasksWithGreaterOrder.map((task) => task.id),
+          },
+        },
+        data: {
+          order: (order) => order - 1,
+        },
+      });
+      const tasks = db.task.findMany({});
+      return res(ctx.status(200), ctx.json(tasks));
+    } else {
+      db.user.delete({
+        where: {
+          id: {
+            equals: itemId,
+          },
+        },
+      });
+      const usersWithGreaterOrder = db.user.findMany({
+        where: {
+          order: {
+            gt: order,
+          },
+        },
+      });
+      db.user.updateMany({
+        where: {
+          id: {
+            in: usersWithGreaterOrder.map((user) => user.id),
+          },
+        },
+        data: {
+          order: (order) => order - 1,
+        },
+      });
+      const users = db.user.findMany({});
+      return res(ctx.status(200), ctx.json(users));
+    }
+  }),
   rest.post(
     "http://localhost:5173/tasks/handle-lane-id-update",
     (req, res, ctx) => {

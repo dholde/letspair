@@ -17,31 +17,20 @@ export const useStore = defineStore({
     } as DragAndDropInfo,
   }),
   actions: {
-    async deleteItem(itemType: string, itemId: string) {
-      if (itemType === "task") {
-        try {
-          const response = await axios.delete(
-            `http://localhost:5173/tasks/${itemId}`
-          );
-          if (response.statusText === "OK") {
-            const response = await axios.get("http://localhost:5173/tasks/");
-            this.tasks = response.data as Task[];
-          }
-        } catch (err) {
-          console.error(err);
+    async deleteItem(itemType: string, itemId: string, order: number) {
+      try {
+        const response = await axios.post("http://localhost:5173/delete-item", {
+          itemType,
+          itemId,
+          order,
+        });
+        if (itemType === "task") {
+          this.tasks = response.data as Task[];
+        } else {
+          this.users = response.data as User[];
         }
-      } else {
-        try {
-          const response = await axios.delete(
-            `http://localhost:5173/users/${itemId}`
-          );
-          if (response.statusText === "OK") {
-            const response = await axios.get("http://localhost:5173/users/");
-            this.users = response.data as User[];
-          }
-        } catch (err) {
-          console.error(err);
-        }
+      } catch (err) {
+        console.error(err);
       }
     },
     async createTask() {

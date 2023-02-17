@@ -118,7 +118,11 @@ export function useDropEvent(
       console.log(`Element from drop: ${JSON.stringify(elementFromDropEvent)}`);
       const store = useStore();
       if (target.value && target.value.id === "deletionArea") {
-        store.deleteItem(dataTransferType, elementFromDropEvent.id);
+        store.deleteItem(
+          dataTransferType,
+          elementFromDropEvent.id,
+          elementFromDropEvent.order
+        );
       } else {
         store.updateLaneForItem(
           elementFromDropEvent.id,
