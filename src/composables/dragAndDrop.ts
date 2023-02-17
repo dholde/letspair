@@ -1,7 +1,6 @@
 import { useStore } from "@/stores/letspairStore";
 import type { Ref } from "vue";
 import { useDragEventListener } from "./event";
-import axios from "axios";
 
 export function useDragStartEvent(
   draggedItemId: string,
@@ -12,6 +11,17 @@ export function useDragStartEvent(
 ) {
   const store = useStore();
   function onDragStart(event: DragEvent) {
+    if (target.value) {
+      const children = target.value.children;
+      Array.from(children).forEach((child) => {
+        Array.from(child.children).forEach((subChild) => {
+          console.log(`TagName: ${subChild.tagName}`);
+          if (subChild.tagName === "INPUT") {
+            (subChild as HTMLFormElement).disabled = true;
+          }
+        });
+      });
+    }
     store.dragAndDropInfo.draggedItemId = draggedItemId;
     event.dataTransfer?.setData(dataTransferType, dataTransferData);
     isDragged.value = true;
@@ -105,11 +115,7 @@ export function useDropEvent(
       ) as string;
       const elementFromDropEvent = JSON.parse(elementAsString);
       elementFromDropEvent.laneId = laneId;
-      const url =
-        dataTransferType === "task"
-          ? "http://localhost:3000/task"
-          : "http://localhost:3000/user";
-      await axios.put(url, elementFromDropEvent);
+      console.log(`Element from drop: ${JSON.stringify(elementFromDropEvent)}`);
       const store = useStore();
       store.updateLaneForItem(
         elementFromDropEvent.id,

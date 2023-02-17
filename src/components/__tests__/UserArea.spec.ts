@@ -1,5 +1,6 @@
 import { describe, it } from "vitest";
 import { render, fireEvent } from "@testing-library/vue";
+import { nextTick } from "vue";
 import UserArea from "@/components/UserArea.vue";
 import { createTestingPinia } from "@pinia/testing";
 import { v4 as uuidv4 } from "uuid";
@@ -64,15 +65,17 @@ describe("UserArea", () => {
     });
     const queryUserNameResult = queryByText("John Wayne");
     expect(queryUserNameResult).toBeNull;
-    const renderedComponent = container.firstElementChild;
-    if (renderedComponent) {
-      await fireEvent.drop(renderedComponent, {
+    const dropZone = container.firstElementChild;
+    if (dropZone) {
+      await nextTick(); // Waiting for the next render cycle is necessary because the events handlers are registered via the watch function
+      await fireEvent.drop(dropZone, {
         dataTransfer: {
           getData: function (dataType: string) {
             if (dataType === "user") {
               return JSON.stringify(user);
             }
           },
+          items: [{ type: "user" }],
         },
       });
       await findByText("John Wayne");

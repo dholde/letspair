@@ -34,15 +34,23 @@ function updateUserName(event: Event) {
 </script>
 <template>
   <div
+    data-test="user"
     class="user"
     :class="{ draft: user.isDraft, dragged: isDragged }"
     draggable="true"
     ref="userElement"
   >
     <div class="inner">
-      <div class="inner">
+      <input
+        :value="user.name"
+        type="text"
+        placeholder="Name"
+        class="input"
+        @focusout="updateUserName"
+      />
+      <!-- <div class="inner">
         {{ user.name ? user.name : "User Name" }}
-      </div>
+      </div> -->
     </div>
   </div>
 </template>
@@ -53,6 +61,7 @@ function updateUserName(event: Event) {
   position: relative;
   background-color: var(--bg-color-task);
   margin: 3px;
+  padding: 2px;
 }
 .inner {
   position: absolute;
@@ -60,6 +69,29 @@ function updateUserName(event: Event) {
   transform: translateY(-50%);
   height: 100%;
   width: 100%;
+}
+
+/* input:hover {
+  background-color: var(--bg-color-main);
+} */
+
+.input {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 100%;
+  width: 100%;
+  border: none;
+  background-color: transparent;
+  padding: 8px;
+  width: 98%;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  cursor: default;
+}
+.input:focus {
+  outline: 2px solid var(--input-focus-color);
 }
 
 /* input {

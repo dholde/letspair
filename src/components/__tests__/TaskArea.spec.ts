@@ -1,6 +1,7 @@
 import { describe, it } from "vitest";
 import { render, fireEvent } from "@testing-library/vue";
 import TaskArea from "@/components/TaskArea.vue";
+import { nextTick } from "vue";
 import { createTestingPinia } from "@pinia/testing";
 import { v4 as uuidv4 } from "uuid";
 import type { Task } from "@/models/Task";
@@ -78,9 +79,10 @@ describe("TaskArea", () => {
     });
     const querytaskNameResult = queryByText(task.description);
     expect(querytaskNameResult).toBeNull;
-    const renderedComponent = container.firstElementChild;
-    if (renderedComponent) {
-      await fireEvent.drop(renderedComponent, {
+    const dropZone = container.firstElementChild;
+    if (dropZone) {
+      await nextTick(); // Waiting for the next render cycle is necessary because the events handlers are registered via the watch function
+      await fireEvent.drop(dropZone, {
         dataTransfer: {
           getData: function (dataType: string) {
             if (dataType === "task") {

@@ -1,4 +1,4 @@
-import type { Task } from "@/models/Task";
+import { Task } from "@/models/Task";
 import { defineStore } from "pinia";
 import axios from "axios";
 import type { User } from "@/models/User";
@@ -18,16 +18,30 @@ export const useStore = defineStore({
   }),
   actions: {
     async createTask() {
-      const { data } = await axios.post("http://localhost:3000/task");
-      const task = data as Task;
-      this.tasks.push(task);
+      const unassignedTaskListLength = this.tasks.filter(
+        (task) => task.laneId == null || task.laneId == ""
+      ).length;
+      const newTask = new Task(unassignedTaskListLength);
+      try {
+        const response = await axios.post(
+          "http://localhost:5173/tasks",
+          newTask
+        );
+        this.tasks.push(response.data);
+      } catch (err) {
+        console.error(err);
+      }
     },
     async updateTask(task: Task) {
-      await axios.put("http://localhost:3000/task", JSON.stringify(task));
+      try {
+        await axios.put(`http://localhost:5173/tasks/${task.id}`, task);
+      } catch (err) {
+        console.error(err);
+      }
       const taskToUpdate = this.tasks.find(
         (existingTask) => existingTask.id === task.id
       );
-      Object.assign(taskToUpdate, task);
+      Object.assign(taskToUpdate as Task, task);
     },
     async addDraftTaskToLane(
       draggedTaskId: string,
@@ -42,24 +56,38 @@ export const useStore = defineStore({
       );
     },
     async createUser() {
-      const { data } = await axios.post("http://localhost:3000/user", {
-        order: this.users.length + 1,
-        name: "John Wayne",
-      });
-      const user = data as User;
-      this.users.push(user);
+      const unassignedUserListLength = this.users.filter(
+        (user) => user.laneId == null || user.laneId == ""
+      ).length;
+      try {
+        const { data } = await axios.post("http://localhost:5173/users", {
+          order: unassignedUserListLength,
+        });
+        const user = data as User;
+        this.users.push(user);
+      } catch (err) {
+        console.error(err);
+      }
     },
     async updateUserName(userId: string, userName: string) {
       const user = this.users.find((user) => user.id === userId);
       if (user) {
         user.name = userName;
-        await axios.put("http://localhost:3000/user", JSON.stringify(user));
+        try {
+          await axios.put(`http://localhost:5173/users/${userId}`, user);
+        } catch (err) {
+          console.error(err);
+        }
       }
     },
     async createLane() {
-      const { data } = await axios.post("http://localhost:3000/lane");
-      const lane = data as Lane;
-      this.lanes.push(lane);
+      try {
+        const { data } = await axios.post("http://localhost:5173/lanes");
+        const lane = data as Lane;
+        this.lanes.push(lane);
+      } catch (err) {
+        console.error(err);
+      }
     },
     async addDraftUserToLane(
       draggedUserId: string,
@@ -80,41 +108,76 @@ export const useStore = defineStore({
         this.tasks = this.tasks.filter((task) => !task.isDraft);
       }
     },
-    updateLaneForItem(
+    async updateLaneForItem(
       itemId: string,
       itemType: string,
       laneId: string | undefined
     ) {
       const items = itemType === "task" ? this.tasks : this.users;
-      const indexOfUpdatedItem = items.findIndex(
-        (existingItem) => existingItem.id === itemId && !existingItem.isDraft
+      const { indexOfUpdatedItem, indexOfDraftItem } = getIndexes(
+        items,
+        itemId
       );
-      const indexOfDraftItem = items.findIndex(
-        (existingItem) =>
-          existingItem.id === itemId && existingItem.isDraft === true
-      );
-      if (indexOfDraftItem === -1) {
-        items[indexOfUpdatedItem].laneId = laneId;
-      } else {
-        items[indexOfDraftItem].isDraft = false;
-        items[indexOfDraftItem].laneId = laneId;
+      let itemToUpdate;
+      if (draftItemExists(indexOfDraftItem)) {
+        itemToUpdate = items[indexOfDraftItem];
         items.splice(indexOfUpdatedItem, 1);
+      } else {
+        itemToUpdate = items[indexOfUpdatedItem];
+      }
+      updateItemFields(itemToUpdate, laneId, itemId, items);
+
+      const oldIndexOfUpdatedItem = getOldIndexOfItemToUpdate(
+        indexOfDraftItem,
+        indexOfUpdatedItem
+      );
+
+      const subPath = itemType === "task" ? "tasks" : "users";
+      try {
+        await axios.post(
+          `http://localhost:5173/${subPath}/handle-lane-id-update`,
+          {
+            updatedItem: itemToUpdate,
+            oldIndexOfUpdatedItem: oldIndexOfUpdatedItem,
+          }
+        );
+        // TODO: Check for response code to be success, otherwise throw
+        const responseWithListOfItems = await axios.get(
+          `http://localhost:5173/${subPath}`
+        );
+        if (itemType === "task") {
+          this.tasks = responseWithListOfItems.data as Task[];
+        } else {
+          this.users = responseWithListOfItems.data as User[];
+          console.log(this.users);
+        }
+      } catch (err) {
+        console.error(err); //TODO: Display error
       }
     },
   },
   getters: {
     usersForLaneId: (state) => {
       return (laneId: string) =>
-        state.users.filter((user) => user.laneId === laneId);
+        state.users
+          .filter((user) => user.laneId === laneId)
+          .sort((user1, user2) => (user1.order < user2.order ? 1 : -1));
     },
     unassignedUsers: (state) =>
-      state.users.filter((user) => !user.laneId || user.laneId === ""),
+      state.users
+        .filter((user) => !user.laneId || user.laneId === "")
+        .sort((user1, user2) => (user1.order < user2.order ? 1 : -1)),
     tasksForLaneId: (state) => {
-      return (laneId: string) =>
-        state.tasks.filter((task) => task.laneId === laneId);
+      const tasks = (laneId: string) =>
+        state.tasks
+          .filter((task) => task.laneId === laneId)
+          .sort((task1, task2) => (task1.order < task2.order ? 1 : -1));
+      return tasks;
     },
     unassignedTasks: (state) =>
-      state.tasks.filter((task) => !task.laneId || task.laneId === ""),
+      state.tasks
+        .filter((task) => !task.laneId || task.laneId === "")
+        .sort((task1, task2) => task1.order - task2.order),
   },
 });
 
@@ -146,9 +209,58 @@ const addDraftItemToLane = (
     const draftItem = JSON.parse(JSON.stringify(draggedItem));
     draftItem.isDraft = true;
     draftItem.laneId = draggedOverItem.laneId;
-    const indertAtIndex = addAbove
+    const insertAtIndex = addAbove
       ? indexOfDraggedOverItem
       : indexOfDraggedOverItem + 1;
-    items.splice(indertAtIndex, 0, draftItem);
+    // draftItem.order = insertAtIndex;
+
+    items.splice(insertAtIndex, 0, draftItem);
+    items.forEach((item, index) => (item.order = index));
+    console.log("sf");
   }
+};
+const isDraftItemInsertedBeforeOriginalItem = (
+  indexOfDraftItem: number,
+  indexOfOriginalItem: number
+) => indexOfDraftItem < indexOfOriginalItem;
+
+const getIndexes = (
+  items: Task[] | User[],
+  itemId: string
+): { indexOfUpdatedItem: number; indexOfDraftItem: number } => {
+  const indexOfUpdatedItem = items.findIndex(
+    (item) => item.id === itemId && !item.isDraft
+  );
+  const indexOfDraftItem = items.findIndex(
+    (existingItem) =>
+      existingItem.id === itemId && existingItem.isDraft === true
+  );
+  return { indexOfUpdatedItem, indexOfDraftItem };
+};
+
+const getOldIndexOfItemToUpdate = (
+  indexOfDraftItem: number,
+  indexOfUpdatedItem: number
+): number => {
+  return isDraftItemInsertedBeforeOriginalItem(
+    indexOfDraftItem,
+    indexOfUpdatedItem
+  )
+    ? indexOfUpdatedItem - 1
+    : indexOfUpdatedItem;
+};
+
+const draftItemExists = (indexOfDraftItem: number): boolean => {
+  return indexOfDraftItem !== -1;
+};
+
+const updateItemFields = (
+  itemToUpdate: Draggable,
+  laneId: string,
+  itemId: string,
+  items: Task[] | User[]
+): void => {
+  itemToUpdate.isDraft = false;
+  itemToUpdate.laneId = laneId;
+  itemToUpdate.order = items.findIndex((item) => item.id === itemId);
 };

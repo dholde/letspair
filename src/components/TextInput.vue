@@ -68,7 +68,7 @@ const onBlur = (event: Event) => {
   </div>
 </template>
 
-<style>
+<style scoped>
 .textInputWrapper {
   display: block;
   margin-bottom: 15px;

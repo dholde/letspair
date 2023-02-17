@@ -1,10 +1,10 @@
 import type { Draggable } from "./Draggable";
 
 export class Task implements Draggable {
-  public id: string;
-  public description: string;
+  public id!: string;
+  public description!: string;
   public order: number;
-  public hasLinkText: () => boolean = () => {
+  public hasLinkText?: () => boolean = () => {
     return this.linkText != null && this.linkText !== "";
   };
   public link?: string;
@@ -13,9 +13,7 @@ export class Task implements Draggable {
   public isCurrentlyDragged?: boolean;
   public isDraft?: boolean;
 
-  constructor(id: string, description: string, order: number) {
-    this.id = id;
-    this.description = description;
+  constructor(order: number) {
     this.order = order;
   }
 }

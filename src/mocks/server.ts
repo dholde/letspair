@@ -1,5 +1,5 @@
 import { setupServer } from "msw/node";
-import { restHandlers } from "./handlers";
+import { handlers } from "./db";
 
 // Intercepts requests in node environment (used for tests)
-export const server = setupServer(...restHandlers);
+export const server = setupServer(...handlers);
