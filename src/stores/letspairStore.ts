@@ -17,6 +17,13 @@ export const useStore = defineStore({
     } as DragAndDropInfo,
   }),
   actions: {
+    async deleteItem(itemType: string, itemId: string) {
+      if (itemType === "task") {
+        console.log("Delete task");
+        return;
+      }
+      console.log("Delete user");
+    },
     async createTask() {
       const unassignedTaskListLength = this.tasks.filter(
         (task) => task.laneId == null || task.laneId == ""

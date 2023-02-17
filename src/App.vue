@@ -2,11 +2,13 @@
 import TaskArea from "@/components/TaskArea.vue";
 import UserArea from "@/components/UserArea.vue";
 import LaneArea from "@/components/LaneArea.vue";
+import DeletionArea from "@/components/DeletionArea.vue";
 </script>
 
 <template>
   <div class="container">
-    <div id="header" class="header">Header</div>
+    <!-- <div id="header" class="header">Header</div> -->
+    <DeletionArea class="deletion-area" />
     <UserArea class="user-area" />
     <TaskArea class="task-area" />
     <LaneArea class="lane-area" />
@@ -29,6 +31,11 @@ import LaneArea from "@/components/LaneArea.vue";
     "taskarea lanearea";
 }
 .header {
+  grid-area: header;
+  background-color: var(--bg-color-secondary);
+}
+
+.deletion-area {
   grid-area: header;
   background-color: var(--bg-color-secondary);
 }
