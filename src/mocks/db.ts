@@ -3,6 +3,31 @@ import { faker } from "@faker-js/faker";
 import { rest } from "msw";
 import type { Task } from "@/models/Task";
 import type { User } from "@/models/User";
+import type { PrimaryKey } from "@mswjs/data/lib/primaryKey";
+import type { NullableProperty } from "@mswjs/data/lib/nullable";
+import type { ModelAPI } from "@mswjs/data/lib/glossary";
+
+type apiModel = {
+  user: {
+    id: PrimaryKey<string>;
+    order: NumberConstructor;
+    name: NullableProperty<string>;
+    laneId: NullableProperty<string>;
+  };
+  task: {
+    id: PrimaryKey<string>;
+    description: NullableProperty<string>;
+    order: NumberConstructor;
+    laneId: NullableProperty<string>;
+    link: StringConstructor;
+    linkText: StringConstructor;
+    isCurrentlyDragged: BooleanConstructor;
+    isDraft: BooleanConstructor;
+  };
+  lane: {
+    id: PrimaryKey<string>;
+  };
+};
 
 export const db = factory({
   user: {
@@ -29,66 +54,40 @@ export const db = factory({
 export const customHandlers = [
   rest.post("http://localhost:5173/delete-item", (req, res, ctx) => {
     const { itemType, itemId, order } = { ...req.body } as {
-      itemType: string;
+      itemType: "user" | "task";
       itemId: string;
       order: number;
     };
-    if (itemType === "task") {
-      db.task.delete({
-        where: {
-          id: {
-            equals: itemId,
-          },
+    const dbModel: ModelAPI<apiModel, typeof itemType> =
+      itemType === "task" ? db.task : db.user;
+    dbModel.delete({
+      where: {
+        id: {
+          equals: itemId,
         },
-      });
-      const tasksWithGreaterOrder = db.task.findMany({
-        where: {
-          order: {
-            gt: order,
-          },
+      },
+    });
+    const itemsWithGreaterOrder = dbModel.findMany({
+      where: {
+        order: {
+          gt: order,
         },
-      });
-      db.task.updateMany({
-        where: {
-          id: {
-            in: tasksWithGreaterOrder.map((task) => task.id),
-          },
+      },
+    });
+    dbModel.updateMany({
+      where: {
+        id: {
+          in: itemsWithGreaterOrder.map((item) => item.id),
         },
-        data: {
-          order: (order) => order - 1,
-        },
-      });
-      const tasks = db.task.findMany({});
-      return res(ctx.status(200), ctx.json(tasks));
-    } else {
-      db.user.delete({
-        where: {
-          id: {
-            equals: itemId,
-          },
-        },
-      });
-      const usersWithGreaterOrder = db.user.findMany({
-        where: {
-          order: {
-            gt: order,
-          },
-        },
-      });
-      db.user.updateMany({
-        where: {
-          id: {
-            in: usersWithGreaterOrder.map((user) => user.id),
-          },
-        },
-        data: {
-          order: (order) => order - 1,
-        },
-      });
-      const users = db.user.findMany({});
-      return res(ctx.status(200), ctx.json(users));
-    }
+      },
+      data: {
+        order: (order) => order - 1,
+      },
+    });
+    const items = dbModel.findMany({});
+    return res(ctx.status(200), ctx.json(items));
   }),
+
   rest.post(
     "http://localhost:5173/tasks/handle-lane-id-update",
     (req, res, ctx) => {
