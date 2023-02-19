@@ -53,9 +53,12 @@ describe("LaneArea", () => {
       renderedLaneArea.querySelectorAll("div.pairing-lane")
     ).find((renderedPairingLane) => renderedPairingLane.id === pairingLane2.id);
     if (renderedPairingLane1 && renderedPairingLane2) {
-      expect(renderedPairingLane1.querySelector("input").value).toEqual(
-        "John Wayne"
-      );
+      let userInput = renderedPairingLane1.querySelector("input");
+      if (userInput) {
+        expect(userInput.value).toEqual("John Wayne");
+      } else {
+        assert.fail("PairingUser should be in lane2");
+      }
       expect(renderedPairingLane2.querySelector("input")).toBeUndefined;
 
       const dataTransferType = "user";
@@ -75,9 +78,12 @@ describe("LaneArea", () => {
         },
       });
       expect(renderedPairingLane1.querySelector("input")).toBeUndefined;
-      expect(renderedPairingLane2.querySelector("input").value).toEqual(
-        "John Wayne"
-      );
+      userInput = renderedPairingLane2.querySelector("input");
+      if (userInput) {
+        expect(userInput.value).toEqual("John Wayne");
+      } else {
+        assert.fail("PairingUser should be in lane2");
+      }
     } else {
       assert.fail(
         `One of the pairing lanes or both were not rendered: PairingLane1: ${pairingLane1}, PairingLane2: ${pairingLane2}`
