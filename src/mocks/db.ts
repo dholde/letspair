@@ -3,6 +3,31 @@ import { faker } from "@faker-js/faker";
 import { rest } from "msw";
 import type { Task } from "@/models/Task";
 import type { User } from "@/models/User";
+import type { PrimaryKey } from "@mswjs/data/lib/primaryKey";
+import type { NullableProperty } from "@mswjs/data/lib/nullable";
+import type { ModelAPI } from "@mswjs/data/lib/glossary";
+
+type apiModel = {
+  user: {
+    id: PrimaryKey<string>;
+    order: NumberConstructor;
+    name: NullableProperty<string>;
+    laneId: NullableProperty<string>;
+  };
+  task: {
+    id: PrimaryKey<string>;
+    description: NullableProperty<string>;
+    order: NumberConstructor;
+    laneId: NullableProperty<string>;
+    link: StringConstructor;
+    linkText: StringConstructor;
+    isCurrentlyDragged: BooleanConstructor;
+    isDraft: BooleanConstructor;
+  };
+  lane: {
+    id: PrimaryKey<string>;
+  };
+};
 
 export const db = factory({
   user: {
@@ -27,6 +52,42 @@ export const db = factory({
 });
 
 export const customHandlers = [
+  rest.post("http://localhost:5173/delete-item", (req, res, ctx) => {
+    const { itemType, itemId, order } = { ...req.body } as {
+      itemType: "user" | "task";
+      itemId: string;
+      order: number;
+    };
+    const dbModel: ModelAPI<apiModel, typeof itemType> =
+      itemType === "task" ? db.task : db.user;
+    dbModel.delete({
+      where: {
+        id: {
+          equals: itemId,
+        },
+      },
+    });
+    const itemsWithGreaterOrder = dbModel.findMany({
+      where: {
+        order: {
+          gt: order,
+        },
+      },
+    });
+    dbModel.updateMany({
+      where: {
+        id: {
+          in: itemsWithGreaterOrder.map((item) => item.id),
+        },
+      },
+      data: {
+        order: (order) => order - 1,
+      },
+    });
+    const items = dbModel.findMany({});
+    return res(ctx.status(200), ctx.json(items));
+  }),
+
   rest.post(
     "http://localhost:5173/tasks/handle-lane-id-update",
     (req, res, ctx) => {

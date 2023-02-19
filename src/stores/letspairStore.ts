@@ -17,6 +17,22 @@ export const useStore = defineStore({
     } as DragAndDropInfo,
   }),
   actions: {
+    async deleteItem(itemType: string, itemId: string, order: number) {
+      try {
+        const response = await axios.post("http://localhost:5173/delete-item", {
+          itemType,
+          itemId,
+          order,
+        });
+        if (itemType === "task") {
+          this.tasks = response.data as Task[];
+        } else {
+          this.users = response.data as User[];
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    },
     async createTask() {
       const unassignedTaskListLength = this.tasks.filter(
         (task) => task.laneId == null || task.laneId == ""

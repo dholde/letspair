@@ -117,11 +117,19 @@ export function useDropEvent(
       elementFromDropEvent.laneId = laneId;
       console.log(`Element from drop: ${JSON.stringify(elementFromDropEvent)}`);
       const store = useStore();
-      store.updateLaneForItem(
-        elementFromDropEvent.id,
-        dataTransferType,
-        laneId
-      );
+      if (target.value && target.value.id === "deletionArea") {
+        store.deleteItem(
+          dataTransferType,
+          elementFromDropEvent.id,
+          elementFromDropEvent.order
+        );
+      } else {
+        store.updateLaneForItem(
+          elementFromDropEvent.id,
+          dataTransferType,
+          laneId
+        );
+      }
     }
   }
   useDragEventListener(target, "drop", onDrop);

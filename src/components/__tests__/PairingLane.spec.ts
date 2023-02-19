@@ -51,11 +51,13 @@ describe("PairingLane", () => {
           ],
         },
       });
-      const userListItems = await waitFor(
-        async () => await findAllByRole("listitem")
-      );
-      const userListItem = userListItems[0];
-      expect(userListItem.innerHTML).toContain(userName);
+      const pairingUserInput = renderedComponent.querySelector("input");
+      if (pairingUserInput) {
+        expect(pairingUserInput.value).toEqual(userName);
+      } else {
+        assert.fail("PairingUser should be in pairing lane");
+      }
+      //expect(userListItem.innerHTML).toContain(userName);
     } else {
       assert.fail("PairingLane component was not rendered.");
     }
