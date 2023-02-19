@@ -48,9 +48,6 @@ function updateUserName(event: Event) {
         class="input"
         @focusout="updateUserName"
       />
-      <!-- <div class="inner">
-        {{ user.name ? user.name : "User Name" }}
-      </div> -->
     </div>
   </div>
 </template>

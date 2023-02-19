@@ -53,8 +53,10 @@ describe("LaneArea", () => {
       renderedLaneArea.querySelectorAll("div.pairing-lane")
     ).find((renderedPairingLane) => renderedPairingLane.id === pairingLane2.id);
     if (renderedPairingLane1 && renderedPairingLane2) {
-      expect(renderedPairingLane1.innerHTML).toContain("John Wayne");
-      expect(renderedPairingLane2.innerHTML).not.toContain("John Wayne");
+      expect(renderedPairingLane1.querySelector("input").value).toEqual(
+        "John Wayne"
+      );
+      expect(renderedPairingLane2.querySelector("input")).toBeUndefined;
 
       const dataTransferType = "user";
       await nextTick(); // Waiting for the next render cycle is necessary because the events handlers are registered via the watch function
@@ -72,12 +74,10 @@ describe("LaneArea", () => {
           ],
         },
       });
-      const renderedPairingLane2AsHTMLElement =
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        renderedPairingLane2 as any as HTMLElement;
-      const { findByText } = within(renderedPairingLane2AsHTMLElement);
-      await waitFor(async () => await findByText("John Wayne"));
-      expect(renderedPairingLane1.innerHTML).not.toContain("John Wayne");
+      expect(renderedPairingLane1.querySelector("input")).toBeUndefined;
+      expect(renderedPairingLane2.querySelector("input").value).toEqual(
+        "John Wayne"
+      );
     } else {
       assert.fail(
         `One of the pairing lanes or both were not rendered: PairingLane1: ${pairingLane1}, PairingLane2: ${pairingLane2}`
