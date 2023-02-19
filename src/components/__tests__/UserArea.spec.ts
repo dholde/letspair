@@ -21,21 +21,20 @@ describe("UserArea", () => {
     const user2 = { id: uuidv4(), name: "Peter Parker", laneId: uuidv4() };
     const user3 = { id: uuidv4(), name: "Robert Bruce Banner", laneId: "" };
     const user4 = { id: uuidv4(), name: "Barry Allen" };
-    const { container, queryByRole, queryByText, findAllByPlaceholderText } =
-      render(UserArea, {
-        global: {
-          plugins: [
-            createTestingPinia({
-              stubActions: false,
-              initialState: {
-                letsPair: {
-                  users: [user1, user2, user3, user4],
-                },
+    const { findAllByPlaceholderText } = render(UserArea, {
+      global: {
+        plugins: [
+          createTestingPinia({
+            stubActions: false,
+            initialState: {
+              letsPair: {
+                users: [user1, user2, user3, user4],
               },
-            }),
-          ],
-        },
-      });
+            },
+          }),
+        ],
+      },
+    });
     await nextTick();
     const pairingUserElements = await findAllByPlaceholderText("Name");
     const usersExpectedInLane = pairingUserElements.filter(
@@ -54,7 +53,7 @@ describe("UserArea", () => {
 
   it("contains a user after dropping the user into the UserArea", async () => {
     const user = { id: uuidv4(), name: "John Wayne", laneId: uuidv4() };
-    const { container, queryByText, findByRole } = render(UserArea, {
+    const { container, queryByText, findByPlaceholderText } = render(UserArea, {
       global: {
         plugins: [
           createTestingPinia({
@@ -83,7 +82,7 @@ describe("UserArea", () => {
           items: [{ type: "user" }],
         },
       });
-      const pairingUserElement = await findByRole("input");
+      const pairingUserElement = await findByPlaceholderText("Name");
       if (pairingUserElement) {
         expect((pairingUserElement as HTMLFormElement).value).toEqual(
           "John Wayne"
