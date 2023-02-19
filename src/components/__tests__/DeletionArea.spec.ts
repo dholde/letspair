@@ -1,5 +1,5 @@
 import { describe, it } from "vitest";
-import { render, fireEvent } from "@testing-library/vue";
+import { render, fireEvent, waitFor } from "@testing-library/vue";
 import DeletionArea from "@/components/DeletionArea.vue";
 import { nextTick } from "vue";
 import { createTestingPinia } from "@pinia/testing";
@@ -50,10 +50,11 @@ describe("DeletionArea", () => {
           items: [{ type: "user" }],
         },
       });
-      await nextTick();
       const store = useStore();
-      expect(store.$state.tasks).length(1);
-      expect(store.$state.users).length(1);
+      await waitFor(() => {
+        expect(store.$state.tasks).length(1);
+        expect(store.$state.users).length(1);
+      });
     } else {
       assert.fail("The taskArea component was not rendered.");
     }
