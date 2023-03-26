@@ -1,8 +1,14 @@
 import { MongoClient, Db } from "mongodb";
 
-const client: MongoClient = new MongoClient("uri");
-await client.connect();
-const db: Db = client.db("default");
+let db: Db;
+
+async function setupDB() {
+  const client: MongoClient = new MongoClient("uri");
+  await client.connect();
+  db = client.db("default");
+}
+
+setupDB();
 
 type User = {
   id: string;
