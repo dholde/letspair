@@ -1,39 +1,48 @@
-import { MongoClient, Db } from "mongodb";
+import {
+  MongoClient,
+  Db,
+  Collection,
+  ObjectId,
+  InsertOneResult,
+  OptionalUnlessRequiredId,
+} from "mongodb";
+import { LetsPairModel, UserModel } from "./model";
 
-let db: Db;
+class Service<T extends LetsPairModel> {
+  private client: MongoClient;
+  private db: Db;
+  private collection: Collection<T>;
 
-async function setupDB() {
-  const client: MongoClient = new MongoClient("uri");
-  await client.connect();
-  db = client.db("default");
-}
+  constructor(
+    private uri: string,
+    private dbName: string,
+    private collectionName: string
+  ) {}
 
-setupDB();
+  async connect(): Promise<void> {
+    this.client = await MongoClient.connect(this.uri);
+    this.db = this.client.db(this.dbName);
+    this.collection = this.db.collection<T>(this.collectionName);
+  }
 
-type User = {
-  id: string;
-  name: string;
-};
-
-type Task = {
-  id: string;
-  name: string;
-};
-
-type Lane = {
-  id: string;
-  name: string;
-};
-
-const serviceFunctions = {
-  async saveItem(itemType: "user" | "task" | "lane", item: User | Task | Lane) {
-    const collection = db.collection(itemType);
+  async saveItem(item: OptionalUnlessRequiredId<T>): Promise<InsertOneResult> {
     try {
-      const result = await collection.insertOne(item);
+      return this.collection.insertOne(item);
     } catch (error) {
       console.error(
-        `Error saving ${itemType} ${JSON.stringify(item)}: ${error}`
+        `Error saving ${item.constructor.name} ${JSON.stringify(
+          item
+        )}: ${error}`
       );
     }
-  },
-};
+  }
+
+  async getItemById(itemType: "user" | "task" | "lane", itemId: ObjectId) {
+    const collection = this.db.collection(itemType);
+    try {
+      const result = await collection.findOne({ _id: itemId });
+    } catch (error) {
+      console.error(`Error retrieving item for id ${itemId}: ${error}`);
+    }
+  }
+}
