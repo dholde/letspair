@@ -38,7 +38,17 @@ class Service<T extends LetsPairModel> {
     }
   }
 
-  async getItemById(itemType: "user" | "task" | "lane", itemId: ObjectId) {
+  async getItems() {
+    try {
+      return this.collection.find().toArray();
+    } catch (error) {
+      console.error(
+        `Error retrieving all entries from the ${this.collection.collectionName} collection`
+      );
+    }
+  }
+
+  async getItemById(itemId: ObjectId) {
     try {
       const filter: Filter<T> = { _id: [itemId] };
       const result = this.collection.findOne(filter);
