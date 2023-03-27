@@ -5,6 +5,7 @@ import {
   ObjectId,
   InsertOneResult,
   OptionalUnlessRequiredId,
+  Filter,
 } from "mongodb";
 import { LetsPairModel, UserModel } from "./model";
 
@@ -16,7 +17,7 @@ class Service<T extends LetsPairModel> {
   constructor(
     private uri: string,
     private dbName: string,
-    private collectionName: string
+    private collectionName: "user" | "task" | "lane"
   ) {}
 
   async connect(): Promise<void> {
@@ -38,9 +39,9 @@ class Service<T extends LetsPairModel> {
   }
 
   async getItemById(itemType: "user" | "task" | "lane", itemId: ObjectId) {
-    const collection = this.db.collection(itemType);
     try {
-      const result = await collection.findOne({ _id: itemId });
+      const filter: Filter<T> = { _id: [itemId] };
+      const result = this.collection.findOne(filter);
     } catch (error) {
       console.error(`Error retrieving item for id ${itemId}: ${error}`);
     }
