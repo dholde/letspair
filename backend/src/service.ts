@@ -6,6 +6,7 @@ import {
   InsertOneResult,
   OptionalUnlessRequiredId,
   Filter,
+  WithoutId,
 } from "mongodb";
 import { LetsPairModel, UserModel } from "./model";
 
@@ -40,7 +41,7 @@ class Service<T extends LetsPairModel> {
 
   async getItems() {
     try {
-      return this.collection.find().toArray();
+      return await this.collection.find().toArray();
     } catch (error) {
       console.error(
         `Error retrieving all entries from the ${this.collection.collectionName} collection`
@@ -51,9 +52,19 @@ class Service<T extends LetsPairModel> {
   async getItemById(itemId: ObjectId) {
     try {
       const filter: Filter<T> = { _id: [itemId] };
-      const result = this.collection.findOne(filter);
+      return await this.collection.findOne(filter);
     } catch (error) {
       console.error(`Error retrieving item for id ${itemId}: ${error}`);
+    }
+  }
+
+  async updateItem(itemId: ObjectId, item: T) {
+    try {
+      const filter: Filter<T> = { _id: [itemId] };
+      const updateDocument: WithoutId<T> = item;
+      const result = await this.collection.replaceOne(filter, updateDocument);
+    } catch (error) {
+      console.error(`Error updating item ${JSON.stringify(item)}`);
     }
   }
 }
