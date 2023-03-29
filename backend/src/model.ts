@@ -6,7 +6,7 @@ export class LetsPairModel {
 
 export class UserModel extends LetsPairModel {
   name: string;
-  constructor(public _id?: string | ObjectId, name: string) {
+  constructor(name: string, public _id?: string | ObjectId) {
     super(_id);
     this.name = name;
   }
