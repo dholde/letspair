@@ -7,10 +7,11 @@ import {
   OptionalUnlessRequiredId,
   Filter,
   WithoutId,
+  WithId,
 } from "mongodb";
-import { LetsPairModel, UserModel } from "./model";
+import { DraggableItem, LetsPairModel, TaskModel, UserModel } from "./model";
 
-class Service<T extends LetsPairModel> {
+class Service<T extends DraggableItem> {
   private client: MongoClient;
   private db: Db;
   private collection: Collection<T>;
@@ -66,5 +67,44 @@ class Service<T extends LetsPairModel> {
     } catch (error) {
       console.error(`Error updating item ${JSON.stringify(item)}`);
     }
+  }
+
+  async handleLaneIdUpdate(updatedItem: T, oldIndexOfUpdatedItem: number) {}
+
+  async handleLaneChange(
+    itemsCurrentLane: T[],
+    updatedItem: T,
+    originalItem: T,
+    oldIndexOfUpdatedItem: number
+  ) {
+    //Update new lane orders
+    itemsCurrentLane.map((item) => {
+      if (item.order >= updatedItem.order) {
+        item.order = item.order + 1;
+      }
+      return item;
+    });
+    //Update old lane orders
+    const filter: Filter<T> = { laneId: [originalItem.laneId] };
+    const itemsFormerLane = await this.collection.find(filter).toArray();
+    itemsFormerLane.forEach((item) => {
+      if (item._id === updatedItem._id) {
+        item.laneId = updatedItem.laneId;
+        item.order = updatedItem.order;
+      } else if (item.order >= oldIndexOfUpdatedItem) {
+        item.order = item.order - 1;
+      }
+    });
+    const allItems = [...itemsCurrentLane, ...itemsFormerLane];
+    allItems.forEach((item) => {
+      const filter: Filter<T> = { _id: [item._id] };
+      const update: Partial<T> = {};
+      Object.keys(item).forEach((key) => {
+        if (key !== "_id" && item[key] !== originalItem[key]) {
+          update[key] = item[key];
+        }
+      });
+      this.collection.updateOne(filter, { $set: update });
+    });
   }
 }
