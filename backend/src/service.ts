@@ -50,7 +50,7 @@ class Service<T extends DraggableItem> {
     }
   }
 
-  async getItemById(itemId: ObjectId) {
+  async getItemById(itemId: ObjectId | string) {
     try {
       const filter: Filter<T> = { _id: [itemId] };
       return await this.collection.findOne(filter);
@@ -69,7 +69,27 @@ class Service<T extends DraggableItem> {
     }
   }
 
-  async handleLaneIdUpdate(updatedItem: T, oldIndexOfUpdatedItem: number) {}
+  async handleDrag(updatedItem: T, oldIndexOfUpdatedItem: number) {
+    updatedItem.laneId = updatedItem.laneId == null ? "" : updatedItem.laneId;
+    const originalItem = await this.getItemById(updatedItem._id);
+    const itemsCurrentLane = await this.findItemsForLaneId(updatedItem.laneId);
+  
+    if (originalItem.laneId === updatedItem.laneId) {
+      this.handleOrderChangeInSameLane(
+        itemsCurrentLane,
+        updatedItem,
+        oldIndexOfUpdatedItem
+      );
+    } else {
+      //Update new lane orders
+      this.handleLaneChange(
+        itemsCurrentLane,
+        updatedItem,
+        originalItem,
+        oldIndexOfUpdatedItem
+      );
+    }
+  }
 
   async findItemsForLaneId(updateItemLaneId: string): Promise<T[]> {
     const filter: Filter<T> = { _id: [updateItemLaneId] };
@@ -77,7 +97,7 @@ class Service<T extends DraggableItem> {
     return items;
   }
 
-  handlePositionChangeInSameLane = (
+  handleOrderChangeInSameLane = (
     items: T[],
     updatedItem: T,
     oldIndexOfUpdatedItem: number
