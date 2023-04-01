@@ -14,7 +14,7 @@ import { DraggableItem, LetsPairModel, TaskModel, UserModel } from "./model";
 class Service<T extends DraggableItem> {
   private client: MongoClient;
   private db: Db;
-  private collection: Collection<T>;
+  private collection: Collection<T extends DraggableItem>;
 
   constructor(
     private uri: string,
@@ -70,6 +70,12 @@ class Service<T extends DraggableItem> {
   }
 
   async handleLaneIdUpdate(updatedItem: T, oldIndexOfUpdatedItem: number) {}
+
+  async findItemsForLaneId(updateItemLaneId: string): Promise<T[]> {
+    const filter: Filter<T> = { _id: [updateItemLaneId] };
+    const items = await this.collection.find(filter).toArray();
+    return items;
+  }
 
   handlePositionChangeInSameLane = (
     items: T[],
@@ -131,7 +137,7 @@ class Service<T extends DraggableItem> {
       }
     });
     const allItems = [...itemsCurrentLane, ...itemsFormerLane];
-    allItems.forEach((item) => {
+    allItems.forEach((item: WithId<T>) => {
       const filter: Filter<T> = { _id: [item._id] };
       const update: Partial<T> = {};
       Object.keys(item).forEach((key) => {
