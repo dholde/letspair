@@ -37,6 +37,19 @@ class Service<T extends DraggableItem> {
           item
         )}: ${error}`
       );
+      throw(error);
+    }
+  }
+
+  async deleteItem(itemId: ObjectId) {
+    try {
+      const filter: Filter<T> = {_id: [itemId]}
+      const result = this.collection.deleteOne(filter);
+    } catch (error) {
+      console.error(
+        `Error deleting item with id ${itemId} from collection ${this.collectionName}: ${error}`
+      );
+      throw error;
     }
   }
 
@@ -47,6 +60,7 @@ class Service<T extends DraggableItem> {
       console.error(
         `Error retrieving all entries from the ${this.collection.collectionName} collection`
       );
+      throw error;
     }
   }
 
@@ -56,6 +70,7 @@ class Service<T extends DraggableItem> {
       return await this.collection.findOne(filter);
     } catch (error) {
       console.error(`Error retrieving item for id ${itemId}: ${error}`);
+      throw error;
     }
   }
 
@@ -66,6 +81,7 @@ class Service<T extends DraggableItem> {
       const result = await this.collection.replaceOne(filter, updateDocument);
     } catch (error) {
       console.error(`Error updating item ${JSON.stringify(item)}`);
+      throw error;
     }
   }
 
