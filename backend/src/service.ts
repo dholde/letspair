@@ -71,6 +71,41 @@ class Service<T extends DraggableItem> {
 
   async handleLaneIdUpdate(updatedItem: T, oldIndexOfUpdatedItem: number) {}
 
+  handlePositionChangeInSameLane = (
+    items: T[],
+    updatedItem: T,
+    oldIndexOfUpdatedItem: number
+  ) => {
+    const itemsWithUpdatedOrders: T[] = this.updateItemOrders(
+      items,
+      updatedItem,
+      oldIndexOfUpdatedItem
+    );
+    itemsWithUpdatedOrders.forEach((item) => {
+      const filter: Filter<T> = { _id: [item._id] };
+      this.collection.updateOne(filter, item);
+    });
+  };
+
+  updateItemOrders(items: T[], updatedItem: T, oldIndexOfUpdatedItem: number) {
+    return items.map((item) => {
+      if (item._id === updatedItem._id) {
+        item = updatedItem;
+      } else if (
+        item.order <= updatedItem.order &&
+        item.order > oldIndexOfUpdatedItem
+      ) {
+        item.order = item.order - 1; // updatedTask moved from below to above the task
+      } else if (
+        item.order >= updatedItem.order &&
+        item.order < oldIndexOfUpdatedItem
+      ) {
+        item.order = item.order + 1; // updatedTask moved from above to below the task
+      }
+      return item;
+    });
+  }
+
   async handleLaneChange(
     itemsCurrentLane: T[],
     updatedItem: T,
