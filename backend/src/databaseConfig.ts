@@ -7,6 +7,9 @@ async function connect(uri: string, dbName: string): Promise<Db> {
   return db;
 }
 
-function getCollection<T extends LetsPairModel>(db: Db) {
-  this.collection = db.collection<T>(this.collectionName);
+function getCollection<T extends LetsPairModel>(
+  db: Db,
+  collectionName: string
+) {
+  this.collection = db.collection<T>(collectionName);
 }
