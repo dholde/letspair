@@ -8,13 +8,14 @@ import {
   Filter,
   WithoutId,
   WithId,
+  UpdateFilter,
 } from "mongodb";
 import { DraggableItem, LetsPairModel, TaskModel, UserModel } from "./model";
 
 class Service<T extends DraggableItem> {
   private client: MongoClient;
   private db: Db;
-  private collection: Collection<T extends DraggableItem>;
+  private collection: Collection<T>;
 
   constructor(
     private uri: string,
@@ -37,13 +38,13 @@ class Service<T extends DraggableItem> {
           item
         )}: ${error}`
       );
-      throw(error);
+      throw error;
     }
   }
 
   async deleteItem(itemId: ObjectId) {
     try {
-      const filter: Filter<T> = {_id: [itemId]}
+      const filter: Filter<T> = { _id: [itemId] };
       const result = this.collection.deleteOne(filter);
     } catch (error) {
       console.error(
@@ -89,47 +90,51 @@ class Service<T extends DraggableItem> {
     updatedItem.laneId = updatedItem.laneId == null ? "" : updatedItem.laneId;
     const originalItem = await this.getItemById(updatedItem._id);
     const itemsCurrentLane = await this.findItemsForLaneId(updatedItem.laneId);
-  
+
     if (originalItem.laneId === updatedItem.laneId) {
       this.handleOrderChangeInSameLane(
         itemsCurrentLane,
-        updatedItem,
+        updatedItem as WithId<T>,
         oldIndexOfUpdatedItem
       );
     } else {
       //Update new lane orders
       this.handleLaneChange(
         itemsCurrentLane,
-        updatedItem,
+        updatedItem as WithId<T>,
         originalItem,
         oldIndexOfUpdatedItem
       );
     }
   }
 
-  async findItemsForLaneId(updateItemLaneId: string): Promise<T[]> {
+  async findItemsForLaneId(updateItemLaneId: string): Promise<WithId<T>[]> {
     const filter: Filter<T> = { _id: [updateItemLaneId] };
     const items = await this.collection.find(filter).toArray();
     return items;
   }
 
   handleOrderChangeInSameLane = (
-    items: T[],
-    updatedItem: T,
+    items: WithId<T>[],
+    updatedItem: WithId<T>,
     oldIndexOfUpdatedItem: number
   ) => {
-    const itemsWithUpdatedOrders: T[] = this.updateItemOrders(
+    const itemsWithUpdatedOrders: WithId<T>[] = this.updateItemOrders(
       items,
       updatedItem,
       oldIndexOfUpdatedItem
     );
     itemsWithUpdatedOrders.forEach((item) => {
       const filter: Filter<T> = { _id: [item._id] };
-      this.collection.updateOne(filter, item);
+      this.collection.updateOne(filter, { $set: item as Partial<T> });
     });
   };
 
-  updateItemOrders(items: T[], updatedItem: T, oldIndexOfUpdatedItem: number) {
+  updateItemOrders(
+    items: WithId<T>[],
+    updatedItem: WithId<T>,
+    oldIndexOfUpdatedItem: number
+  ) {
     return items.map((item) => {
       if (item._id === updatedItem._id) {
         item = updatedItem;
@@ -149,9 +154,9 @@ class Service<T extends DraggableItem> {
   }
 
   async handleLaneChange(
-    itemsCurrentLane: T[],
-    updatedItem: T,
-    originalItem: T,
+    itemsCurrentLane: WithId<T>[],
+    updatedItem: WithId<T>,
+    originalItem: WithId<T>,
     oldIndexOfUpdatedItem: number
   ) {
     //Update new lane orders
