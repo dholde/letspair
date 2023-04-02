@@ -12,20 +12,10 @@ import {
 import { DraggableItem } from "./model";
 
 class Service<T extends DraggableItem> {
-  private client: MongoClient;
-  private db: Db;
   private collection: Collection<T>;
 
-  constructor(
-    private uri: string,
-    private dbName: string,
-    private collectionName: "user" | "task" | "lane"
-  ) {}
-
-  async connect(): Promise<void> {
-    this.client = await MongoClient.connect(this.uri);
-    this.db = this.client.db(this.dbName);
-    this.collection = this.db.collection<T>(this.collectionName);
+  constructor(collection: Collection<T>) {
+    this.collection = collection;
   }
 
   async saveItem(item: OptionalUnlessRequiredId<T>): Promise<InsertOneResult> {
@@ -47,7 +37,7 @@ class Service<T extends DraggableItem> {
       const result = this.collection.deleteOne(filter);
     } catch (error) {
       console.error(
-        `Error deleting item with id ${itemId} from collection ${this.collectionName}: ${error}`
+        `Error deleting item with id ${itemId} from collection ${this.collection.collectionName}: ${error}`
       );
       throw error;
     }
