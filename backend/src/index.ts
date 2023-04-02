@@ -1,6 +1,10 @@
 import express from "express";
+import { Service } from "./service";
+import { UserModel } from "./model";
 const app = express();
 const port = 3000;
+
+const userService = new Service<UserModel>();
 
 app.get("/", (req, res) => {
   res.send("Letspair");
