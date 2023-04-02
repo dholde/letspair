@@ -1,13 +1,18 @@
 import { MongoClient, Db } from "mongodb";
 import { LetsPairModel } from "./model";
 
-async function connect(uri: string, dbName: string): Promise<Db> {
-  const client = await MongoClient.connect(uri);
-  const db: Db = this.client.db(dbName);
-  return db;
+export async function openDatabaseConnect(): Promise<Db> {
+  try {
+    const client = await MongoClient.connect("");
+    const db: Db = client.db("");
+    return db;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
 }
 
-function getCollection<T extends LetsPairModel>(
+export function getCollection<T extends LetsPairModel>(
   db: Db,
   collectionName: string
 ) {

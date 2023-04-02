@@ -1,10 +1,29 @@
 import express from "express";
-import { Service } from "./service";
-import { UserModel } from "./model";
+import { Service, DraggableItemService } from "./service";
+import { TaskModel, UserModel, LaneModel } from "./model";
+import { Db } from "mongodb";
+import { openDatabaseConnect } from "./databaseConfig";
 const app = express();
 const port = 3000;
 
-const userService = new Service<UserModel>();
+let userService: DraggableItemService<UserModel>;
+let taskService: DraggableItemService<TaskModel>;
+let laneService: Service<LaneModel>;
+
+async function startServer() {
+  try {
+    const db: Db = await openDatabaseConnect();
+  } catch {
+    console.error("Failed to connect to database");
+    //TODO: retry
+    process.exit(1);
+  }
+  app.listen(port, () => {
+    return console.log(`Express is listening at http://localhost:${port}`);
+  });
+}
+
+startServer();
 
 app.get("/", (req, res) => {
   res.send("Letspair");
@@ -68,8 +87,4 @@ app.get("/lanes/:id", (req, res) => {
 
 app.post("/delete-item", (req, res) => {
   res.send("POST delete-item");
-});
-
-app.listen(port, () => {
-  return console.log(`Express is listening at http://localhost:${port}`);
 });

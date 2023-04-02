@@ -1,6 +1,4 @@
 import {
-  MongoClient,
-  Db,
   Collection,
   ObjectId,
   InsertOneResult,
@@ -9,10 +7,10 @@ import {
   WithoutId,
   WithId,
 } from "mongodb";
-import { DraggableItem } from "./model";
+import { DraggableItem, LetsPairModel } from "./model";
 
-class Service<T extends DraggableItem> {
-  private collection: Collection<T>;
+export class Service<T extends LetsPairModel> {
+  protected collection: Collection<T>;
 
   constructor(collection: Collection<T>) {
     this.collection = collection;
@@ -74,7 +72,9 @@ class Service<T extends DraggableItem> {
       throw error;
     }
   }
+}
 
+export class DraggableItemService<T extends DraggableItem> extends Service<T> {
   async handleDrag(updatedItem: T, oldIndexOfUpdatedItem: number) {
     updatedItem.laneId = updatedItem.laneId == null ? "" : updatedItem.laneId;
     const originalItem = await this.getItemById(updatedItem._id);
