@@ -8,9 +8,8 @@ import {
   Filter,
   WithoutId,
   WithId,
-  UpdateFilter,
 } from "mongodb";
-import { DraggableItem, LetsPairModel, TaskModel, UserModel } from "./model";
+import { DraggableItem } from "./model";
 
 class Service<T extends DraggableItem> {
   private client: MongoClient;
