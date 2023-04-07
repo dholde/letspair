@@ -1,5 +1,6 @@
 import express, { Request, Response } from "express";
-import { Service, DraggableItemService } from "./service";
+import { Service } from "./service/Service";
+import { DraggableItemService } from "./service/DraggableService";
 import { TaskModel, UserModel, LaneModel } from "./model";
 import { Db } from "mongodb";
 import { openDatabaseConnection } from "./databaseConfig";
