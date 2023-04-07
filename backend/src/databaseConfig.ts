@@ -3,7 +3,7 @@ import { LetsPairModel } from "./model";
 
 export async function openDatabaseConnection(): Promise<Db> {
   try {
-    const client = await MongoClient.connect("");
+    const client = await MongoClient.connect(process.env.DB_URL);
     const db: Db = client.db("");
     return db;
   } catch (error) {

@@ -1,3 +1,5 @@
+import { config } from "dotenv";
+config();
 import express, { Request, Response } from "express";
 import { Service } from "./services/Service";
 import { DraggableItemService } from "./services/DraggableItemService";
@@ -7,7 +9,7 @@ import { openDatabaseConnection } from "./databaseConfig";
 import { ObjectId } from "mongodb";
 
 export const app = express();
-const port = 3000;
+const port = parseInt(process.env.PORT || "3000", 10);
 
 let userService: DraggableItemService<UserModel>;
 let taskService: DraggableItemService<TaskModel>;
