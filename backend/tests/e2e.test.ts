@@ -1,17 +1,17 @@
-import { request } from "supertest";
+import request from "supertest";
 import { app } from "../src/index";
 import { MongoMemoryServer } from "mongodb-memory-server";
 
-let mongoServer;
+let mongod;
 
 beforeAll(async () => {
-  mongoServer = new MongoMemoryServer();
-  const mongoUri = await mongoServer.getUri();
-  process.env.DB_URL = mongoUri;
+  const mongod = await MongoMemoryServer.create();
+  const uri = mongod.getUri();
+  process.env.DB_URL = uri;
 });
 
 afterAll(async () => {
-  await mongoServer.stop();
+  await mongod.stop();
 });
 
 describe("Test the root path", () => {
