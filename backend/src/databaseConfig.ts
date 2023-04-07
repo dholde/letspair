@@ -1,7 +1,7 @@
 import { MongoClient, Db } from "mongodb";
 import { LetsPairModel } from "./model";
 
-export async function openDatabaseConnect(): Promise<Db> {
+export async function openDatabaseConnection(): Promise<Db> {
   try {
     const client = await MongoClient.connect("");
     const db: Db = client.db("");
