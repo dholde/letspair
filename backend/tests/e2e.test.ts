@@ -7,7 +7,7 @@ let mongoServer;
 beforeAll(async () => {
   mongoServer = new MongoMemoryServer();
   const mongoUri = await mongoServer.getUri();
-  process.env.MONGODB_URI = mongoUri;
+  process.env.DB_URL = mongoUri;
 });
 
 afterAll(async () => {
