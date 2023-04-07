@@ -1,5 +1,18 @@
 const request = require("supertest");
 const app = require("./app"); // replace with the path to your app file
+const { MongoMemoryServer } = require("mongodb-memory-server");
+
+let mongoServer;
+
+beforeAll(async () => {
+  mongoServer = new MongoMemoryServer();
+  const mongoUri = await mongoServer.getUri();
+  process.env.MONGODB_URI = mongoUri;
+});
+
+afterAll(async () => {
+  await mongoServer.stop();
+});
 
 describe("Test the root path", () => {
   test("It should respond to the GET method", async () => {
