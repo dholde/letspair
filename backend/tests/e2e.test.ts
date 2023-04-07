@@ -1,6 +1,6 @@
-const request = require("supertest");
-const app = require("./app"); // replace with the path to your app file
-const { MongoMemoryServer } = require("mongodb-memory-server");
+import { request } from "supertest";
+import { app } from "../src/index";
+import { MongoMemoryServer } from "mongodb-memory-server";
 
 let mongoServer;
 

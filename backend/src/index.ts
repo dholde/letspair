@@ -6,7 +6,7 @@ import { Db } from "mongodb";
 import { openDatabaseConnection } from "./databaseConfig";
 import { ObjectId } from "mongodb";
 
-const app = express();
+export const app = express();
 const port = 3000;
 
 let userService: DraggableItemService<UserModel>;
