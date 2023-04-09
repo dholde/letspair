@@ -7,8 +7,11 @@ import { TaskModel, UserModel, LaneModel } from "./model";
 import { Db } from "mongodb";
 import { openDatabaseConnection } from "./databaseConfig";
 import { ObjectId } from "mongodb";
+import { json, urlencoded } from "body-parser";
 
 export const app = express();
+app.use(json());
+app.use(urlencoded({ extended: true }));
 const port = parseInt(process.env.PORT || "3000", 10);
 
 let userService: DraggableItemService<UserModel>;
