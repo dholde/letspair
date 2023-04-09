@@ -1,10 +1,14 @@
-import { MongoClient, Db } from "mongodb";
+import { MongoClient, Db, MongoClientOptions } from "mongodb";
 import { LetsPairModel } from "./model";
 
 export async function openDatabaseConnection(): Promise<Db> {
+  const options: MongoClientOptions = {
+    serverSelectionTimeoutMS: 30000,
+  };
+
   try {
-    const client = await MongoClient.connect(process.env.DB_URL);
-    const db: Db = client.db("");
+    const client = await MongoClient.connect(process.env.DB_URL, options);
+    const db: Db = client.db("test");
     return db;
   } catch (error) {
     console.error(error);
