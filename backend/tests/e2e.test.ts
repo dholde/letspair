@@ -24,7 +24,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await mongod.stop();
-  server.close();
+  await server.close();
 });
 
 describe("Root path", () => {

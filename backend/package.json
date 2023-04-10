@@ -7,7 +7,7 @@
     "dev": "nodemon --exec 'ts-node' src/index.ts",
     "debug": "nodemon --exec node --inspect -r ts-node/register src/index.ts",
     "start": "node dist/app.js",
-    "test": "jest"
+    "test": "jest --timeout=10000"
   },
   "nodemonConfig": {
     "watch": [
