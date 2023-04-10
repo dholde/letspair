@@ -1,6 +1,7 @@
 import request from "supertest";
 import { app, startServer } from "../src/index";
 import { MongoMemoryServer } from "mongodb-memory-server";
+import { ObjectId } from "mongodb";
 
 let mongod;
 let server;
@@ -26,29 +27,46 @@ afterAll(async () => {
   server.close();
 });
 
-describe("Test the root path", () => {
-  test("It should respond to the GET method", async () => {
+describe("Root path", () => {
+  test("should responde to the GET method", async () => {
     const response = await request(app).get("/");
     expect(response.statusCode).toBe(200);
     expect(response.text).toBe("Letspair");
   });
 });
 
-describe("Test the /users path", () => {
-  test("It should respond to the POST method", async () => {
+describe("The /users path", () => {
+  let expectedUser: {
+    name: string;
+    order: string;
+    laneId: string;
+    _id?: string;
+  } = {
+    name: "Alice",
+    order: "0",
+    laneId: "",
+  };
+  it("should should create a user when called with the POST method", async () => {
     const response = await request(app)
       .post("/users")
       .send({ name: "Alice", order: "0", laneId: "" });
     expect(response.statusCode).toBe(200);
-    expect(response.body).toMatchObject({
-      name: "Alice",
-      order: "0",
-      laneId: "",
-    });
+    const responseUser = response.body;
+    expect(responseUser).toMatchObject(expectedUser);
+    expect(responseUser._id).toBeDefined();
+    expectedUser._id = responseUser._id;
   });
-  test("It should respond to the GET method", async () => {
+  it("should return a user when called with the GET method and with the path variable /:id", async () => {
+    const response = await request(app).get(`/users/${expectedUser._id}`);
+    expect(response.statusCode).toBe(200);
+    const responseUser = response.body;
+    expect(responseUser).toMatchObject(expectedUser);
+  });
+  it("should return a list of users when called with the GET method", async () => {
     const response = await request(app).get("/users");
     expect(response.statusCode).toBe(200);
-    expect(response.body).toEqual([{ _id: 1, name: "Alice" }]);
+    expect(response.body).toHaveLength(1);
+    const user = response.body[0];
+    expect(user).toMatchObject(expectedUser);
   });
 });
