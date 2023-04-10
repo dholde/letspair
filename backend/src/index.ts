@@ -18,7 +18,7 @@ let userService: DraggableItemService<UserModel>;
 let taskService: DraggableItemService<TaskModel>;
 let laneService: Service<LaneModel>;
 
-async function startServer() {
+export async function startServer() {
   try {
     const db: Db = await openDatabaseConnection();
     userService = new DraggableItemService<UserModel>(
@@ -33,13 +33,14 @@ async function startServer() {
     //TODO: retry
     process.exit(1);
   }
-
-  app.listen(port, () => {
-    return console.log(`Express is listening at http://localhost:${port}`);
+  return app.listen(port, () => {
+    console.log(`Express is listening at http://localhost:${port}`);
   });
 }
 
-startServer();
+if (require.main === module) {
+  startServer();
+}
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Letspair");

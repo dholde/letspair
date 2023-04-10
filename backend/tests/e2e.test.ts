@@ -1,18 +1,29 @@
 import request from "supertest";
-import { app } from "../src/index";
+import { app, startServer } from "../src/index";
 import { MongoMemoryServer } from "mongodb-memory-server";
 
 let mongod;
+let server;
 
 beforeAll(async () => {
-  process.env.NODE_ENV = "test";
   mongod = await MongoMemoryServer.create();
   const uri = mongod.getUri();
-  //process.env.DB_URL = uri;
-});
+  process.env.DB_URL = uri;
+  server = await startServer();
+  await new Promise<void>((resolve, reject) => {
+    server.on("listening", () => {
+      console.log("Server is ready!");
+      resolve();
+    });
+    server.on("error", (err) => {
+      reject(err);
+    });
+  });
+}, 40000);
 
 afterAll(async () => {
   await mongod.stop();
+  server.close();
 });
 
 describe("Test the root path", () => {
@@ -29,7 +40,11 @@ describe("Test the /users path", () => {
       .post("/users")
       .send({ name: "Alice", order: "0", laneId: "" });
     expect(response.statusCode).toBe(200);
-    expect(response.body).toEqual({ name: "Alice", order: "0", laneId: "" });
+    expect(response.body).toMatchObject({
+      name: "Alice",
+      order: "0",
+      laneId: "",
+    });
   });
   test("It should respond to the GET method", async () => {
     const response = await request(app).get("/users");

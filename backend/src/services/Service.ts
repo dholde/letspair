@@ -16,9 +16,10 @@ export class Service<T extends LetsPairModel> {
     this.collection = collection;
   }
 
-  async saveItem(item: OptionalUnlessRequiredId<T>): Promise<InsertOneResult> {
+  async saveItem(item: OptionalUnlessRequiredId<T>): Promise<LetsPairModel> {
     try {
-      return this.collection.insertOne(item);
+      const result = await this.collection.insertOne(item);
+      return await this.getItemById(result.insertedId);
     } catch (error) {
       console.error(
         `Error saving ${item.constructor.name} ${JSON.stringify(
@@ -54,7 +55,7 @@ export class Service<T extends LetsPairModel> {
 
   async getItemById(itemId: ObjectId | string) {
     try {
-      const filter: Filter<T> = { _id: [itemId] };
+      const filter: Filter<T> = { _id: new ObjectId(itemId) } as Filter<T>;
       return await this.collection.findOne(filter);
     } catch (error) {
       console.error(`Error retrieving item for id ${itemId}: ${error}`);
