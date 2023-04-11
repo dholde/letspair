@@ -65,12 +65,25 @@ export class Service<T extends LetsPairModel> {
 
   async updateItem(itemId: ObjectId, item: T) {
     try {
-      const filter: Filter<T> = { _id: [itemId] };
-      const updateDocument: WithoutId<T> = item;
-      const result = await this.collection.replaceOne(filter, updateDocument);
+      const filter: Filter<T> = { _id: itemId } as Filter<T>;
+      //const updateDocument: WithoutId<T> = { ...item };
+      //const updateDocument: Omit<T, "_id"> = { ...item };
+      const itemWithoutId = this.removeIdField(item);
+      const result = await this.collection.replaceOne(filter, itemWithoutId);
+      if (result.modifiedCount === 1) {
+        const updatedItem = await this.getItemById(itemId);
+        return updatedItem;
+      } else {
+        throw "Not Found";
+      }
     } catch (error) {
       console.error(`Error updating item ${JSON.stringify(item)}`);
       throw error;
     }
+  }
+
+  removeIdField(item: T): WithoutId<T> {
+    const { _id, ...itemWithoutId } = item;
+    return itemWithoutId as WithoutId<T>;
   }
 }

@@ -87,7 +87,7 @@ app.put("/users/:id", async (req: Request, res: Response) => {
   const updatedUser = req.body;
   try {
     await userService.updateItem(new ObjectId(id), updatedUser);
-    res.send(`User ${id} has been updated`);
+    res.json(updatedUser);
   } catch (error) {
     console.error(`Failed to update user ${id}`, error);
     res.status(500).send(`Failed to update user ${id}`);

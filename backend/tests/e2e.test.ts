@@ -69,4 +69,17 @@ describe("The /users path", () => {
     const user = response.body[0];
     expect(user).toMatchObject(expectedUser);
   });
+  it("should update user when sending a PUT request", async () => {
+    const updatedUser = {
+      _id: expectedUser._id,
+      order: 1,
+      name: "New Name",
+      laneId: new ObjectId().toString(),
+    };
+    const response = await request(app)
+      .put(`/users/${expectedUser._id}`)
+      .send(updatedUser);
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toMatchObject(updatedUser);
+  });
 });
