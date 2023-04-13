@@ -8,8 +8,11 @@ import { Db } from "mongodb";
 import { openDatabaseConnection } from "./databaseConfig";
 import { ObjectId } from "mongodb";
 import { json, urlencoded } from "body-parser";
+import taskRoutes from "./routes/taskRoutes";
+import { UserRoutes } from "./routes/userRoutes";
 
 export const app = express();
+// app.use("/tasks", taskRoutes);
 app.use(json());
 app.use(urlencoded({ extended: true }));
 const port = parseInt(process.env.PORT || "3000", 10);
@@ -24,11 +27,13 @@ export async function startServer() {
     userService = new DraggableItemService<UserModel>(
       db.collection<UserModel>("users")
     );
+    const userRoutes = new UserRoutes(userService);
+    app.use("/users", userRoutes.get());
     taskService = new DraggableItemService<TaskModel>(
       db.collection<TaskModel>("tasks")
     );
     laneService = new Service<LaneModel>(db.collection<LaneModel>("lanes"));
-  } catch {
+  } catch (error) {
     console.error("Failed to connect to database");
     //TODO: retry
     process.exit(1);
@@ -45,68 +50,6 @@ if (require.main === module) {
 app.get("/", (req: Request, res: Response) => {
   res.send("Letspair");
 });
-
-app.get("/users", async (req: Request, res: Response) => {
-  try {
-    const users = await userService.getItems();
-    res.json(users);
-  } catch (error) {
-    console.error("Failed to get users", error);
-    res.status(500).send("Failed to get users");
-  }
-});
-
-app.get("/users/:id", async (req: Request, res: Response) => {
-  const { id } = req.params;
-  try {
-    const user = await userService.getItemById(id);
-    if (user) {
-      res.json(user);
-    } else {
-      res.status(404).send(`User ${id} not found`);
-    }
-  } catch (error) {
-    console.error(`Failed to get user ${id}`, error);
-    res.status(500).send(`Failed to get user ${id}`);
-  }
-});
-
-app.post("/users", async (req: Request, res: Response) => {
-  const user = req.body;
-  try {
-    const result = await userService.saveItem(user);
-    res.json(result);
-  } catch (error) {
-    console.error("Failed to save user", error);
-    res.status(500).send("Failed to save user");
-  }
-});
-
-app.put("/users/:id", async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const updatedUser = req.body;
-  try {
-    await userService.updateItem(new ObjectId(id), updatedUser);
-    res.json(updatedUser);
-  } catch (error) {
-    console.error(`Failed to update user ${id}`, error);
-    res.status(500).send(`Failed to update user ${id}`);
-  }
-});
-
-app.post(
-  "/users/handle-lane-id-update",
-  async (req: Request, res: Response) => {
-    const { updatedItem, oldIndexOfUpdatedItem } = req.body;
-    try {
-      await userService.handleDrag(updatedItem, oldIndexOfUpdatedItem);
-      res.send("POST /users/handle-lane-id-update");
-    } catch (error) {
-      console.error("Failed to handle lane id update", error);
-      res.status(500).send("Failed to handle lane id update");
-    }
-  }
-);
 
 app.get("/tasks", async (req: Request, res: Response) => {
   try {
