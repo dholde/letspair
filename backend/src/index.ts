@@ -6,10 +6,10 @@ import { DraggableItemService } from "./services/DraggableItemService";
 import { TaskModel, UserModel, LaneModel } from "./model";
 import { Db } from "mongodb";
 import { openDatabaseConnection } from "./databaseConfig";
-import { ObjectId } from "mongodb";
 import { json, urlencoded } from "body-parser";
 import { TaskRoutes } from "./routes/taskRoutes";
 import { UserRoutes } from "./routes/userRoutes";
+import { LaneRoutes } from "./routes/laneRoutes";
 
 export const app = express();
 // app.use("/tasks", taskRoutes);
@@ -35,6 +35,8 @@ export async function startServer() {
     const taskRoutes = new TaskRoutes(taskService);
     app.use("/tasks", taskRoutes.get());
     laneService = new Service<LaneModel>(db.collection<LaneModel>("lanes"));
+    const laneRoutes = new LaneRoutes(laneService);
+    app.use("/lanes", laneRoutes.get());
   } catch (error) {
     console.error("Failed to connect to database");
     //TODO: retry
