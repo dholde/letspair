@@ -53,63 +53,6 @@ app.get("/", (req: Request, res: Response) => {
   res.send("Letspair");
 });
 
-app.get("/tasks", async (req: Request, res: Response) => {
-  try {
-    const tasks = await taskService.getItems();
-    res.json(tasks);
-  } catch (error) {
-    res.status(500).json({ error: "Failed to retrieve tasks" });
-  }
-});
-
-app.get("/tasks/:id", async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params;
-    const task = await taskService.getItemById(id);
-    if (!task) {
-      res.status(404).json({ error: "Task not found" });
-      return;
-    }
-    res.json(task);
-  } catch (error) {
-    res.status(500).json({ error: "Failed to retrieve task" });
-  }
-});
-
-app.post("/tasks", async (req: Request, res: Response) => {
-  try {
-    const task = req.body;
-    const result = await taskService.saveItem(task);
-    res.json(result);
-  } catch (error) {
-    res.status(500).json({ error: "Failed to save task" });
-  }
-});
-
-app.put("/tasks/:id", async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params;
-    const updatedTask = req.body;
-    await taskService.updateItem(new ObjectId(id), updatedTask);
-    res.send(`Task ${id} has been updated`);
-  } catch (error) {
-    res.status(500).json({ error: "Failed to update task" });
-  }
-});
-
-app.post(
-  "/tasks/handle-lane-id-update",
-  async (req: Request, res: Response) => {
-    try {
-      const { updatedItem, oldIndexOfUpdatedItem } = req.body;
-      await userService.handleDrag(updatedItem, oldIndexOfUpdatedItem);
-      res.send("POST /tasks/handle-lane-id-update");
-    } catch (error) {
-      res.status(500).json({ error: "Failed to handle task lane ID update" });
-    }
-  }
-);
-
 app.get("/lanes", (req, res) => {
   res.send("GET lanes");
 });

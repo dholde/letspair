@@ -54,8 +54,11 @@ export class TaskRoutes {
       try {
         const { id } = req.params;
         const updatedTask = req.body;
-        await this.taskService.updateItem(new ObjectId(id), updatedTask);
-        res.send(`Task ${id} has been updated`);
+        const response: TaskModel = await this.taskService.updateItem(
+          new ObjectId(id),
+          updatedTask
+        );
+        res.json(response);
       } catch (error) {
         res.status(500).json({ error: "Failed to update task" });
       }

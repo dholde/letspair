@@ -77,7 +77,7 @@ export class Service<T extends LetsPairModel> {
         throw "Not Found";
       }
     } catch (error) {
-      console.error(`Error updating item ${JSON.stringify(item)}`);
+      console.error(`Error updating item ${JSON.stringify(item)}: ${error}`);
       throw error;
     }
   }

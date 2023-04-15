@@ -83,3 +83,60 @@ describe("The /users path", () => {
     expect(response.body).toMatchObject(updatedUser);
   });
 });
+
+describe("The /tasks path", () => {
+  let expectedTask: {
+    order: number;
+    laneId: string;
+    description: string;
+    link: string;
+    linkText: string;
+    _id?: string;
+  } = {
+    order: 0,
+    laneId: "",
+    description: "Task 1",
+    link: "",
+    linkText: "",
+  };
+
+  it("should create a task when called with the POST method", async () => {
+    const response = await request(app).post("/tasks").send(expectedTask);
+    expect(response.statusCode).toBe(200);
+    const responseTask = response.body;
+    expect(responseTask).toMatchObject(expectedTask);
+    expect(responseTask._id).toBeDefined();
+    expectedTask._id = responseTask._id;
+  });
+
+  it("should return a task when called with the GET method and with the path variable /:id", async () => {
+    const response = await request(app).get(`/tasks/${expectedTask._id}`);
+    expect(response.statusCode).toBe(200);
+    const responseTask = response.body;
+    expect(responseTask).toMatchObject(expectedTask);
+  });
+
+  it("should return a list of tasks when called with the GET method", async () => {
+    const response = await request(app).get("/tasks");
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toHaveLength(1);
+    const task = response.body[0];
+    expect(task).toMatchObject(expectedTask);
+  });
+
+  it("should update a task when sending a PUT request", async () => {
+    const updatedTask = {
+      _id: expectedTask._id,
+      order: 1,
+      laneId: "2",
+      description: "Updated task description",
+      link: "http://updatedlink.com",
+      linkText: "Updated link",
+    };
+    const response = await request(app)
+      .put(`/tasks/${expectedTask._id}`)
+      .send(updatedTask);
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toMatchObject(updatedTask);
+  });
+});

@@ -57,8 +57,11 @@ export class UserRoutes {
       const { id } = req.params;
       const updatedUser = req.body;
       try {
-        await this.userService.updateItem(new ObjectId(id), updatedUser);
-        res.json(updatedUser);
+        const reponse: UserModel = await this.userService.updateItem(
+          new ObjectId(id),
+          updatedUser
+        );
+        res.json(reponse);
       } catch (error) {
         console.error(`Failed to update user ${id}`, error);
         res.status(500).send(`Failed to update user ${id}`);
