@@ -82,6 +82,13 @@ describe("The /users path", () => {
     expect(response.statusCode).toBe(200);
     expect(response.body).toMatchObject(updatedUser);
   });
+  it("should delete user when sending a DELETE request", async () => {
+    const response = await request(app)
+      .delete(`/users/${expectedUser._id}`)
+      .send();
+    expect(response.statusCode).toBe(200);
+    expect(response.body.result).toMatch("OK");
+  });
 });
 
 describe("The /tasks path", () => {

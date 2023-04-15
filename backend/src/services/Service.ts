@@ -32,8 +32,16 @@ export class Service<T extends LetsPairModel> {
 
   async deleteItem(itemId: ObjectId) {
     try {
-      const filter: Filter<T> = { _id: [itemId] };
-      const result = this.collection.deleteOne(filter);
+      const filter: Filter<T> = { _id: new ObjectId(itemId) } as Filter<T>;
+      const result = await this.collection.deleteOne(filter);
+      if (result.deletedCount === 1) {
+        return "OK";
+      } else {
+        console.error(
+          `Could not be deleted. No item with id ${itemId} found in ${this.collection.collectionName}`
+        );
+        throw `Could not be deleted. No item with id ${itemId} found in ${this.collection.collectionName}`;
+      }
     } catch (error) {
       console.error(
         `Error deleting item with id ${itemId} from collection ${this.collection.collectionName}: ${error}`
