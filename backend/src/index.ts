@@ -54,15 +54,3 @@ if (require.main === module) {
 app.get("/", (req: Request, res: Response) => {
   res.send("Letspair");
 });
-
-app.get("/lanes", (req, res) => {
-  res.send("GET lanes");
-});
-
-app.get("/lanes/:id", (req, res) => {
-  res.send("GET lane by id");
-});
-
-app.post("/delete-item", (req, res) => {
-  res.send("POST delete-item");
-});
