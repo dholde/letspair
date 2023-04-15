@@ -66,8 +66,6 @@ export class Service<T extends LetsPairModel> {
   async updateItem(itemId: ObjectId, item: T) {
     try {
       const filter: Filter<T> = { _id: itemId } as Filter<T>;
-      //const updateDocument: WithoutId<T> = { ...item };
-      //const updateDocument: Omit<T, "_id"> = { ...item };
       const itemWithoutId = this.removeIdField(item);
       const result = await this.collection.replaceOne(filter, itemWithoutId);
       if (result.modifiedCount === 1) {
