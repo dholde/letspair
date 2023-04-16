@@ -78,5 +78,16 @@ export class TaskRoutes {
         }
       }
     );
+
+    this.router.delete("/:id", async (req: Request, res: Response) => {
+      const { id } = req.params;
+      try {
+        const result = await this.taskService.deleteItem(new ObjectId(id));
+        res.json({ result: result });
+      } catch (error) {
+        console.error(`Failed to delete task with id ${id}`, error);
+        res.status(500).send(`Failed to delete task with id ${id}`);
+      }
+    });
   }
 }

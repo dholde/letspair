@@ -146,4 +146,12 @@ describe("The /tasks path", () => {
     expect(response.statusCode).toBe(200);
     expect(response.body).toMatchObject(updatedTask);
   });
+
+  it("should delete task when sending a DELETE request", async () => {
+    const response = await request(app)
+      .delete(`/tasks/${expectedTask._id}`)
+      .send();
+    expect(response.statusCode).toBe(200);
+    expect(response.body.result).toMatch("OK");
+  });
 });
