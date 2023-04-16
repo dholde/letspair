@@ -63,5 +63,16 @@ export class LaneRoutes {
         res.status(500).json({ error: "Failed to update lane" });
       }
     });
+
+    this.router.delete("/:id", async (req: Request, res: Response) => {
+      const { id } = req.params;
+      try {
+        const result = await this.laneService.deleteItem(new ObjectId(id));
+        res.json({ result: result });
+      } catch (error) {
+        console.error(`Failed to delete lane with id ${id}`, error);
+        res.status(500).send(`Failed to delete lane with id ${id}`);
+      }
+    });
   }
 }

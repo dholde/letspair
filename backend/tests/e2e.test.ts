@@ -155,3 +155,40 @@ describe("The /tasks path", () => {
     expect(response.body.result).toMatch("OK");
   });
 });
+
+describe("The /lanes path", () => {
+  let expectedLane: {
+    _id?: string;
+  } = {};
+
+  it("should create a lane when called with the POST method", async () => {
+    const response = await request(app).post("/lanes").send(expectedLane);
+    expect(response.statusCode).toBe(200);
+    const responseLane = response.body;
+    expect(responseLane._id).toBeDefined();
+    expectedLane._id = responseLane._id;
+  });
+
+  it("should return a lane when called with the GET method and with the path variable /:id", async () => {
+    const response = await request(app).get(`/lanes/${expectedLane._id}`);
+    expect(response.statusCode).toBe(200);
+    const responseLane = response.body;
+    expect(responseLane).toMatchObject({ _id: expectedLane._id });
+  });
+
+  it("should return a list of lanes when called with the GET method", async () => {
+    const response = await request(app).get("/lanes");
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toHaveLength(1);
+    const lane = response.body[0];
+    expect(lane).toMatchObject({ _id: expectedLane._id });
+  });
+
+  it("should delete lane when sending a DELETE request", async () => {
+    const response = await request(app)
+      .delete(`/lanes/${expectedLane._id}`)
+      .send();
+    expect(response.statusCode).toBe(200);
+    expect(response.body.result).toMatch("OK");
+  });
+});
