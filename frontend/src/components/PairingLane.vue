@@ -53,15 +53,20 @@ function onDragEnter(event: DragEvent) {
 </template>
 <style scoped>
 .pairing-lane {
-  margin: var(--margin-medium);
-  padding: var(--padding-small);
-  /*background-color: var(--bg-color-main);*/
-  background-color: red;
+  background-color: var(--bg-color-secondary);
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: var(--padding-medium);
+  margin-bottom: var(--margin-medium);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
-.users {
-  min-height: 35px;
-}
+
+.users,
 .tasks {
   min-height: 50px;
+}
+
+.no-bullets {
+  padding-left: 0;
 }
 </style>
