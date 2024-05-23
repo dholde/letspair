@@ -2,6 +2,7 @@ import request from "supertest";
 import { app, startServer } from "../src/index";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import { ObjectId } from "mongodb";
+import { setupUsersTestData } from "./testUtils";
 
 let mongod;
 let server;
@@ -83,6 +84,15 @@ describe("The /users path", () => {
     expect(response.body).toMatchObject(updatedUser);
   });
   it("should delete user when sending a DELETE request", async () => {
+    const response = await request(app)
+      .delete(`/users/${expectedUser._id}`)
+      .send();
+    expect(response.statusCode).toBe(200);
+    expect(response.body.result).toMatch("OK");
+  });
+  // Simulates drop from user area to a lane. User's original position is index 2 in the user area, it's dropped to index 1 in lane
+  it("should put users in correct order when user changed the lane", async () => {
+    await setupUsersTestData();
     const response = await request(app)
       .delete(`/users/${expectedUser._id}`)
       .send();

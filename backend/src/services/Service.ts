@@ -7,7 +7,7 @@ import {
   WithoutId,
   WithId,
 } from "mongodb";
-import { DraggableItem, LetsPairModel } from "../model";
+import { LetsPairModel } from "../model";
 
 export class Service<T extends LetsPairModel> {
   protected collection: Collection<T>;
