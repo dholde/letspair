@@ -64,6 +64,7 @@ function updateUserName(event: Event) {
   display: flex;
   align-items: center;
   cursor: pointer;
+  margin-bottom: var(--margin-small);
 }
 
 .user:hover {

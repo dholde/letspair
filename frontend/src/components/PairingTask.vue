@@ -128,6 +128,7 @@ function onSaveLinkText(value: string) {
   border-radius: 5px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   transition: background-color 0.3s ease;
+  margin-bottom: var(--margin-small);
 }
 
 .task:hover {

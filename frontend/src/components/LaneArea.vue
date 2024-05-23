@@ -21,3 +21,10 @@ function createLane() {
     </ul>
   </div>
 </template>
+
+<style scoped>
+button {
+  margin-top: var(--margin-small);
+  margin-bottom: var(--margin-small);
+}
+</style>
