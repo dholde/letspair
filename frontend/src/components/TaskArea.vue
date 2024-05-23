@@ -33,5 +33,6 @@ useDropEvent(taskAreaElement, undefined);
 
 button {
   margin-top: var(--margin-small);
+  margin-bottom: var(--margin-small);
 }
 </style>

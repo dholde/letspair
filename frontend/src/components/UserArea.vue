@@ -40,6 +40,7 @@ useDropEvent(userAreaElement, undefined);
 
 button {
   margin-top: var(--margin-small);
+  margin-bottom: var(--margin-small);
 }
 
 ul.no-bullets {

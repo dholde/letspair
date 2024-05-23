@@ -58,7 +58,7 @@ function updateUserName(event: Event) {
     --bg-color-task
   ); /* Consistent soft blue for user background */
   padding: var(--padding-small);
-  margin-bottom: var(--margin-small);
+  /*margin-bottom: var(--margin-small);*/
   border-radius: 5px;
   transition: background-color 0.3s ease, transform 0.2s ease;
   display: flex;
@@ -81,7 +81,6 @@ function updateUserName(event: Event) {
   border: none;
   background-color: transparent;
   width: 100%;
-  box-shadow: inset 0 -1px 0 0 var(--bg-color-main);
   color: var(--text-color-primary);
   padding: var(--padding-small);
 }
