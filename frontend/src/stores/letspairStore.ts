@@ -1,7 +1,7 @@
 import { Task } from "@/models/Task";
 import { defineStore } from "pinia";
 import axios from "axios";
-import type { User } from "@/models/User";
+import { User } from "@/models/User";
 import type { Lane } from "@/models/Lane";
 import type { Draggable } from "@/models/Draggable";
 
@@ -72,15 +72,30 @@ export const useStore = defineStore({
       );
     },
     async createUser() {
+      // const unassignedUserListLength = this.users.filter(
+      //   (user) => user.laneId == null || user.laneId == ""
+      // ).length;
+      // try {
+      //   const { data } = await axios.post("http://localhost:5173/users", {
+      //     order: unassignedUserListLength,
+      //   });
+      //   const user = data as User;
+      //   this.users.push(user);
+      // } catch (err) {
+      //   console.error(err);
+      // }
+
       const unassignedUserListLength = this.users.filter(
-        (user) => user.laneId == null || user.laneId == ""
+        (users) => users.laneId == null || users.laneId == ""
       ).length;
+      const newUser = new User(unassignedUserListLength);
       try {
-        const { data } = await axios.post("http://localhost:5173/users", {
-          order: unassignedUserListLength,
-        });
-        const user = data as User;
-        this.users.push(user);
+        const response = await axios.post(
+          "http://localhost:5173/users",
+          newUser
+        );
+        this.users.push(response.data);
+        console.log("debug");
       } catch (err) {
         console.error(err);
       }
