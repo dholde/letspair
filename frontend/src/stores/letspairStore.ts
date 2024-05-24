@@ -198,17 +198,17 @@ export const useStore = defineStore({
       return (laneId: string) =>
         state.users
           .filter((user) => user.laneId === laneId)
-          .sort((user1, user2) => (user1.order < user2.order ? 1 : -1));
+          .sort((user1, user2) => user1.order - user2.order);
     },
     unassignedUsers: (state) =>
       state.users
         .filter((user) => !user.laneId || user.laneId === "")
-        .sort((user1, user2) => (user1.order < user2.order ? 1 : -1)),
+        .sort((user1, user2) => user1.order - user2.order),
     tasksForLaneId: (state) => {
       const tasks = (laneId: string) =>
         state.tasks
           .filter((task) => task.laneId === laneId)
-          .sort((task1, task2) => (task1.order < task2.order ? 1 : -1));
+          .sort((task1, task2) => task1.order - task2.order);
       return tasks;
     },
     unassignedTasks: (state) =>
