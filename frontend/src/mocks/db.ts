@@ -96,7 +96,7 @@ export const customHandlers = [
         oldIndexOfUpdatedItem: number;
       };
       handleDraggableItemLaneIdUpdate(
-        "user",
+        "task",
         updatedItem,
         oldIndexOfUpdatedItem
       );
