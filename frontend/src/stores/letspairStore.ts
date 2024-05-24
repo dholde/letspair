@@ -172,7 +172,7 @@ export const useStore = defineStore({
       const subPath = itemType === "task" ? "tasks" : "users";
       try {
         await axios.post(
-          //Fix this logic as it returns uses in the original order always
+          //Fix this so it's called also for tasks (Mock server has to be adapted)
           `http://localhost:5173/${subPath}/handle-lane-id-update`,
           {
             updatedItem: itemToUpdate,
