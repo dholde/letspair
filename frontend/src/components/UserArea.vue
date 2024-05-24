@@ -21,12 +21,11 @@ useDropEvent(userAreaElement, undefined);
   <div id="userArea" @dragenter.prevent @dragover.prevent ref="userAreaElement">
     Users
     <button @click="createUser">+</button>
-    <PairingUser v-for="user in users" :key="user.id" :user="user" />
-    <!-- <ul class="no-bullets">
+    <ul class="no-bullets">
       <li v-for="user in users" :key="user.id" :user="user">
         <PairingUser :user="user" />
       </li>
-    </ul> -->
+    </ul>
   </div>
 </template>
 
