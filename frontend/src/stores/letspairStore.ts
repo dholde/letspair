@@ -118,34 +118,40 @@ export const useStore = defineStore({
       );
     },
     removeDraftItem(itemType: string) {
+      console.log(`removeDraftItem ...`);
       if (itemType === "user") {
+        console.log(`Print users: ${JSON.stringify(this.users)}`);
         this.users = this.users.filter((user) => !user.isDraft);
       } else if (itemType === "task") {
+        console.log(`Print tasks before: ${JSON.stringify(this.tasks)}`);
         this.tasks = this.tasks.filter((task) => !task.isDraft);
+        console.log(`Print tasks after: ${JSON.stringify(this.tasks)}`);
       }
     },
+    // Check this logic to be correct
     async updateLaneForItem(
       itemId: string,
       itemType: string,
       laneId: string | undefined
     ) {
       const items = itemType === "task" ? this.tasks : this.users;
-      const { indexOfUpdatedItem, indexOfDraftItem } = getIndexes(
+      const { currentIndexOfDraggedItem, indexOfDraftItem } = getIndexes(
         items,
         itemId
       );
       let itemToUpdate;
       if (draftItemExists(indexOfDraftItem)) {
         itemToUpdate = items[indexOfDraftItem];
-        items.splice(indexOfUpdatedItem, 1);
+        items.splice(currentIndexOfDraggedItem, 1);
       } else {
-        itemToUpdate = items[indexOfUpdatedItem];
+        itemToUpdate = items[currentIndexOfDraggedItem];
       }
       updateItemFields(itemToUpdate, laneId, itemId, items);
+      updateItemOrders(items);
 
-      const oldIndexOfUpdatedItem = getOldIndexOfItemToUpdate(
+      const oldIndexOfUpdatedItem = getOriginalIndexOfItemToUpdate(
         indexOfDraftItem,
-        indexOfUpdatedItem
+        currentIndexOfDraggedItem
       );
 
       const subPath = itemType === "task" ? "tasks" : "users";
@@ -233,6 +239,7 @@ const addDraftItemToLane = (
     items.splice(insertAtIndex, 0, draftItem);
     items.forEach((item, index) => (item.order = index));
     console.log("sf");
+    console.log(`Printing items: ${JSON.stringify(items)}`);
   }
 };
 const isDraftItemInsertedBeforeOriginalItem = (
@@ -243,27 +250,27 @@ const isDraftItemInsertedBeforeOriginalItem = (
 const getIndexes = (
   items: Task[] | User[],
   itemId: string
-): { indexOfUpdatedItem: number; indexOfDraftItem: number } => {
-  const indexOfUpdatedItem = items.findIndex(
+): { currentIndexOfDraggedItem: number; indexOfDraftItem: number } => {
+  const currentIndexOfDraggedItem = items.findIndex(
     (item) => item.id === itemId && !item.isDraft
   );
   const indexOfDraftItem = items.findIndex(
     (existingItem) =>
       existingItem.id === itemId && existingItem.isDraft === true
   );
-  return { indexOfUpdatedItem, indexOfDraftItem };
+  return { currentIndexOfDraggedItem, indexOfDraftItem };
 };
 
-const getOldIndexOfItemToUpdate = (
+const getOriginalIndexOfItemToUpdate = (
   indexOfDraftItem: number,
-  indexOfUpdatedItem: number
+  currentIndexOfDraggedItem: number
 ): number => {
   return isDraftItemInsertedBeforeOriginalItem(
     indexOfDraftItem,
-    indexOfUpdatedItem
+    currentIndexOfDraggedItem
   )
-    ? indexOfUpdatedItem - 1
-    : indexOfUpdatedItem;
+    ? currentIndexOfDraggedItem - 1
+    : currentIndexOfDraggedItem;
 };
 
 const draftItemExists = (indexOfDraftItem: number): boolean => {
@@ -272,11 +279,15 @@ const draftItemExists = (indexOfDraftItem: number): boolean => {
 
 const updateItemFields = (
   itemToUpdate: Draggable,
-  laneId: string,
+  laneId: string | undefined,
   itemId: string,
   items: Task[] | User[]
 ): void => {
   itemToUpdate.isDraft = false;
   itemToUpdate.laneId = laneId;
   itemToUpdate.order = items.findIndex((item) => item.id === itemId);
+};
+
+const updateItemOrders = (items: Task[] | User[]): void => {
+  items.forEach((item, index) => (item.order = index));
 };
