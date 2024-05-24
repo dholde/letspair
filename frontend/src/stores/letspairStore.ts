@@ -180,13 +180,14 @@ export const useStore = defineStore({
           }
         );
         // TODO: Check for response code to be success, otherwise throw
-        const responseWithListOfItems = await axios.get(
-          `http://localhost:5173/${subPath}`
-        );
+        const responseWithListOfItems = (
+          await axios.get(`http://localhost:5173/${subPath}`)
+        ).data as Task[] | User[];
+        responseWithListOfItems.sort((a, b) => a.order - b.order);
         if (itemType === "task") {
-          this.tasks = responseWithListOfItems.data as Task[];
+          this.tasks = responseWithListOfItems as Task[];
         } else {
-          this.users = responseWithListOfItems.data as User[];
+          this.users = responseWithListOfItems as User[];
           console.log(this.users);
         }
       } catch (err) {
@@ -251,7 +252,6 @@ const addDraftItemToLane = (
       ? indexOfDraggedOverItem
       : indexOfDraggedOverItem + 1;
     // draftItem.order = insertAtIndex;
-
     items.splice(insertAtIndex, 0, draftItem);
     items.forEach((item, index) => (item.order = index));
     console.log("sf");
