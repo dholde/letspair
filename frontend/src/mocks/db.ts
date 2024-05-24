@@ -229,7 +229,7 @@ const handleNoLaneChange = (
       });
     });
   } else {
-    items.forEach((user) => {
+    itemsWithUpdatedOrders.forEach((user) => {
       db.user.update({
         where: {
           id: {

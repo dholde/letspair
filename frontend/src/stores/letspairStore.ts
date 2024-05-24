@@ -72,33 +72,33 @@ export const useStore = defineStore({
       );
     },
     async createUser() {
-      // const unassignedUserListLength = this.users.filter(
-      //   (user) => user.laneId == null || user.laneId == ""
-      // ).length;
-      // try {
-      //   const { data } = await axios.post("http://localhost:5173/users", {
-      //     order: unassignedUserListLength,
-      //   });
-      //   const user = data as User;
-      //   this.users.push(user);
-      // } catch (err) {
-      //   console.error(err);
-      // }
-
       const unassignedUserListLength = this.users.filter(
-        (users) => users.laneId == null || users.laneId == ""
+        (user) => user.laneId == null || user.laneId == ""
       ).length;
-      const newUser = new User(unassignedUserListLength);
       try {
-        const response = await axios.post(
-          "http://localhost:5173/users",
-          newUser
-        );
-        this.users.push(response.data);
-        console.log("debug");
+        const { data } = await axios.post("http://localhost:5173/users", {
+          order: unassignedUserListLength,
+        });
+        const user = data as User;
+        this.users.push(user);
       } catch (err) {
         console.error(err);
       }
+
+      // const unassignedUserListLength = this.users.filter(
+      // (users) => users.laneId == null || users.laneId == ""
+      // ).length;
+      // const newUser = new User(unassignedUserListLength);
+      // try {
+      // const response = await axios.post(
+      // "http://localhost:5173/users",
+      // newUser
+      // );
+      // this.users.push(response.data);
+      // console.log("debug");
+      // } catch (err) {
+      // console.error(err);
+      // }
     },
     async updateUserName(userId: string, userName: string) {
       const user = this.users.find((user) => user.id === userId);
@@ -172,6 +172,7 @@ export const useStore = defineStore({
       const subPath = itemType === "task" ? "tasks" : "users";
       try {
         await axios.post(
+          //Fix this logic as it returns uses in the original order always
           `http://localhost:5173/${subPath}/handle-lane-id-update`,
           {
             updatedItem: itemToUpdate,
