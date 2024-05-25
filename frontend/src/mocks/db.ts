@@ -1,4 +1,4 @@
-import { factory, primaryKey, nullable } from "@mswjs/data";
+import { factory, primaryKey, nullable, manyOf } from "@mswjs/data";
 import { faker } from "@faker-js/faker";
 import { rest } from "msw";
 import type { Task } from "@/models/Task";
@@ -6,6 +6,11 @@ import type { User } from "@/models/User";
 import type { PrimaryKey } from "@mswjs/data/lib/primaryKey";
 import type { NullableProperty } from "@mswjs/data/lib/nullable";
 import type { ModelAPI } from "@mswjs/data/lib/glossary";
+import type { ManyOf } from "@mswjs/data/lib/relations/Relation";
+
+type UserType = {
+  test: StringConstructor;
+};
 
 type apiModel = {
   user: {
@@ -26,6 +31,23 @@ type apiModel = {
   };
   lane: {
     id: PrimaryKey<string>;
+  };
+  pairingBoard: {
+    id: PrimaryKey<string>;
+    users: [UserType];
+    tasks: {
+      id: StringConstructor;
+      description: NullableProperty<string>;
+      order: NumberConstructor;
+      laneId: NullableProperty<string>;
+      link: StringConstructor;
+      linkText: StringConstructor;
+      isCurrentlyDragged: BooleanConstructor;
+      isDraft: BooleanConstructor;
+    };
+    lanes: {
+      id: StringConstructor;
+    };
   };
 };
 
@@ -49,44 +71,50 @@ export const db = factory({
   lane: {
     id: primaryKey(faker.datatype.uuid),
   },
+  pairingBoard: {
+    id: primaryKey(faker.datatype.uuid),
+    users: manyOf("user"),
+    tasks: manyOf("task"),
+    lanes: manyOf("lane"),
+  },
 });
 
 export const customHandlers = [
-  rest.post("http://localhost:5173/delete-item", (req, res, ctx) => {
-    const { itemType, itemId, order } = { ...req.body } as {
-      itemType: "user" | "task";
-      itemId: string;
-      order: number;
-    };
-    const dbModel: ModelAPI<apiModel, typeof itemType> =
-      itemType === "task" ? db.task : db.user;
-    dbModel.delete({
-      where: {
-        id: {
-          equals: itemId,
-        },
-      },
-    });
-    const itemsWithGreaterOrder = dbModel.findMany({
-      where: {
-        order: {
-          gt: order,
-        },
-      },
-    });
-    dbModel.updateMany({
-      where: {
-        id: {
-          in: itemsWithGreaterOrder.map((item) => item.id),
-        },
-      },
-      data: {
-        order: (order) => order - 1,
-      },
-    });
-    const items = dbModel.findMany({});
-    return res(ctx.status(200), ctx.json(items));
-  }),
+  // rest.post("http://localhost:5173/delete-item", (req, res, ctx) => {
+  //   const { itemType, itemId, order } = { ...req.body } as {
+  //     itemType: "user" | "task";
+  //     itemId: string;
+  //     order: number;
+  //   };
+  //   const dbModel: ModelAPI<apiModel, typeof itemType> =
+  //     itemType === "task" ? db.task : db.user;
+  //   dbModel.delete({
+  //     where: {
+  //       id: {
+  //         equals: itemId,
+  //       },
+  //     },
+  //   });
+  //   const itemsWithGreaterOrder = dbModel.findMany({
+  //     where: {
+  //       order: {
+  //         gt: order,
+  //       },
+  //     },
+  //   });
+  //   dbModel.updateMany({
+  //     where: {
+  //       id: {
+  //         in: itemsWithGreaterOrder.map((item) => item.id),
+  //       },
+  //     },
+  //     data: {
+  //       order: (order) => order - 1,
+  //     },
+  //   });
+  //   const items = dbModel.findMany({});
+  //   return res(ctx.status(200), ctx.json(items));
+  // }),
 
   rest.post(
     "http://localhost:5173/tasks/handle-lane-id-update",
@@ -324,5 +352,6 @@ export const handlers = [
   ...db.user.toHandlers("rest", "http://localhost:5173"),
   ...db.task.toHandlers("rest", "http://localhost:5173"),
   ...db.lane.toHandlers("rest", "http://localhost:5173"),
+  ...db.pairingBoard.toHandlers("rest", "http://localhost:5173"),
   ...customHandlers,
 ];
