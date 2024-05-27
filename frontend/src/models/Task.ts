@@ -1,7 +1,7 @@
 import type { Draggable } from "./Draggable";
 
 export class Task implements Draggable {
-  public id!: string;
+  public id?: string;
   public description!: string;
   public order: number;
   public hasLinkText?: () => boolean = () => {
