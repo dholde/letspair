@@ -1,7 +1,7 @@
 import { Task } from "@/models/Task";
 import { defineStore } from "pinia";
 import axios from "axios";
-import { User } from "@/models/User";
+import type { User } from "@/models/User";
 import type { Lane } from "@/models/Lane";
 import type { Draggable } from "@/models/Draggable";
 
