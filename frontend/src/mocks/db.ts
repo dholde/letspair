@@ -3,6 +3,7 @@ import { faker } from "@faker-js/faker";
 import { rest } from "msw";
 import type { Task } from "@/models/Task";
 import type { User } from "@/models/User";
+import type { Lane } from "@/models/Lane";
 import type { PrimaryKey } from "@mswjs/data/lib/primaryKey";
 import type { NullableProperty } from "@mswjs/data/lib/nullable";
 import type { ModelAPI } from "@mswjs/data/lib/glossary";
@@ -29,6 +30,43 @@ import type { ModelAPI } from "@mswjs/data/lib/glossary";
 //   };
 // };
 
+type TaskType = {
+  id: PrimaryKey<string>;
+  description: NullableProperty<string>;
+  order: number;
+  laneId: NullableProperty<string>;
+  link: NullableProperty<string>;
+  linkText: NullableProperty<string>;
+  isCurrentlyDragged: NullableProperty<boolean>;
+  isDraft: NullableProperty<boolean>;
+};
+
+type apiModel = {
+  user: {
+    id: PrimaryKey<string>;
+    order: NumberConstructor;
+    name: NullableProperty<string>;
+    laneId: NullableProperty<string>;
+  };
+  task: {
+    id: PrimaryKey<string>;
+    description: NullableProperty<string>;
+    order: NumberConstructor;
+    laneId: NullableProperty<string>;
+    link: StringConstructor;
+    linkText: StringConstructor;
+    isCurrentlyDragged: BooleanConstructor;
+    isDraft: BooleanConstructor;
+  };
+  lane: {
+    id: PrimaryKey<string>;
+  };
+  pairingBoard: {
+    id: PrimaryKey<string>;
+    tasks: [TaskType];
+  };
+};
+
 export const db = factory({
   user: {
     id: primaryKey(faker.datatype.uuid),
@@ -41,23 +79,50 @@ export const db = factory({
     description: nullable(String),
     order: Number,
     laneId: nullable(String),
-    link: String,
-    linkText: String,
-    isCurrentlyDragged: Boolean,
-    isDraft: Boolean,
+    link: nullable(String),
+    linkText: nullable(String),
+    isCurrentlyDragged: nullable(Boolean),
+    isDraft: nullable(Boolean),
   },
   lane: {
     id: primaryKey(faker.datatype.uuid),
   },
   pairingBoard: {
     id: primaryKey(faker.datatype.uuid),
-    tasks: manyOf("Task"),
-    users: manyOf("User"),
-    lanes: manyOf("Lane"),
+    tasks: manyOf("task"),
+    // users: manyOf("user"),
+    // lanes: manyOf("lane"),
   },
 });
 
 export const customHandlers = [
+  rest.post("http://localhost:5173/pairing-board", (req, res, ctx) => {
+    const { id, tasks, users, lanes } = { ...req.body } as {
+      id: string;
+      tasks: Task[];
+      users: User[];
+      lanes: Lane[];
+    };
+    // const dbModel: ModelAPI<apiModel, typeof db.pairingBoard> = db.pairingBoard;
+    // Create task models
+    const taskModels = tasks.map((task) => db.task.create(task));
+
+    // Create user models (if required)
+    const userModels = users.map((user) => db.user.create(user));
+
+    // Create lane models (if required)
+    const laneModels = lanes.map((lane) => db.lane.create(lane));
+
+    // Create the pairing board
+    const pairingBoard = db.pairingBoard.create({
+      id,
+      tasks: taskModels,
+      //users: userModels,
+      //lanes: laneModels,
+    });
+
+    return res(ctx.json(pairingBoard));
+  }),
   // rest.post("http://localhost:5173/delete-item", (req, res, ctx) => {
   //   const { itemType, itemId, order } = { ...req.body } as {
   //     itemType: "user" | "task";

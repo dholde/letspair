@@ -4,6 +4,7 @@ import axios from "axios";
 import type { User } from "@/models/User";
 import type { Lane } from "@/models/Lane";
 import type { Draggable } from "@/models/Draggable";
+import { PairingBoard } from "@/models/PairingBoard";
 
 export const useStore = defineStore({
   id: "letsPair",
@@ -11,6 +12,7 @@ export const useStore = defineStore({
     tasks: [] as Task[],
     users: [] as User[],
     lanes: [] as Lane[],
+    pairingBoard: {} as PairingBoard,
     dragAndDropInfo: {
       draggedItemId: null,
       draggedOverItemId: null,
@@ -37,16 +39,37 @@ export const useStore = defineStore({
       const unassignedTaskListLength = this.tasks.filter(
         (task) => task.laneId == null || task.laneId == ""
       ).length;
-      const newTask = new Task(unassignedTaskListLength);
+      const task = new Task(unassignedTaskListLength);
+      if (!this.pairingBoard || Object.keys(this.pairingBoard).length == 0) {
+        this.pairingBoard = new PairingBoard();
+      }
+
+      this.pairingBoard.tasks.push(task);
+
       try {
         const response = await axios.post(
-          "http://localhost:5173/tasks",
-          newTask
+          "http://localhost:5173/pairing-board",
+          this.pairingBoard
         );
-        this.tasks.push(response.data);
+        this.pairingBoard = response.data as PairingBoard;
+        this.tasks = this.pairingBoard.tasks;
       } catch (err) {
         console.error(err);
       }
+
+      // const unassignedTaskListLength = this.tasks.filter(
+      //   (task) => task.laneId == null || task.laneId == ""
+      // ).length;
+      // const newTask = new Task(unassignedTaskListLength);
+      // try {
+      //   const response = await axios.post(
+      //     "http://localhost:5173/tasks",
+      //     newTask
+      //   );
+      //   this.tasks.push(response.data);
+      // } catch (err) {
+      //   console.error(err);
+      // }
     },
     async updateTask(task: Task) {
       try {
