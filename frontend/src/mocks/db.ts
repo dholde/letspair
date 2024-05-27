@@ -6,50 +6,28 @@ import type { User } from "@/models/User";
 import type { PrimaryKey } from "@mswjs/data/lib/primaryKey";
 import type { NullableProperty } from "@mswjs/data/lib/nullable";
 import type { ModelAPI } from "@mswjs/data/lib/glossary";
-import type { ManyOf } from "@mswjs/data/lib/relations/Relation";
 
-type UserType = {
-  test: StringConstructor;
-};
-
-type apiModel = {
-  user: {
-    id: PrimaryKey<string>;
-    order: NumberConstructor;
-    name: NullableProperty<string>;
-    laneId: NullableProperty<string>;
-  };
-  task: {
-    id: PrimaryKey<string>;
-    description: NullableProperty<string>;
-    order: NumberConstructor;
-    laneId: NullableProperty<string>;
-    link: StringConstructor;
-    linkText: StringConstructor;
-    isCurrentlyDragged: BooleanConstructor;
-    isDraft: BooleanConstructor;
-  };
-  lane: {
-    id: PrimaryKey<string>;
-  };
-  pairingBoard: {
-    id: PrimaryKey<string>;
-    users: [UserType];
-    tasks: {
-      id: StringConstructor;
-      description: NullableProperty<string>;
-      order: NumberConstructor;
-      laneId: NullableProperty<string>;
-      link: StringConstructor;
-      linkText: StringConstructor;
-      isCurrentlyDragged: BooleanConstructor;
-      isDraft: BooleanConstructor;
-    };
-    lanes: {
-      id: StringConstructor;
-    };
-  };
-};
+// type apiModel = {
+//   user: {
+//     id: PrimaryKey<string>;
+//     order: NumberConstructor;
+//     name: NullableProperty<string>;
+//     laneId: NullableProperty<string>;
+//   };
+//   task: {
+//     id: PrimaryKey<string>;
+//     description: NullableProperty<string>;
+//     order: NumberConstructor;
+//     laneId: NullableProperty<string>;
+//     link: StringConstructor;
+//     linkText: StringConstructor;
+//     isCurrentlyDragged: BooleanConstructor;
+//     isDraft: BooleanConstructor;
+//   };
+//   lane: {
+//     id: PrimaryKey<string>;
+//   };
+// };
 
 export const db = factory({
   user: {
@@ -73,9 +51,9 @@ export const db = factory({
   },
   pairingBoard: {
     id: primaryKey(faker.datatype.uuid),
-    users: manyOf("user"),
-    tasks: manyOf("task"),
-    lanes: manyOf("lane"),
+    tasks: manyOf("Task"),
+    users: manyOf("User"),
+    lanes: manyOf("Lane"),
   },
 });
 
@@ -115,39 +93,38 @@ export const customHandlers = [
   //   const items = dbModel.findMany({});
   //   return res(ctx.status(200), ctx.json(items));
   // }),
-
-  rest.post(
-    "http://localhost:5173/tasks/handle-lane-id-update",
-    (req, res, ctx) => {
-      const { updatedItem, oldIndexOfUpdatedItem } = { ...req.body } as {
-        updatedItem: Task;
-        oldIndexOfUpdatedItem: number;
-      };
-      handleDraggableItemLaneIdUpdate(
-        "task",
-        updatedItem,
-        oldIndexOfUpdatedItem
-      );
-      return res(ctx.status(201), ctx.json({ status: "ok" }));
-    }
-  ),
-  rest.post(
-    "http://localhost:5173/users/handle-lane-id-update",
-    (req, res, ctx) => {
-      const { updatedItem, oldIndexOfUpdatedItem } = {
-        ...req.body,
-      } as {
-        updatedItem: User;
-        oldIndexOfUpdatedItem: number;
-      };
-      handleDraggableItemLaneIdUpdate(
-        "user",
-        updatedItem,
-        oldIndexOfUpdatedItem
-      );
-      return res(ctx.status(201), ctx.json({ status: "ok" }));
-    }
-  ),
+  // rest.post(
+  //   "http://localhost:5173/tasks/handle-lane-id-update",
+  //   (req, res, ctx) => {
+  //     const { updatedItem, oldIndexOfUpdatedItem } = { ...req.body } as {
+  //       updatedItem: Task;
+  //       oldIndexOfUpdatedItem: number;
+  //     };
+  //     handleDraggableItemLaneIdUpdate(
+  //       "task",
+  //       updatedItem,
+  //       oldIndexOfUpdatedItem
+  //     );
+  //     return res(ctx.status(201), ctx.json({ status: "ok" }));
+  //   }
+  // ),
+  // rest.post(
+  //   "http://localhost:5173/users/handle-lane-id-update",
+  //   (req, res, ctx) => {
+  //     const { updatedItem, oldIndexOfUpdatedItem } = {
+  //       ...req.body,
+  //     } as {
+  //       updatedItem: User;
+  //       oldIndexOfUpdatedItem: number;
+  //     };
+  //     handleDraggableItemLaneIdUpdate(
+  //       "user",
+  //       updatedItem,
+  //       oldIndexOfUpdatedItem
+  //     );
+  //     return res(ctx.status(201), ctx.json({ status: "ok" }));
+  //   }
+  // ),
 ];
 
 const handleDraggableItemLaneIdUpdate = (
