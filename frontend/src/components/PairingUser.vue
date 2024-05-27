@@ -54,56 +54,40 @@ function updateUserName(event: Event) {
 
 <style scoped>
 .user {
-  height: 2em;
-  position: relative;
-  background-color: var(--bg-color-task);
-  margin: 3px;
-  padding: 2px;
-}
-.inner {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  height: 100%;
-  width: 100%;
+  background-color: var(
+    --bg-color-task
+  ); /* Consistent soft blue for user background */
+  padding: var(--padding-small);
+  /*margin-bottom: var(--margin-small);*/
+  border-radius: 5px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  margin-bottom: var(--margin-small);
 }
 
-/* input:hover {
-  background-color: var(--bg-color-main);
-} */
+.user:hover {
+  transform: translateY(-2px);
+  background-color: var(--hover-bg-color); /* Soft hover effect */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.inner {
+  width: 100%;
+  position: relative;
+}
 
 .input {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  height: 100%;
-  width: 100%;
   border: none;
   background-color: transparent;
-  padding: 8px;
-  width: 98%;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-  cursor: default;
+  width: 100%;
+  color: var(--text-color-primary);
+  padding: var(--padding-small);
 }
+
 .input:focus {
-  outline: 2px solid var(--input-focus-color);
+  outline: none;
+  box-shadow: inset 0 -2px 0 0 var(--input-focus-color);
 }
-
-/* input {
-  position: relative;
-  border-width: 0px;
-  border: none;
-  background-color: transparent;
-  padding: 5px;
-  height: 100%;
-  width: 100%;
-  -webkit-box-sizing: border-box; 
-  -moz-box-sizing: border-box; 
-} */
-
-/* input:focus {
-  outline: 3px solid var(--input-focus-color);
-} */
 </style>

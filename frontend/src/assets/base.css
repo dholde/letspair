@@ -1,17 +1,34 @@
 :root {
-  /*colors*/
-  --bg-color-main: #eeeeee;
-  --bg-color-secondary: #cccccc;
-  --bg-color-task: #accbff;
-  --input-focus-color: #9999ff;
+  /* Base colors */
+  --bg-color-main: #f8f9fa; /* Very light grey background */
+  --bg-color-secondary: #ffffff; /* White for cards and panels */
+  --bg-color-task: #d6e4ff; /* Soft blue for tasks */
+  --bg-color-accent: #b8daff; /* Lighter blue for buttons and interactive elements */
+  --input-focus-color: #ffc069; /* Soft orange for focused inputs */
 
-  /*margins*/
-  --margin-big: 15px;
-  --margin-medium: 8px;
-  --margin-small: 3px;
-  --padding-big: 15px;
-  --padding-medium: 8px;
-  --padding-small: 3px;
+  /* Additional color accents */
+  --text-color-primary: #5a5a5a; /* Dark grey for primary text */
+  --hover-bg-color: #ffe7ba; /* Very soft orange for hover states */
+
+  /* Typography */
+  --font-primary: "Roboto", sans-serif;
+
+  /* Margins and padding */
+  --margin-big: 20px;
+  --margin-medium: 12px;
+  --margin-small: 8px;
+  --padding-big: 20px;
+  --padding-medium: 12px;
+  --padding-small: 8px;
+}
+
+body {
+  font-family: var(--font-primary);
+  background-color: var(--bg-color-main);
+  color: #333;
+  margin: 0;
+  padding: 0;
+  font-size: 16px;
 }
 
 ul.no-bullets {
@@ -20,29 +37,39 @@ ul.no-bullets {
   padding: 0;
 }
 
+button {
+  background-color: var(--bg-color-accent);
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+input,
+textarea {
+  width: 100%;
+  padding: 10px;
+  border-radius: 5px;
+  border: 2px solid transparent;
+  transition: border-color 0.3s;
+}
+
+input:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--input-focus-color);
+}
+
 .dragged {
   opacity: 0.5;
 }
+
 .draft {
-  opacity: 0.2;
-}
-
-/* 1. declare transition */
-.list-move,
-.list-enter-active,
-.list-leave-active {
-  transition: all 0.5s cubic-bezier(0.55, 0, 0.1, 1);
-}
-
-/* 2. declare enter from and leave to state */
-.list-enter-from,
-.list-leave-to {
-  opacity: 0;
-  transform: scaleY(0.01) translate(30px, 0);
-}
-
-/* 3. ensure leaving items are taken out of layout flow so that moving
-      animations can be calculated correctly. */
-.list-leave-active {
-  position: absolute;
+  opacity: 0.3;
 }

@@ -121,12 +121,23 @@ function onSaveLinkText(value: string) {
 
 <style scoped>
 .task {
-  min-height: 2em;
   background-color: var(--bg-color-task);
-  margin: 5px;
+  color: var(--text-color-primary);
+  padding: var(--padding-small);
+  margin-bottom: var(--margin-small);
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease;
+  margin-bottom: var(--margin-small);
 }
+
+.task:hover {
+  background-color: var(--hover-bg-color);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
 .inner {
-  padding: 0.5em;
+  padding: var(--padding-small);
 }
 
 /* The Modal (background) */

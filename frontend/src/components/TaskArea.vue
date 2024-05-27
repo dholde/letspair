@@ -21,3 +21,18 @@ useDropEvent(taskAreaElement, undefined);
     <PairingTask v-for="task in tasks" :key="task.id" :task="task" />
   </div>
 </template>
+
+/* In TaskArea.vue */
+<style scoped>
+#taskArea {
+  background-color: var(--bg-color-secondary);
+  padding: var(--padding-medium);
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+button {
+  margin-top: var(--margin-small);
+  margin-bottom: var(--margin-small);
+}
+</style>

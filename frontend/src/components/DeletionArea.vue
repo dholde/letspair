@@ -20,6 +20,6 @@ useDropEvent(deletionAreaElement, undefined);
   margin: var(--margin-medium);
   padding: var(--padding-small);
   /*background-color: var(--bg-color-main);*/
-  background-color: red;
+  background-color: green;
 }
 </style>
