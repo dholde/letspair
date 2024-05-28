@@ -105,23 +105,49 @@ export const customHandlers = [
     };
     // const dbModel: ModelAPI<apiModel, typeof db.pairingBoard> = db.pairingBoard;
     // Create task models
-    const taskModels = tasks.map((task) => db.task.create(task));
+    if (tasks) {
+      tasks.map((task) => {
+        if (!task.id) {
+          return db.task.create(task);
+        }
+      });
+    }
 
     // Create user models (if required)
-    const userModels = users.map((user) => db.user.create(user));
+    if (users) {
+      const userModels = users.map((user) => db.user.create(user));
+    }
 
-    // Create lane models (if required)
-    const laneModels = lanes.map((lane) => db.lane.create(lane));
+    if (lanes) {
+      const laneModels = lanes.map((lane) => db.lane.create(lane));
+    }
 
-    // Create the pairing board
-    const pairingBoard = db.pairingBoard.create({
-      id,
-      tasks: taskModels,
-      //users: userModels,
-      //lanes: laneModels,
-    });
+    const allTasks = db.task.getAll();
+    const pairingBoards = db.pairingBoard.getAll();
+    let pairingBoard = pairingBoards[0];
+    if (!pairingBoards.length) {
+      pairingBoard = db.pairingBoard.create({
+        id,
+        tasks: allTasks,
+        //users: userModels,
+        //lanes: laneModels,
+      });
+    } else {
+      db.pairingBoard.update({
+        where: {
+          id: {
+            equals: pairingBoard.id,
+          },
+        },
+        data: {
+          tasks: allTasks,
+          //users: userModels,
+          //lanes: laneModels,
+        },
+      });
+    }
 
-    return res(ctx.json(pairingBoard));
+    return res(ctx.json(db.pairingBoard.getAll()[0]));
   }),
   // rest.post("http://localhost:5173/delete-item", (req, res, ctx) => {
   //   const { itemType, itemId, order } = { ...req.body } as {

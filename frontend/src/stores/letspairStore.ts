@@ -56,31 +56,41 @@ export const useStore = defineStore({
       } catch (err) {
         console.error(err);
       }
-
-      // const unassignedTaskListLength = this.tasks.filter(
-      //   (task) => task.laneId == null || task.laneId == ""
-      // ).length;
-      // const newTask = new Task(unassignedTaskListLength);
+    },
+    async updateTask(task: Task) {
       // try {
-      //   const response = await axios.post(
-      //     "http://localhost:5173/tasks",
-      //     newTask
-      //   );
-      //   this.tasks.push(response.data);
+      //   await axios.put(`http://localhost:5173/tasks/${task.id}`, task);
       // } catch (err) {
       //   console.error(err);
       // }
-    },
-    async updateTask(task: Task) {
-      try {
-        await axios.put(`http://localhost:5173/tasks/${task.id}`, task);
-      } catch (err) {
-        console.error(err);
-      }
-      const taskToUpdate = this.tasks.find(
+      // const taskToUpdate = this.tasks.find(
+      //   (existingTask) => existingTask.id === task.id
+      // );
+      // Object.assign(taskToUpdate as Task, task);
+
+      // Find and update the task within the pairingBoard
+      const taskToUpdate = this.pairingBoard.tasks.find(
         (existingTask) => existingTask.id === task.id
       );
-      Object.assign(taskToUpdate as Task, task);
+
+      if (taskToUpdate) {
+        Object.assign(taskToUpdate, task);
+        try {
+          // Send the entire pairingBoard to the server
+          const response = await axios.post(
+            "http://localhost:5173/pairing-board",
+            this.pairingBoard
+          );
+
+          // Update the local state with the response from the server
+          this.pairingBoard = response.data as PairingBoard;
+          this.tasks = this.pairingBoard.tasks;
+        } catch (err) {
+          console.error(err);
+        }
+      } else {
+        console.error("Task not found in pairingBoard");
+      }
     },
     async addDraftTaskToLane(
       draggedTaskId: string,
