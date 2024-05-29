@@ -90,8 +90,8 @@ export const db = factory({
   pairingBoard: {
     id: primaryKey(faker.datatype.uuid),
     tasks: manyOf("task"),
-    // users: manyOf("user"),
-    // lanes: manyOf("lane"),
+    users: manyOf("user"),
+    lanes: manyOf("lane"),
   },
 });
 
@@ -103,8 +103,7 @@ export const customHandlers = [
       users: User[];
       lanes: Lane[];
     };
-    // const dbModel: ModelAPI<apiModel, typeof db.pairingBoard> = db.pairingBoard;
-    // Create task models
+
     if (tasks) {
       tasks.map((task) => {
         if (!task.id) {
@@ -113,24 +112,33 @@ export const customHandlers = [
       });
     }
 
-    // Create user models (if required)
     if (users) {
-      const userModels = users.map((user) => db.user.create(user));
+      users.map((user) => {
+        if (!user.id) {
+          return db.user.create(user);
+        }
+      });
     }
 
     if (lanes) {
-      const laneModels = lanes.map((lane) => db.lane.create(lane));
+      lanes.map((lane) => {
+        if (!lane.id) {
+          return db.lane.create(lane);
+        }
+      });
     }
 
     const allTasks = db.task.getAll();
+    const allUsers = db.user.getAll();
+    const allLanes = db.lane.getAll();
     const pairingBoards = db.pairingBoard.getAll();
     let pairingBoard = pairingBoards[0];
     if (!pairingBoards.length) {
       pairingBoard = db.pairingBoard.create({
         id,
         tasks: allTasks,
-        //users: userModels,
-        //lanes: laneModels,
+        users: allUsers,
+        lanes: allLanes,
       });
     } else {
       db.pairingBoard.update({
@@ -141,8 +149,8 @@ export const customHandlers = [
         },
         data: {
           tasks: allTasks,
-          //users: userModels,
-          //lanes: laneModels,
+          users: allUsers,
+          lanes: allLanes,
         },
       });
     }

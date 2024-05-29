@@ -1,7 +1,7 @@
 import { Task } from "@/models/Task";
 import { defineStore } from "pinia";
 import axios from "axios";
-import type { User } from "@/models/User";
+import { User } from "@/models/User";
 import type { Lane } from "@/models/Lane";
 import type { Draggable } from "@/models/Draggable";
 import { PairingBoard } from "@/models/PairingBoard";
@@ -58,17 +58,6 @@ export const useStore = defineStore({
       }
     },
     async updateTask(task: Task) {
-      // try {
-      //   await axios.put(`http://localhost:5173/tasks/${task.id}`, task);
-      // } catch (err) {
-      //   console.error(err);
-      // }
-      // const taskToUpdate = this.tasks.find(
-      //   (existingTask) => existingTask.id === task.id
-      // );
-      // Object.assign(taskToUpdate as Task, task);
-
-      // Find and update the task within the pairingBoard
       const taskToUpdate = this.pairingBoard.tasks.find(
         (existingTask) => existingTask.id === task.id
       );
@@ -77,7 +66,7 @@ export const useStore = defineStore({
         Object.assign(taskToUpdate, task);
         try {
           // Send the entire pairingBoard to the server
-          const response = await axios.post(
+          const response = await axios.put(
             "http://localhost:5173/pairing-board",
             this.pairingBoard
           );
@@ -108,40 +97,43 @@ export const useStore = defineStore({
       const unassignedUserListLength = this.users.filter(
         (user) => user.laneId == null || user.laneId == ""
       ).length;
+      const user = new User(unassignedUserListLength);
+      if (!this.pairingBoard || Object.keys(this.pairingBoard).length == 0) {
+        this.pairingBoard = new PairingBoard();
+      }
+
+      this.pairingBoard.users.push(user);
+
       try {
-        const { data } = await axios.post("http://localhost:5173/users", {
-          order: unassignedUserListLength,
-        });
-        const user = data as User;
-        this.users.push(user);
+        const response = await axios.post(
+          "http://localhost:5173/pairing-board",
+          this.pairingBoard
+        );
+        this.pairingBoard = response.data as PairingBoard;
+        this.users = this.pairingBoard.users;
       } catch (err) {
         console.error(err);
       }
-
-      // const unassignedUserListLength = this.users.filter(
-      // (users) => users.laneId == null || users.laneId == ""
-      // ).length;
-      // const newUser = new User(unassignedUserListLength);
-      // try {
-      // const response = await axios.post(
-      // "http://localhost:5173/users",
-      // newUser
-      // );
-      // this.users.push(response.data);
-      // console.log("debug");
-      // } catch (err) {
-      // console.error(err);
-      // }
     },
     async updateUserName(userId: string, userName: string) {
-      const user = this.users.find((user) => user.id === userId);
-      if (user) {
-        user.name = userName;
+      const userToUpdate = this.pairingBoard.users.find(
+        (existingUser) => existingUser.id === userId
+      );
+
+      if (userToUpdate) {
+        userToUpdate.name = userName;
         try {
-          await axios.put(`http://localhost:5173/users/${userId}`, user);
+          const response = await axios.put(
+            "http://localhost:5173/pairing-board",
+            this.pairingBoard
+          );
+          this.pairingBoard = response.data as PairingBoard;
+          this.users = this.pairingBoard.users;
         } catch (err) {
           console.error(err);
         }
+      } else {
+        console.error("User not found in pairingBoard");
       }
     },
     async createLane() {
