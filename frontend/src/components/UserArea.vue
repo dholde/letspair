@@ -11,7 +11,7 @@ const users = computed(() => {
 });
 
 function createUser() {
-  store.createUser();
+  store.createEntity("user");
 }
 
 useDropEvent(userAreaElement, undefined);

@@ -35,16 +35,18 @@ export const useStore = defineStore({
         console.error(err);
       }
     },
-    async createTask() {
-      const unassignedTaskListLength = this.tasks.filter(
-        (task) => task.laneId == null || task.laneId == ""
-      ).length;
-      const task = new Task(unassignedTaskListLength);
-      if (!this.pairingBoard || Object.keys(this.pairingBoard).length == 0) {
-        this.pairingBoard = new PairingBoard();
-      }
 
-      this.pairingBoard.tasks.push(task);
+    async createEntity(entityType: "task" | "user") {
+      const entityListOfInterest =
+        entityType === "task" ? this.tasks : this.users;
+
+      const entity = instantiateEntity(entityListOfInterest, entityType);
+
+      this.pairingBoard = addEntityToPairingBoard(
+        this.pairingBoard,
+        entity,
+        entityType
+      );
 
       try {
         const response = await axios.post(
@@ -53,7 +55,9 @@ export const useStore = defineStore({
         );
         this.pairingBoard = response.data as PairingBoard;
         this.tasks = this.pairingBoard.tasks;
+        this.users = this.pairingBoard.users;
       } catch (err) {
+        alert(`Error creating entity of type ${entityType}: ${err}`);
         console.error(err);
       }
     },
@@ -92,28 +96,6 @@ export const useStore = defineStore({
         addAbove,
         this.tasks
       );
-    },
-    async createUser() {
-      const unassignedUserListLength = this.users.filter(
-        (user) => user.laneId == null || user.laneId == ""
-      ).length;
-      const user = new User(unassignedUserListLength);
-      if (!this.pairingBoard || Object.keys(this.pairingBoard).length == 0) {
-        this.pairingBoard = new PairingBoard();
-      }
-
-      this.pairingBoard.users.push(user);
-
-      try {
-        const response = await axios.post(
-          "http://localhost:5173/pairing-board",
-          this.pairingBoard
-        );
-        this.pairingBoard = response.data as PairingBoard;
-        this.users = this.pairingBoard.users;
-      } catch (err) {
-        console.error(err);
-      }
     },
     async updateUserName(userId: string, userName: string) {
       const userToUpdate = this.pairingBoard.users.find(
@@ -253,6 +235,37 @@ interface DragAndDropInfo {
   addPositionChanged: false;
   currentLaneId: string | null;
 }
+
+const instantiateEntity = (
+  entityList: Draggable[],
+  entityType: string
+): Draggable => {
+  const unassignedEntityListLength = entityList.filter(
+    (item) => item.laneId == null || item.laneId == ""
+  ).length;
+
+  const entity =
+    entityType === "task"
+      ? new Task(unassignedEntityListLength)
+      : new User(unassignedEntityListLength);
+  return entity;
+};
+
+const addEntityToPairingBoard = (
+  pairingBoard: PairingBoard,
+  entity: Draggable,
+  entityType: "task" | "user"
+) => {
+  if (!pairingBoard || Object.keys(pairingBoard).length == 0) {
+    pairingBoard = new PairingBoard();
+  }
+  if (entityType === "task") {
+    pairingBoard.tasks.push(entity as Task);
+  } else {
+    pairingBoard.users.push(entity as User);
+  }
+  return pairingBoard;
+};
 
 const addDraftItemToLane = (
   draggedItemId: string,

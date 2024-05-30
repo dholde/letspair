@@ -9,7 +9,7 @@ const tasks = computed(() => {
 });
 const taskAreaElement = ref<HTMLElement | null>(null);
 function createTask() {
-  store.createTask();
+  store.createEntity("task");
 }
 
 useDropEvent(taskAreaElement, undefined);
