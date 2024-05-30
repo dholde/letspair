@@ -61,30 +61,38 @@ export const useStore = defineStore({
         console.error(err);
       }
     },
-    async updateTask(task: Task) {
-      const taskToUpdate = this.pairingBoard.tasks.find(
-        (existingTask) => existingTask.id === task.id
+    async updateEntity(entity: Draggable, entityType: "task" | "user") {
+      const entityListOfInterest =
+        entityType === "task" ? this.tasks : this.users;
+      const entityToUpdate = entityListOfInterest.find(
+        (existingEntity) => existingEntity.id === entity.id
       );
-
-      if (taskToUpdate) {
-        Object.assign(taskToUpdate, task);
+      if (entityToUpdate) {
+        Object.assign(entityToUpdate, entity);
         try {
-          // Send the entire pairingBoard to the server
+          // const responseGet = await axios.get(
+          //   `http://localhost:5173/pairing-board/${this.pairingBoard.id}`
+          // );
           const response = await axios.put(
-            "http://localhost:5173/pairing-board",
+            `http://localhost:5173/pairing-boards/${this.pairingBoard.id}`,
             this.pairingBoard
           );
-
-          // Update the local state with the response from the server
           this.pairingBoard = response.data as PairingBoard;
           this.tasks = this.pairingBoard.tasks;
+          this.users = this.pairingBoard.users;
         } catch (err) {
           console.error(err);
         }
       } else {
-        console.error("Task not found in pairingBoard");
+        alert(
+          `Entity of type ${entityType} not found in pairingBoard for id: ${entity.id}`
+        );
+        console.error(
+          `Entity of type ${entityType} not found in pairingBoard for id: ${entity.id}`
+        );
       }
     },
+
     async addDraftTaskToLane(
       draggedTaskId: string,
       draggedOverTaskId: string,

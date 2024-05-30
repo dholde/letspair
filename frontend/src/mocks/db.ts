@@ -96,6 +96,50 @@ export const db = factory({
 });
 
 export const customHandlers = [
+  rest.put("http://localhost:5173/pairing-boards/:id", (req, res, ctx) => {
+    const { id, tasks, users, lanes } = { ...req.body } as {
+      id: string;
+      tasks: Task[];
+      users: User[];
+      lanes: Lane[];
+    };
+    if (tasks) {
+      tasks.map((task) => {
+        return db.task.update({
+          where: {
+            id: {
+              equals: task.id,
+            },
+          },
+          data: task,
+        });
+      });
+    }
+
+    if (users) {
+      users.map((user) => {
+        return db.user.update({
+          where: {
+            id: {
+              equals: user.id,
+            },
+          },
+          data: user,
+        });
+      });
+    }
+
+    if (lanes) {
+      lanes.map((lane) => {
+        return db.lane.update({
+          where: { id: { equals: lane.id } },
+          data: lane,
+        });
+      });
+    }
+    updatePairingBoard(id);
+    return res(ctx.json(db.pairingBoard.getAll()[0]));
+  }),
   rest.post("http://localhost:5173/pairing-board", (req, res, ctx) => {
     const { id, tasks, users, lanes } = { ...req.body } as {
       id: string;
@@ -128,32 +172,7 @@ export const customHandlers = [
       });
     }
 
-    const allTasks = db.task.getAll();
-    const allUsers = db.user.getAll();
-    const allLanes = db.lane.getAll();
-    const pairingBoards = db.pairingBoard.getAll();
-    let pairingBoard = pairingBoards[0];
-    if (!pairingBoards.length) {
-      pairingBoard = db.pairingBoard.create({
-        id,
-        tasks: allTasks,
-        users: allUsers,
-        lanes: allLanes,
-      });
-    } else {
-      db.pairingBoard.update({
-        where: {
-          id: {
-            equals: pairingBoard.id,
-          },
-        },
-        data: {
-          tasks: allTasks,
-          users: allUsers,
-          lanes: allLanes,
-        },
-      });
-    }
+    updatePairingBoard(id);
 
     return res(ctx.json(db.pairingBoard.getAll()[0]));
   }),
@@ -225,6 +244,35 @@ export const customHandlers = [
   //   }
   // ),
 ];
+
+const updatePairingBoard = (id: string) => {
+  const allTasks = db.task.getAll();
+  const allUsers = db.user.getAll();
+  const allLanes = db.lane.getAll();
+  const pairingBoards = db.pairingBoard.getAll();
+  let pairingBoard = pairingBoards[0];
+  if (!pairingBoards.length) {
+    pairingBoard = db.pairingBoard.create({
+      id,
+      tasks: allTasks,
+      users: allUsers,
+      lanes: allLanes,
+    });
+  } else {
+    db.pairingBoard.update({
+      where: {
+        id: {
+          equals: pairingBoard.id,
+        },
+      },
+      data: {
+        tasks: allTasks,
+        users: allUsers,
+        lanes: allLanes,
+      },
+    });
+  }
+};
 
 const handleDraggableItemLaneIdUpdate = (
   updatedItemType: "task" | "user",

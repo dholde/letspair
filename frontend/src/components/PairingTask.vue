@@ -36,7 +36,7 @@ function closeModal() {
 function onSaveDescription(value: string) {
   const task = { ...props.task };
   task.description = value;
-  store.updateTask(task);
+  store.updateEntity(task, "task");
 }
 
 function onSaveLink(value: string) {
@@ -46,7 +46,7 @@ function onSaveLink(value: string) {
   if (!hasLinkText(task)) {
     task.linkText = value;
   }
-  store.updateTask(task);
+  store.updateEntity(task, "task");
 }
 
 function hasLinkText(task: Task): boolean {
@@ -63,7 +63,7 @@ function prependProtocol(taskLink: string) {
 function onSaveLinkText(value: string) {
   const task = { ...props.task };
   task.linkText = value;
-  store.updateTask(task);
+  store.updateEntity(task, "task");
 }
 </script>
 <template>
