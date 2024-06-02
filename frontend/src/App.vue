@@ -3,6 +3,13 @@ import TaskArea from "@/components/TaskArea.vue";
 import UserArea from "@/components/UserArea.vue";
 import LaneArea from "@/components/LaneArea.vue";
 import DeletionArea from "@/components/DeletionArea.vue";
+import { useStore } from "@/stores/letspairStore";
+import { onMounted } from "vue";
+
+const store = useStore();
+onMounted(() => {
+  store.getPairingBoard();
+});
 </script>
 
 <template>

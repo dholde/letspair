@@ -19,6 +19,23 @@ export const useStore = defineStore({
     } as DragAndDropInfo,
   }),
   actions: {
+    async getPairingBoard() {
+      try {
+        const response = await axios.get(
+          "http://localhost:5173/pairing-boards"
+        );
+        const pairingBoard = response.data as PairingBoard[];
+        if (pairingBoard.length > 0) {
+          this.pairingBoard = pairingBoard[0];
+          this.tasks = this.pairingBoard.tasks ? this.pairingBoard.tasks : [];
+          this.users = this.pairingBoard.users ? this.pairingBoard.users : [];
+          this.lanes = this.pairingBoard.lanes ? this.pairingBoard.lanes : [];
+        }
+      } catch (err) {
+        alert(`Error loading pairing board data: ${err}`);
+        console.error(err);
+      }
+    },
     async deleteItem(itemType: string, itemId: string, order: number) {
       try {
         const response = await axios.post("http://localhost:5173/delete-item", {
@@ -50,7 +67,7 @@ export const useStore = defineStore({
 
       try {
         const response = await axios.post(
-          "http://localhost:5173/pairing-board",
+          "http://localhost:5173/pairing-boards",
           this.pairingBoard
         );
         this.pairingBoard = response.data as PairingBoard;

@@ -96,6 +96,10 @@ export const db = factory({
 });
 
 export const customHandlers = [
+  rest.get("http://localhost:5173/pairing-boards", (req, res, ctx) => {
+    const pairingBoards = db.pairingBoard.getAll();
+    return res(ctx.json(pairingBoards));
+  }),
   rest.put("http://localhost:5173/pairing-boards/:id", (req, res, ctx) => {
     const { id, tasks, users, lanes } = { ...req.body } as {
       id: string;
@@ -140,7 +144,7 @@ export const customHandlers = [
     updatePairingBoard(id);
     return res(ctx.json(db.pairingBoard.getAll()[0]));
   }),
-  rest.post("http://localhost:5173/pairing-board", (req, res, ctx) => {
+  rest.post("http://localhost:5173/pairing-boards", (req, res, ctx) => {
     const { id, tasks, users, lanes } = { ...req.body } as {
       id: string;
       tasks: Task[];
