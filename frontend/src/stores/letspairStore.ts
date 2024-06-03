@@ -36,18 +36,25 @@ export const useStore = defineStore({
         console.error(err);
       }
     },
-    async deleteItem(itemType: string, itemId: string, order: number) {
+    async deleteItem(entityType: string, itemId: string, order: number) {
+      const entityListOfInterest =
+        entityType === "task" ? this.tasks : this.users;
+      entityListOfInterest.sort((a, b) => a.order - b.order);
+      entityListOfInterest.splice(order, 1);
+
+      if (entityType === "task") {
+        this.pairingBoard.tasks = entityListOfInterest as Task[];
+      } else {
+        this.pairingBoard.users = entityListOfInterest as User[];
+      }
       try {
-        const response = await axios.post("http://localhost:5173/delete-item", {
-          itemType,
-          itemId,
-          order,
-        });
-        if (itemType === "task") {
-          this.tasks = response.data as Task[];
-        } else {
-          this.users = response.data as User[];
-        }
+        const response = await axios.put(
+          `http://localhost:5173/pairing-boards/${this.pairingBoard.id}`,
+          this.pairingBoard
+        );
+        this.pairingBoard = response.data as PairingBoard;
+        this.tasks = this.pairingBoard.tasks;
+        this.users = this.pairingBoard.users;
       } catch (err) {
         console.error(err);
       }
@@ -87,9 +94,6 @@ export const useStore = defineStore({
       if (entityToUpdate) {
         Object.assign(entityToUpdate, entity);
         try {
-          // const responseGet = await axios.get(
-          //   `http://localhost:5173/pairing-board/${this.pairingBoard.id}`
-          // );
           const response = await axios.put(
             `http://localhost:5173/pairing-boards/${this.pairingBoard.id}`,
             this.pairingBoard
