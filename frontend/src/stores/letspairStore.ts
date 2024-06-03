@@ -39,8 +39,17 @@ export const useStore = defineStore({
     async deleteItem(entityType: string, itemId: string, order: number) {
       const entityListOfInterest =
         entityType === "task" ? this.tasks : this.users;
-      entityListOfInterest.filter((entity) => entity.isDraft === false);
-      entityListOfInterest.splice(order, 1);
+      const indexesOfItemsToDelete = entityListOfInterest
+        .map((entity, index) => {
+          if (entity.id === itemId) {
+            return index;
+          }
+        })
+        .filter((index) => index !== undefined) as number[];
+      indexesOfItemsToDelete.sort((a, b) => b - a);
+      indexesOfItemsToDelete.forEach((index) =>
+        entityListOfInterest.splice(index, 1)
+      );
       entityListOfInterest.sort((a, b) => a.order - b.order);
       entityListOfInterest.forEach((entity, index) => (entity.order = index));
 
