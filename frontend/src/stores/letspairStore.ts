@@ -39,8 +39,10 @@ export const useStore = defineStore({
     async deleteItem(entityType: string, itemId: string, order: number) {
       const entityListOfInterest =
         entityType === "task" ? this.tasks : this.users;
-      entityListOfInterest.sort((a, b) => a.order - b.order);
+      entityListOfInterest.filter((entity) => entity.isDraft === false);
       entityListOfInterest.splice(order, 1);
+      entityListOfInterest.sort((a, b) => a.order - b.order);
+      entityListOfInterest.forEach((entity, index) => (entity.order = index));
 
       if (entityType === "task") {
         this.pairingBoard.tasks = entityListOfInterest as Task[];
@@ -49,7 +51,7 @@ export const useStore = defineStore({
       }
       try {
         const response = await axios.put(
-          `http://localhost:5173/pairing-boards/${this.pairingBoard.id}`,
+          `http://localhost:5173/pairing-boards/${this.pairingBoard.id}`, //TODO: Apply the logic for updating/deleting items in the db
           this.pairingBoard
         );
         this.pairingBoard = response.data as PairingBoard;
