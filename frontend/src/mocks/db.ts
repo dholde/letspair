@@ -4,68 +4,6 @@ import { rest } from "msw";
 import type { Task } from "@/models/Task";
 import type { User } from "@/models/User";
 import type { Lane } from "@/models/Lane";
-import type { PrimaryKey } from "@mswjs/data/lib/primaryKey";
-import type { NullableProperty } from "@mswjs/data/lib/nullable";
-import type { ModelAPI } from "@mswjs/data/lib/glossary";
-
-// type apiModel = {
-//   user: {
-//     id: PrimaryKey<string>;
-//     order: NumberConstructor;
-//     name: NullableProperty<string>;
-//     laneId: NullableProperty<string>;
-//   };
-//   task: {
-//     id: PrimaryKey<string>;
-//     description: NullableProperty<string>;
-//     order: NumberConstructor;
-//     laneId: NullableProperty<string>;
-//     link: StringConstructor;
-//     linkText: StringConstructor;
-//     isCurrentlyDragged: BooleanConstructor;
-//     isDraft: BooleanConstructor;
-//   };
-//   lane: {
-//     id: PrimaryKey<string>;
-//   };
-// };
-
-type TaskType = {
-  id: PrimaryKey<string>;
-  description: NullableProperty<string>;
-  order: number;
-  laneId: NullableProperty<string>;
-  link: NullableProperty<string>;
-  linkText: NullableProperty<string>;
-  isCurrentlyDragged: NullableProperty<boolean>;
-  isDraft: NullableProperty<boolean>;
-};
-
-type apiModel = {
-  user: {
-    id: PrimaryKey<string>;
-    order: NumberConstructor;
-    name: NullableProperty<string>;
-    laneId: NullableProperty<string>;
-  };
-  task: {
-    id: PrimaryKey<string>;
-    description: NullableProperty<string>;
-    order: NumberConstructor;
-    laneId: NullableProperty<string>;
-    link: StringConstructor;
-    linkText: StringConstructor;
-    isCurrentlyDragged: BooleanConstructor;
-    isDraft: BooleanConstructor;
-  };
-  lane: {
-    id: PrimaryKey<string>;
-  };
-  pairingBoard: {
-    id: PrimaryKey<string>;
-    tasks: [TaskType];
-  };
-};
 
 export const db = factory({
   user: {
@@ -107,40 +45,105 @@ export const customHandlers = [
       users: User[];
       lanes: Lane[];
     };
-    if (tasks) {
-      tasks.map((task) => {
-        return db.task.update({
-          where: {
-            id: {
-              equals: task.id,
-            },
-          },
-          data: task,
-        });
-      });
-    }
 
-    if (users) {
-      users.map((user) => {
-        return db.user.update({
-          where: {
-            id: {
-              equals: user.id,
-            },
-          },
-          data: user,
-        });
-      });
-    }
+    const persistedTasks = db.task.getAll();
+    const persistedUsers = db.user.getAll();
+    const persistedLanes = db.lane.getAll();
 
-    if (lanes) {
-      lanes.map((lane) => {
-        return db.lane.update({
-          where: { id: { equals: lane.id } },
-          data: lane,
-        });
+    const taskMap = new Map(tasks.map((task) => [task.id, task]));
+    const userMap = new Map(users.map((user) => [user.id, user]));
+    const laneMap = new Map(users.map((lane) => [lane.id, lane]));
+
+    // Tasks
+    const taskIdsToDelete = persistedTasks
+      .filter((task) => !taskMap.has(task.id))
+      .map((task) => task.id);
+    const tasksToUpdate = persistedTasks
+      .map((task) => taskMap.get(task.id))
+      .filter(Boolean) as Task[];
+    const tasksToCreate = tasks.filter((task) => !tasksToUpdate.includes(task));
+
+    db.task.deleteMany({
+      where: {
+        id: {
+          in: taskIdsToDelete,
+        },
+      },
+    });
+    tasksToUpdate.forEach((task) => {
+      db.task.update({
+        where: {
+          id: {
+            equals: task.id,
+          },
+        },
+        data: task,
       });
-    }
+    });
+    tasksToCreate.forEach((task) => {
+      db.task.create(task);
+    });
+
+    // Users
+    const userIdsToDelete = persistedUsers
+      .filter((user) => !userMap.has(user.id))
+      .map((user) => user.id);
+    const usersToUpdate = persistedUsers
+      .map((user) => userMap.get(user.id))
+      .filter(Boolean) as User[];
+    const usersToCreate = users.filter((user) => !usersToUpdate.includes(user));
+
+    db.user.deleteMany({
+      where: {
+        id: {
+          in: userIdsToDelete,
+        },
+      },
+    });
+    usersToUpdate.forEach((user) => {
+      db.user.update({
+        where: {
+          id: {
+            equals: user.id,
+          },
+        },
+        data: user,
+      });
+    });
+    usersToCreate.forEach((user) => {
+      db.user.create(user);
+    });
+
+    // Lanes
+    const laneIdsToDelete = persistedLanes
+      .filter((lane) => !laneMap.has(lane.id))
+      .map((lane) => lane.id);
+    const lanesToUpdate = persistedLanes
+      .map((lane) => laneMap.get(lane.id))
+      .filter(Boolean) as Lane[];
+    const lanesToCreate = lanes.filter((lane) => !lanesToUpdate.includes(lane));
+
+    db.lane.deleteMany({
+      where: {
+        id: {
+          in: laneIdsToDelete,
+        },
+      },
+    });
+    lanesToUpdate.forEach((lane) => {
+      db.lane.update({
+        where: {
+          id: {
+            equals: lane.id,
+          },
+        },
+        data: lane,
+      });
+    });
+    lanesToCreate.forEach((lane) => {
+      db.lane.create(lane);
+    });
+
     updatePairingBoard(id);
     return res(ctx.json(db.pairingBoard.getAll()[0]));
   }),
