@@ -244,26 +244,38 @@ export const useStore = defineStore({
   },
   getters: {
     usersForLaneId: (state) => {
-      return (laneId: string) =>
-        state.users
-          .filter((user) => user.laneId === laneId)
-          .sort((user1, user2) => user1.order - user2.order);
+      return (laneId: string) => {
+        const usersOfInterest = state.pairingBoard.lanes.find(
+          (lane) => lane.id === laneId
+        )?.users;
+        if (usersOfInterest) {
+          return usersOfInterest.sort(
+            (user1, user2) => user1.order - user2.order
+          );
+        }
+      };
     },
     unassignedUsers: (state) =>
-      state.users
-        .filter((user) => !user.laneId || user.laneId === "")
-        .sort((user1, user2) => user1.order - user2.order),
+      state.pairingBoard.users.sort(
+        (user1, user2) => user1.order - user2.order
+      ),
     tasksForLaneId: (state) => {
-      const tasks = (laneId: string) =>
-        state.tasks
-          .filter((task) => task.laneId === laneId)
-          .sort((task1, task2) => task1.order - task2.order);
+      const tasks = (laneId: string) => {
+        const tasksOfInterest = state.pairingBoard.lanes.find(
+          (lane) => lane.id === laneId
+        )?.tasks;
+        if (tasksOfInterest) {
+          return tasksOfInterest.sort(
+            (task1, task2) => task1.order - task2.order
+          );
+        }
+      };
       return tasks;
     },
     unassignedTasks: (state) =>
-      state.tasks
-        .filter((task) => !task.laneId || task.laneId === "")
-        .sort((task1, task2) => task1.order - task2.order),
+      state.pairingBoard.tasks.sort(
+        (task1, task2) => task1.order - task2.order
+      ),
   },
 });
 
