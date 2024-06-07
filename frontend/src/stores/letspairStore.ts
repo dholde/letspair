@@ -172,12 +172,18 @@ export const useStore = defineStore({
       draggedOverUserId: string,
       addAbove: boolean
     ) {
-      addDraftItemToLane(
+      const [draggedUser, users] = findItem(
         draggedUserId,
-        draggedOverUserId,
-        addAbove,
-        this.users
+        "users",
+        this.pairingBoard
       );
+      if (draggedUser && users) {
+        addDraftItemToLaneNew(draggedUser, draggedOverUserId, addAbove, users);
+      } else {
+        const errorMessage = `User with id ${draggedUserId} not found in pairing board`;
+        console.error(errorMessage);
+        alert(errorMessage);
+      }
     },
     removeDraftItem(itemType: string) {
       console.log(`removeDraftItem ...`);
@@ -317,6 +323,54 @@ const addEntityToPairingBoard = (
     pairingBoard.users.push(entity as User);
   }
   return pairingBoard;
+};
+
+const findItem = (
+  itemId: string,
+  itemListFieldName: "users" | "tasks",
+  pairingBoard: PairingBoard
+): [Draggable | null, Draggable[] | null] => {
+  const item = pairingBoard[itemListFieldName].find(
+    (item) => item.id === itemId
+  );
+  if (item) {
+    return [item, pairingBoard[itemListFieldName]];
+  } else {
+    pairingBoard.lanes.forEach((lane) => {
+      const item = lane[itemListFieldName]?.find((item) => item.id === itemId);
+      if (item) {
+        return [item, lane[itemListFieldName]];
+      }
+    });
+  }
+  return [null, null];
+};
+
+const addDraftItemToLaneNew = (
+  draggedItem: Draggable,
+  draggedOverItemId: string,
+  addAbove: boolean,
+  items: Draggable[]
+) => {
+  const draggedOverItem = items.find((item) => item.id === draggedOverItemId);
+  if (draggedItem && draggedOverItem) {
+    const fromerDraftItemIndex = items.findIndex(
+      (item) => item.id === draggedItem.id && item.isDraft === true
+    );
+    if (fromerDraftItemIndex != -1) {
+      items.splice(fromerDraftItemIndex, 1);
+    }
+    const indexOfDraggedOverItem = items.indexOf(draggedOverItem);
+    const draftItem = JSON.parse(JSON.stringify(draggedItem));
+    draftItem.isDraft = true;
+    draftItem.laneId = draggedOverItem.laneId;
+    const insertAtIndex = addAbove
+      ? indexOfDraggedOverItem
+      : indexOfDraggedOverItem + 1;
+    // draftItem.order = insertAtIndex;
+    items.splice(insertAtIndex, 0, draftItem);
+    items.forEach((item, index) => (item.order = index));
+  }
 };
 
 const addDraftItemToLane = (
