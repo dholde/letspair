@@ -177,8 +177,19 @@ export const useStore = defineStore({
         "users",
         this.pairingBoard
       );
-      if (draggedUser && users) {
-        addDraftItemToLaneNew(draggedUser, draggedOverUserId, addAbove, users);
+      const [draggedOverUser, draggedOverUserList] = findItem(
+        draggedUserId,
+        "users",
+        this.pairingBoard
+      );
+      if (draggedUser && users && draggedOverUser && draggedOverUserList) {
+        addDraftItemToLaneNew(
+          draggedUser,
+          draggedOverUser,
+          draggedOverUserList,
+          addAbove,
+          users
+        );
       } else {
         const errorMessage = `User with id ${draggedUserId} not found in pairing board`;
         console.error(errorMessage);
@@ -348,11 +359,11 @@ const findItem = (
 
 const addDraftItemToLaneNew = (
   draggedItem: Draggable,
-  draggedOverItemId: string,
+  draggedOverItem: Draggable,
+  draggedOverItemList: Draggable[],
   addAbove: boolean,
   items: Draggable[]
 ) => {
-  const draggedOverItem = items.find((item) => item.id === draggedOverItemId);
   if (draggedItem && draggedOverItem) {
     const fromerDraftItemIndex = items.findIndex(
       (item) => item.id === draggedItem.id && item.isDraft === true
