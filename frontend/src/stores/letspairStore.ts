@@ -12,7 +12,7 @@ export const useStore = defineStore({
     tasks: [] as Task[],
     users: [] as User[],
     lanes: [] as Lane[],
-    pairingBoard: {} as PairingBoard,
+    pairingBoard: new PairingBoard(),
     dragAndDropInfo: {
       draggedItemId: null,
       draggedOverItemId: null,
