@@ -357,6 +357,31 @@ const findItem = (
   return [null, null];
 };
 
+const findItemIndex = (
+  itemId: string,
+  isDraft: boolean,
+  pairingBoard: PairingBoard,
+  itemListFieldName: "users" | "tasks"
+): number => {
+  let itemIndex = pairingBoard[itemListFieldName].findIndex(
+    (item) => item.id === itemId && item.isDraft === isDraft
+  );
+  if (itemIndex == -1) {
+    pairingBoard.lanes.forEach((lane) => {
+      const items = lane[itemListFieldName];
+      if (items) {
+        itemIndex = items.findIndex(
+          (item) => item.id === itemId && item.isDraft === isDraft
+        );
+        if (itemIndex != -1) {
+          return itemIndex;
+        }
+      }
+    });
+  }
+  return itemIndex;
+};
+
 const addDraftItemToLaneNew = (
   draggedItem: Draggable,
   draggedOverItem: Draggable,
