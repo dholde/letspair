@@ -4,9 +4,11 @@ import type { User } from "./User";
 
 export class Lane implements BaseModel {
   public id?: string;
-  public tasks?: Task[];
-  public users?: User[];
+  public tasks: Task[];
+  public users: User[];
   constructor(id: string) {
     this.id = id;
+    this.tasks = [];
+    this.users = [];
   }
 }

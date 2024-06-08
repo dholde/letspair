@@ -172,7 +172,7 @@ export const useStore = defineStore({
       draggedOverUserId: string,
       addAbove: boolean
     ) {
-      const [draggedUser, users] = findItem(
+      const [draggedUser, itemListContainingDraggedUser] = findItem(
         draggedUserId,
         "users",
         this.pairingBoard
@@ -182,13 +182,22 @@ export const useStore = defineStore({
         "users",
         this.pairingBoard
       );
-      if (draggedUser && users && draggedOverUser && draggedOverUserList) {
+      const [itemListContainingPreviosDraftUser, previousDraftItemIndex] =
+        findItemListAndIndex(draggedUserId, true, this.pairingBoard, "users");
+      if (
+        draggedUser &&
+        itemListContainingDraggedUser &&
+        draggedOverUser &&
+        draggedOverUserList
+      ) {
         addDraftItemToLaneNew(
           draggedUser,
+          previousDraftItemIndex,
+          itemListContainingPreviosDraftUser,
           draggedOverUser,
           draggedOverUserList,
           addAbove,
-          users
+          itemListContainingDraggedUser
         );
       } else {
         const errorMessage = `User with id ${draggedUserId} not found in pairing board`;
@@ -357,18 +366,19 @@ const findItem = (
   return [null, null];
 };
 
-const findItemIndex = (
+const findItemListAndIndex = (
   itemId: string,
   isDraft: boolean,
   pairingBoard: PairingBoard,
   itemListFieldName: "users" | "tasks"
-): number => {
+): [Draggable[], number] => {
   let itemIndex = pairingBoard[itemListFieldName].findIndex(
     (item) => item.id === itemId && item.isDraft === isDraft
   );
+  let items = pairingBoard[itemListFieldName];
   if (itemIndex == -1) {
     pairingBoard.lanes.forEach((lane) => {
-      const items = lane[itemListFieldName];
+      items = lane[itemListFieldName];
       if (items) {
         itemIndex = items.findIndex(
           (item) => item.id === itemId && item.isDraft === isDraft
@@ -379,33 +389,31 @@ const findItemIndex = (
       }
     });
   }
-  return itemIndex;
+  return [items, itemIndex];
 };
 
 const addDraftItemToLaneNew = (
   draggedItem: Draggable,
+  previousDraftItemIndex: number,
+  itemListContainingPreviosDraftItem: Draggable[],
   draggedOverItem: Draggable,
   draggedOverItemList: Draggable[],
   addAbove: boolean,
-  items: Draggable[]
+  itemListContainingDraggedItem: Draggable[] // TODO: Don't need this here
 ) => {
   if (draggedItem && draggedOverItem) {
-    const fromerDraftItemIndex = items.findIndex(
-      (item) => item.id === draggedItem.id && item.isDraft === true
-    );
-    if (fromerDraftItemIndex != -1) {
-      items.splice(fromerDraftItemIndex, 1);
+    if (previousDraftItemIndex != -1) {
+      itemListContainingPreviosDraftItem.splice(previousDraftItemIndex, 1);
     }
-    const indexOfDraggedOverItem = items.indexOf(draggedOverItem);
+    const indexOfDraggedOverItem = draggedOverItemList.indexOf(draggedOverItem);
     const draftItem = JSON.parse(JSON.stringify(draggedItem));
     draftItem.isDraft = true;
     draftItem.laneId = draggedOverItem.laneId;
     const insertAtIndex = addAbove
       ? indexOfDraggedOverItem
       : indexOfDraggedOverItem + 1;
-    // draftItem.order = insertAtIndex;
-    items.splice(insertAtIndex, 0, draftItem);
-    items.forEach((item, index) => (item.order = index));
+    draggedOverItemList.splice(insertAtIndex, 0, draftItem);
+    draggedOverItemList.forEach((item, index) => (item.order = index));
   }
 };
 
