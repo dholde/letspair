@@ -178,7 +178,7 @@ export const useStore = defineStore({
         this.pairingBoard
       );
       const [draggedOverUser, draggedOverUserList] = findItem(
-        draggedUserId,
+        draggedOverUserId,
         "users",
         this.pairingBoard
       );
@@ -412,6 +412,9 @@ const addDraftItemToLaneNew = (
     const insertAtIndex = addAbove
       ? indexOfDraggedOverItem
       : indexOfDraggedOverItem + 1;
+    console.log(
+      `addAbove: ${addAbove}, indexOfDraggedOverItem: ${indexOfDraggedOverItem}, indertAtIndex: ${insertAtIndex}`
+    );
     draggedOverItemList.splice(insertAtIndex, 0, draftItem);
     draggedOverItemList.forEach((item, index) => (item.order = index));
   }
