@@ -130,12 +130,33 @@ export const useStore = defineStore({
       draggedOverTaskId: string,
       addAbove: boolean
     ) {
-      addDraftItemToLane(
+      const draggedTask = findItemAndRespectiveItemList(
         draggedTaskId,
-        draggedOverTaskId,
-        addAbove,
-        this.tasks
-      );
+        "tasks",
+        this.pairingBoard
+      )[0];
+      const [draggedOverTask, draggedOverTaskList] =
+        findItemAndRespectiveItemList(
+          draggedOverTaskId,
+          "tasks",
+          this.pairingBoard
+        );
+      const [itemListContainingPreviosDraftTask, previousDraftItemIndex] =
+        findItemListAndIndex(draggedTaskId, true, this.pairingBoard, "tasks");
+      if (draggedTask && draggedOverTask && draggedOverTaskList) {
+        addDraftItemToLane(
+          draggedTask,
+          previousDraftItemIndex,
+          itemListContainingPreviosDraftTask,
+          draggedOverTask,
+          draggedOverTaskList,
+          addAbove
+        );
+      } else {
+        const errorMessage = `Task with id ${draggedTaskId} not found in pairing board`;
+        console.error(errorMessage);
+        alert(errorMessage);
+      }
     },
     async updateUserName(userId: string, userName: string) {
       const userToUpdate = this.pairingBoard.users.find(
@@ -172,32 +193,27 @@ export const useStore = defineStore({
       draggedOverUserId: string,
       addAbove: boolean
     ) {
-      const [draggedUser, itemListContainingDraggedUser] = findItem(
+      const draggedUser = findItemAndRespectiveItemList(
         draggedUserId,
         "users",
         this.pairingBoard
-      );
-      const [draggedOverUser, draggedOverUserList] = findItem(
-        draggedOverUserId,
-        "users",
-        this.pairingBoard
-      );
+      )[0];
+      const [draggedOverUser, draggedOverUserList] =
+        findItemAndRespectiveItemList(
+          draggedOverUserId,
+          "users",
+          this.pairingBoard
+        );
       const [itemListContainingPreviosDraftUser, previousDraftItemIndex] =
         findItemListAndIndex(draggedUserId, true, this.pairingBoard, "users");
-      if (
-        draggedUser &&
-        itemListContainingDraggedUser &&
-        draggedOverUser &&
-        draggedOverUserList
-      ) {
-        addDraftItemToLaneNew(
+      if (draggedUser && draggedOverUser && draggedOverUserList) {
+        addDraftItemToLane(
           draggedUser,
           previousDraftItemIndex,
           itemListContainingPreviosDraftUser,
           draggedOverUser,
           draggedOverUserList,
-          addAbove,
-          itemListContainingDraggedUser
+          addAbove
         );
       } else {
         const errorMessage = `User with id ${draggedUserId} not found in pairing board`;
@@ -345,7 +361,7 @@ const addEntityToPairingBoard = (
   return pairingBoard;
 };
 
-const findItem = (
+const findItemAndRespectiveItemList = (
   itemId: string,
   itemListFieldName: "users" | "tasks",
   pairingBoard: PairingBoard
@@ -392,14 +408,13 @@ const findItemListAndIndex = (
   return [items, itemIndex];
 };
 
-const addDraftItemToLaneNew = (
+const addDraftItemToLane = (
   draggedItem: Draggable,
   previousDraftItemIndex: number,
   itemListContainingPreviosDraftItem: Draggable[],
   draggedOverItem: Draggable,
   draggedOverItemList: Draggable[],
-  addAbove: boolean,
-  itemListContainingDraggedItem: Draggable[] // TODO: Don't need this here
+  addAbove: boolean
 ) => {
   if (draggedItem && draggedOverItem) {
     if (previousDraftItemIndex != -1) {
@@ -420,35 +435,6 @@ const addDraftItemToLaneNew = (
   }
 };
 
-const addDraftItemToLane = (
-  draggedItemId: string,
-  draggedOverItemId: string,
-  addAbove: boolean,
-  items: Draggable[]
-) => {
-  const draggedItem = items.find((item) => item.id === draggedItemId);
-  const draggedOverItem = items.find((item) => item.id === draggedOverItemId);
-  if (draggedItem && draggedOverItem) {
-    const fromerDraftItemIndex = items.findIndex(
-      (item) => item.id === draggedItem.id && item.isDraft === true
-    );
-    if (fromerDraftItemIndex != -1) {
-      items.splice(fromerDraftItemIndex, 1);
-    }
-    const indexOfDraggedOverItem = items.indexOf(draggedOverItem);
-    const draftItem = JSON.parse(JSON.stringify(draggedItem));
-    draftItem.isDraft = true;
-    draftItem.laneId = draggedOverItem.laneId;
-    const insertAtIndex = addAbove
-      ? indexOfDraggedOverItem
-      : indexOfDraggedOverItem + 1;
-    // draftItem.order = insertAtIndex;
-    items.splice(insertAtIndex, 0, draftItem);
-    items.forEach((item, index) => (item.order = index));
-    console.log("sf");
-    console.log(`Printing items: ${JSON.stringify(items)}`);
-  }
-};
 const isDraftItemInsertedBeforeOriginalItem = (
   indexOfDraftItem: number,
   indexOfOriginalItem: number
