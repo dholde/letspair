@@ -52,7 +52,7 @@ export const customHandlers = [
 
     const taskMap = new Map(tasks.map((task) => [task.id, task]));
     const userMap = new Map(users.map((user) => [user.id, user]));
-    const laneMap = new Map(users.map((lane) => [lane.id, lane]));
+    const laneMap = new Map(lanes.map((lane) => [lane.id, lane]));
 
     // Tasks
     const taskIdsToDelete = persistedTasks
