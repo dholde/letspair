@@ -4,6 +4,10 @@ import { rest } from "msw";
 import type { Task } from "@/models/Task";
 import type { User } from "@/models/User";
 import type { Lane } from "@/models/Lane";
+import type { Entities, Entity } from "@/types/types";
+import type { PrimaryKey } from "@mswjs/data/lib/primaryKey";
+import type { Value } from "@mswjs/data/lib/glossary";
+import type { NullableProperty } from "@mswjs/data/lib/nullable";
 
 export const db = factory({
   user: {
@@ -24,6 +28,9 @@ export const db = factory({
   },
   lane: {
     id: primaryKey(faker.datatype.uuid),
+    // Adding this relation makes it uncompatible with type lane
+    tasks: manyOf("task"),
+    users: manyOf("user"),
   },
   pairingBoard: {
     id: primaryKey(faker.datatype.uuid),
@@ -100,8 +107,9 @@ export const customHandlers = [
         },
       },
     });
+    const laneIdVsUsers = new Map<unknown, unknown[]>();
     usersToUpdate.forEach((user) => {
-      db.user.update({
+      const updatedUser = db.user.update({
         where: {
           id: {
             equals: user.id,
@@ -109,12 +117,28 @@ export const customHandlers = [
         },
         data: user,
       });
+      if (updatedUser && updatedUser.laneId) {
+        if (updatedUser && updatedUser.laneId) {
+          const existingUsers = laneIdVsUsers.get(updatedUser.laneId) || [];
+          existingUsers.push(updatedUser);
+          laneIdVsUsers.set(updatedUser.laneId, existingUsers);
+        }
+      }
     });
     usersToCreate.forEach((user) => {
-      db.user.create(user);
+      const createdUser = db.user.create(user);
+      const existingUsers = laneIdVsUsers.get(createdUser.laneId) || [];
+      existingUsers.push(createdUser);
+      laneIdVsUsers.set(createdUser.laneId, existingUsers);
     });
 
+    // persistedTasks = db.task.getAll();
+    // persistedUsers = db.user.getAll();
+
     // Lanes
+    const laneIdVsPersistedLane = new Map(
+      persistedLanes.map((lane) => [lane.id, lane])
+    );
     const laneIdsToDelete = persistedLanes
       .filter((lane) => !laneMap.has(lane.id))
       .map((lane) => lane.id);
@@ -131,17 +155,50 @@ export const customHandlers = [
       },
     });
     lanesToUpdate.forEach((lane) => {
-      db.lane.update({
+      if (lane.id) {
+        const persistedLane = laneIdVsPersistedLane.get(lane.id);
+        const users = db.user.findMany({
+          where: {
+            laneId: {
+              equals: lane.id,
+            },
+          },
+        });
+        if (persistedLane) {
+          persistedLane.users = users;
+          if (persistedLane) {
+            db.lane.update({
+              where: {
+                id: {
+                  equals: lane.id,
+                },
+              },
+              data: persistedLane,
+            });
+          }
+        }
+      }
+    });
+    lanesToCreate.forEach((lane) => {
+      const tasks = db.task.findMany({
         where: {
-          id: {
+          laneId: {
             equals: lane.id,
           },
         },
-        data: lane,
       });
-    });
-    lanesToCreate.forEach((lane) => {
-      db.lane.create(lane);
+      const users = db.user.findMany({
+        where: {
+          laneId: {
+            equals: lane.id,
+          },
+        },
+      });
+      db.lane.create({
+        ...lane,
+        tasks,
+        users,
+      });
     });
 
     updatePairingBoard(id);
