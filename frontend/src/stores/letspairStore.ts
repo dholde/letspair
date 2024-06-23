@@ -91,8 +91,8 @@ export const useStore = defineStore({
       );
 
       try {
-        const response = await axios.post(
-          "http://localhost:5173/pairing-boards",
+        const response = await axios.put(
+          `http://localhost:5173/pairing-boards/${this.pairingBoard.id}`,
           this.pairingBoard
         );
         this.pairingBoard = response.data as PairingBoard;
@@ -240,54 +240,96 @@ export const useStore = defineStore({
       }
     },
     // Check this logic to be correct
+    //   async updateLaneForItem(
+    //     itemId: string,
+    //     itemType: string,
+    //     laneId: string | undefined
+    //   ) {
+    //     const items = itemType === "task" ? this.tasks : this.users;
+    //     const { currentIndexOfDraggedItem, indexOfDraftItem } = getIndexes(
+    //       items,
+    //       itemId
+    //     );
+    //     let itemToUpdate;
+    //     if (draftItemExists(indexOfDraftItem)) {
+    //       itemToUpdate = items[indexOfDraftItem];
+    //       items.splice(currentIndexOfDraggedItem, 1);
+    //     } else {
+    //       itemToUpdate = items[currentIndexOfDraggedItem];
+    //     }
+    //     updateItemFields(itemToUpdate, laneId, itemId, items);
+    //     updateItemOrders(items);
+
+    //     const oldIndexOfUpdatedItem = getOriginalIndexOfItemToUpdate(
+    //       indexOfDraftItem,
+    //       currentIndexOfDraggedItem
+    //     );
+
+    //     const subPath = itemType === "task" ? "tasks" : "users";
+    //     try {
+    //       await axios.post(
+    //         //TODO: Fix this so it's called also for tasks (Mock server has to be adapted)
+    //         `http://localhost:5173/${subPath}/handle-lane-id-update`,
+    //         {
+    //           updatedItem: itemToUpdate,
+    //           oldIndexOfUpdatedItem: oldIndexOfUpdatedItem,
+    //         }
+    //       );
+    //       // TODO: Check for response code to be success, otherwise throw
+    //       const responseWithListOfItems = (
+    //         await axios.get(`http://localhost:5173/${subPath}`)
+    //       ).data as Task[] | User[];
+    //       responseWithListOfItems.sort((a, b) => a.order - b.order);
+    //       if (itemType === "task") {
+    //         this.tasks = responseWithListOfItems as Task[];
+    //       } else {
+    //         this.users = responseWithListOfItems as User[];
+    //         console.log(this.users);
+    //       }
+    //     } catch (err) {
+    //       console.error(err); //TODO: Display error
+    //     }
+    //   },
+    // },
     async updateLaneForItem(
       itemId: string,
       itemType: string,
       laneId: string | undefined
     ) {
-      const items = itemType === "task" ? this.tasks : this.users;
-      const { currentIndexOfDraggedItem, indexOfDraftItem } = getIndexes(
-        items,
-        itemId
+      const itemListName = itemType === "task" ? "tasks" : "users";
+      const indexOfOriginalItem = this.pairingBoard[itemListName].findIndex(
+        (user) => user.id === itemId && !user.isDraft
       );
-      let itemToUpdate;
-      if (draftItemExists(indexOfDraftItem)) {
-        itemToUpdate = items[indexOfDraftItem];
-        items.splice(currentIndexOfDraggedItem, 1);
-      } else {
-        itemToUpdate = items[currentIndexOfDraggedItem];
-      }
-      updateItemFields(itemToUpdate, laneId, itemId, items);
-      updateItemOrders(items);
-
-      const oldIndexOfUpdatedItem = getOriginalIndexOfItemToUpdate(
-        indexOfDraftItem,
-        currentIndexOfDraggedItem
-      );
-
-      const subPath = itemType === "task" ? "tasks" : "users";
-      try {
-        await axios.post(
-          //TODO: Fix this so it's called also for tasks (Mock server has to be adapted)
-          `http://localhost:5173/${subPath}/handle-lane-id-update`,
-          {
-            updatedItem: itemToUpdate,
-            oldIndexOfUpdatedItem: oldIndexOfUpdatedItem,
+      if (indexOfOriginalItem != -1) {
+        this.pairingBoard[itemListName].splice(indexOfOriginalItem, 1);
+        this.pairingBoard[itemListName].forEach((item) => {
+          if (item.isDraft) {
+            item.isDraft = false;
           }
+        });
+      } else {
+        this.pairingBoard.lanes.forEach((lane) => {
+          const indexOfOriginalItem = lane[itemListName].findIndex(
+            (user) => user.id === itemId && !user.isDraft
+          );
+          if (indexOfOriginalItem != -1) {
+            lane[itemListName].splice(indexOfOriginalItem, 1);
+            lane[itemListName].forEach((item) => {
+              if (item.isDraft) {
+                item.isDraft = false;
+              }
+            });
+          }
+        });
+      }
+      try {
+        const response = await axios.put(
+          `http://localhost:5173/pairing-boards/${this.pairingBoard.id}`, //TODO: Apply the logic for updating/deleting items in the db
+          this.pairingBoard
         );
-        // TODO: Check for response code to be success, otherwise throw
-        const responseWithListOfItems = (
-          await axios.get(`http://localhost:5173/${subPath}`)
-        ).data as Task[] | User[];
-        responseWithListOfItems.sort((a, b) => a.order - b.order);
-        if (itemType === "task") {
-          this.tasks = responseWithListOfItems as Task[];
-        } else {
-          this.users = responseWithListOfItems as User[];
-          console.log(this.users);
-        }
+        this.pairingBoard = response.data as PairingBoard;
       } catch (err) {
-        console.error(err); //TODO: Display error
+        console.error(err);
       }
     },
   },
