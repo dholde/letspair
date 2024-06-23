@@ -30,6 +30,13 @@ export const useStore = defineStore({
           this.tasks = this.pairingBoard.tasks ? this.pairingBoard.tasks : [];
           this.users = this.pairingBoard.users ? this.pairingBoard.users : [];
           this.lanes = this.pairingBoard.lanes ? this.pairingBoard.lanes : [];
+        } else {
+          const pairingBoard = new PairingBoard();
+          const response = await axios.post(
+            "http://localhost:5173/pairing-boards",
+            pairingBoard
+          );
+          this.pairingBoard = response.data as PairingBoard;
         }
       } catch (err) {
         alert(`Error loading pairing board data: ${err}`);
