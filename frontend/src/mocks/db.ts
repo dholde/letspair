@@ -4,10 +4,6 @@ import { rest } from "msw";
 import type { Task } from "@/models/Task";
 import type { User } from "@/models/User";
 import type { Lane } from "@/models/Lane";
-import type { Entities, Entity } from "@/types/types";
-import type { PrimaryKey } from "@mswjs/data/lib/primaryKey";
-import type { Value } from "@mswjs/data/lib/glossary";
-import type { NullableProperty } from "@mswjs/data/lib/nullable";
 
 export const db = factory({
   user: {
@@ -107,7 +103,6 @@ export const customHandlers = [
         },
       },
     });
-    const laneIdVsUsers = new Map<unknown, unknown[]>();
     usersToUpdate.forEach((user) => {
       const updatedUser = db.user.update({
         where: {
@@ -117,23 +112,10 @@ export const customHandlers = [
         },
         data: user,
       });
-      if (updatedUser && updatedUser.laneId) {
-        if (updatedUser && updatedUser.laneId) {
-          const existingUsers = laneIdVsUsers.get(updatedUser.laneId) || [];
-          existingUsers.push(updatedUser);
-          laneIdVsUsers.set(updatedUser.laneId, existingUsers);
-        }
-      }
     });
-    usersToCreate.forEach((user) => {
-      const createdUser = db.user.create(user);
-      const existingUsers = laneIdVsUsers.get(createdUser.laneId) || [];
-      existingUsers.push(createdUser);
-      laneIdVsUsers.set(createdUser.laneId, existingUsers);
+    usersToCreate.forEach((user: User) => {
+      db.user.create(user);
     });
-
-    // persistedTasks = db.task.getAll();
-    // persistedUsers = db.user.getAll();
 
     // Lanes
     const laneIdVsPersistedLane = new Map(
@@ -164,8 +146,16 @@ export const customHandlers = [
             },
           },
         });
+        const tasks = db.task.findMany({
+          where: {
+            laneId: {
+              equals: lane.id,
+            },
+          },
+        });
         if (persistedLane) {
           persistedLane.users = users;
+          persistedLane.tasks = tasks;
           if (persistedLane) {
             db.lane.update({
               where: {
@@ -240,73 +230,6 @@ export const customHandlers = [
 
     return res(ctx.json(db.pairingBoard.getAll()[0]));
   }),
-  // rest.post("http://localhost:5173/delete-item", (req, res, ctx) => {
-  //   const { itemType, itemId, order } = { ...req.body } as {
-  //     itemType: "user" | "task";
-  //     itemId: string;
-  //     order: number;
-  //   };
-  //   const dbModel: ModelAPI<apiModel, typeof itemType> =
-  //     itemType === "task" ? db.task : db.user;
-  //   dbModel.delete({
-  //     where: {
-  //       id: {
-  //         equals: itemId,
-  //       },
-  //     },
-  //   });
-  //   const itemsWithGreaterOrder = dbModel.findMany({
-  //     where: {
-  //       order: {
-  //         gt: order,
-  //       },
-  //     },
-  //   });
-  //   dbModel.updateMany({
-  //     where: {
-  //       id: {
-  //         in: itemsWithGreaterOrder.map((item) => item.id),
-  //       },
-  //     },
-  //     data: {
-  //       order: (order) => order - 1,
-  //     },
-  //   });
-  //   const items = dbModel.findMany({});
-  //   return res(ctx.status(200), ctx.json(items));
-  // }),
-  // rest.post(
-  //   "http://localhost:5173/tasks/handle-lane-id-update",
-  //   (req, res, ctx) => {
-  //     const { updatedItem, oldIndexOfUpdatedItem } = { ...req.body } as {
-  //       updatedItem: Task;
-  //       oldIndexOfUpdatedItem: number;
-  //     };
-  //     handleDraggableItemLaneIdUpdate(
-  //       "task",
-  //       updatedItem,
-  //       oldIndexOfUpdatedItem
-  //     );
-  //     return res(ctx.status(201), ctx.json({ status: "ok" }));
-  //   }
-  // ),
-  // rest.post(
-  //   "http://localhost:5173/users/handle-lane-id-update",
-  //   (req, res, ctx) => {
-  //     const { updatedItem, oldIndexOfUpdatedItem } = {
-  //       ...req.body,
-  //     } as {
-  //       updatedItem: User;
-  //       oldIndexOfUpdatedItem: number;
-  //     };
-  //     handleDraggableItemLaneIdUpdate(
-  //       "user",
-  //       updatedItem,
-  //       oldIndexOfUpdatedItem
-  //     );
-  //     return res(ctx.status(201), ctx.json({ status: "ok" }));
-  //   }
-  // ),
 ];
 
 const updatePairingBoard = (id: string) => {
