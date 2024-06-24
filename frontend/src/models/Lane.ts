@@ -6,8 +6,7 @@ export class Lane implements BaseModel {
   public id?: string;
   public tasks: Task[];
   public users: User[];
-  constructor(id: string) {
-    this.id = id;
+  constructor() {
     this.tasks = [];
     this.users = [];
   }

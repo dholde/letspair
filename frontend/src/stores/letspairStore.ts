@@ -2,7 +2,7 @@ import { Task } from "@/models/Task";
 import { defineStore } from "pinia";
 import axios from "axios";
 import { User } from "@/models/User";
-import type { Lane } from "@/models/Lane";
+import { Lane } from "@/models/Lane";
 import type { Draggable } from "@/models/Draggable";
 import { PairingBoard } from "@/models/PairingBoard";
 
@@ -187,10 +187,16 @@ export const useStore = defineStore({
       }
     },
     async createLane() {
+      const lane = new Lane();
+      lane.users = [];
+      lane.tasks = [];
+      this.pairingBoard.lanes.push(lane);
       try {
-        const { data } = await axios.post("http://localhost:5173/lanes");
-        const lane = data as Lane;
-        this.lanes.push(lane);
+        const response = await axios.put(
+          `http://localhost:5173/pairing-boards/${this.pairingBoard.id}`,
+          this.pairingBoard
+        );
+        this.pairingBoard = response.data as PairingBoard;
       } catch (err) {
         console.error(err);
       }

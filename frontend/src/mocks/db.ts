@@ -173,18 +173,19 @@ export const customHandlers = [
       const tasks = db.task.findMany({
         where: {
           laneId: {
-            equals: lane.id,
+            equals: "123",
           },
         },
       });
       const users = db.user.findMany({
         where: {
           laneId: {
-            equals: lane.id,
+            equals: "123",
           },
         },
       });
       db.lane.create({
+        // TODO: Create lane without tasks and users
         ...lane,
         tasks,
         users,
