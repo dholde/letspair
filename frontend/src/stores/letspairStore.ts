@@ -239,89 +239,102 @@ export const useStore = defineStore({
         console.log(`Print tasks after: ${JSON.stringify(this.tasks)}`);
       }
     },
-    // Check this logic to be correct
-    //   async updateLaneForItem(
-    //     itemId: string,
-    //     itemType: string,
-    //     laneId: string | undefined
-    //   ) {
-    //     const items = itemType === "task" ? this.tasks : this.users;
-    //     const { currentIndexOfDraggedItem, indexOfDraftItem } = getIndexes(
-    //       items,
-    //       itemId
-    //     );
-    //     let itemToUpdate;
-    //     if (draftItemExists(indexOfDraftItem)) {
-    //       itemToUpdate = items[indexOfDraftItem];
-    //       items.splice(currentIndexOfDraggedItem, 1);
-    //     } else {
-    //       itemToUpdate = items[currentIndexOfDraggedItem];
-    //     }
-    //     updateItemFields(itemToUpdate, laneId, itemId, items);
-    //     updateItemOrders(items);
 
-    //     const oldIndexOfUpdatedItem = getOriginalIndexOfItemToUpdate(
-    //       indexOfDraftItem,
-    //       currentIndexOfDraggedItem
-    //     );
-
-    //     const subPath = itemType === "task" ? "tasks" : "users";
-    //     try {
-    //       await axios.post(
-    //         //TODO: Fix this so it's called also for tasks (Mock server has to be adapted)
-    //         `http://localhost:5173/${subPath}/handle-lane-id-update`,
-    //         {
-    //           updatedItem: itemToUpdate,
-    //           oldIndexOfUpdatedItem: oldIndexOfUpdatedItem,
-    //         }
-    //       );
-    //       // TODO: Check for response code to be success, otherwise throw
-    //       const responseWithListOfItems = (
-    //         await axios.get(`http://localhost:5173/${subPath}`)
-    //       ).data as Task[] | User[];
-    //       responseWithListOfItems.sort((a, b) => a.order - b.order);
-    //       if (itemType === "task") {
-    //         this.tasks = responseWithListOfItems as Task[];
-    //       } else {
-    //         this.users = responseWithListOfItems as User[];
-    //         console.log(this.users);
-    //       }
-    //     } catch (err) {
-    //       console.error(err); //TODO: Display error
-    //     }
-    //   },
-    // },
     async updateLaneForItem(
       itemId: string,
       itemType: string,
       laneId: string | undefined
     ) {
       const itemListName = itemType === "task" ? "tasks" : "users";
+      let isDraftItemExists = false;
+      this.pairingBoard[itemListName].forEach((item) => {
+        if (item.isDraft) {
+          item.isDraft = false;
+          isDraftItemExists = true;
+        }
+      });
+      this.pairingBoard.lanes.forEach((lane) => {
+        lane[itemListName].forEach((item) => {
+          if (item.isDraft) {
+            item.isDraft = false;
+            isDraftItemExists = true;
+          }
+        });
+      });
       const indexOfOriginalItem = this.pairingBoard[itemListName].findIndex(
         (user) => user.id === itemId && !user.isDraft
       );
       if (indexOfOriginalItem != -1) {
-        this.pairingBoard[itemListName].splice(indexOfOriginalItem, 1);
-        this.pairingBoard[itemListName].forEach((item) => {
-          if (item.isDraft) {
-            item.isDraft = false;
-          }
-        });
-      } else {
-        this.pairingBoard.lanes.forEach((lane) => {
-          const indexOfOriginalItem = lane[itemListName].findIndex(
-            (user) => user.id === itemId && !user.isDraft
+        if (isDraftItemExists) {
+          this.pairingBoard[itemListName].splice(indexOfOriginalItem, 1);
+        } else {
+          const originalItem = this.pairingBoard[itemListName].find(
+            (item) => item.id == itemId
           );
-          if (indexOfOriginalItem != -1) {
-            lane[itemListName].splice(indexOfOriginalItem, 1);
-            lane[itemListName].forEach((item) => {
-              if (item.isDraft) {
-                item.isDraft = false;
+          if (originalItem) {
+            if (
+              originalItem.laneId == laneId ||
+              (!originalItem.laneId && !laneId)
+            ) {
+              return;
+            }
+            originalItem.laneId = laneId;
+            originalItem.order = 0;
+            if (laneId) {
+              const lane = this.pairingBoard.lanes.find(
+                (lane) => lane.id === laneId
+              );
+              if (lane) {
+                if (itemType === "task") {
+                  (lane[itemListName] as Task[]).push(originalItem as Task);
+                } else {
+                  (lane[itemListName] as User[]).push(originalItem);
+                }
               }
-            });
+            }
+            this.pairingBoard[itemListName].splice(indexOfOriginalItem, 1);
           }
-        });
+        }
       }
+      // else {
+      //   this.pairingBoard.lanes.forEach((lane) => {
+      //     const indexOfOriginalItem = lane[itemListName].findIndex(
+      //       (user) => user.id === itemId && !user.isDraft
+      //     );
+      //     if (indexOfOriginalItem != -1) {
+      //       if (isDraftItemExists) {
+      //         lane[itemListName].splice(indexOfOriginalItem, 1);
+      //       } else {
+      //         const originalItem = lane[itemListName].find(
+      //           (item) => item.id == itemId
+      //         );
+      //         if (originalItem) {
+      //           if (
+      //             originalItem.laneId == laneId ||
+      //             (!originalItem.laneId && !laneId)
+      //           ) {
+      //             return;
+      //           }
+      //           originalItem.laneId = laneId;
+      //           originalItem.order = 0;
+      //           if (laneId) {
+      //             const lane = this.pairingBoard.lanes.find(
+      //               (lane) => lane.id === laneId
+      //             );
+      //             if (lane) {
+      //               if (itemType === "task") {
+      //                 (lane[itemListName] as Task[]).push(originalItem as Task);
+      //               } else {
+      //                 (lane[itemListName] as User[]).push(originalItem);
+      //               }
+      //             }
+      //           }
+      //           this.pairingBoard[itemListName].splice(indexOfOriginalItem, 1);
+      //         }
+      //       }
+      //     }
+      //   });
+      // }
       try {
         const response = await axios.put(
           `http://localhost:5173/pairing-boards/${this.pairingBoard.id}`, //TODO: Apply the logic for updating/deleting items in the db
