@@ -32,6 +32,9 @@ export const useStore = defineStore({
           this.lanes = this.pairingBoard.lanes ? this.pairingBoard.lanes : [];
         } else {
           const pairingBoard = new PairingBoard();
+          pairingBoard.tasks = [];
+          pairingBoard.users = [];
+          pairingBoard.lanes = [];
           const response = await axios.post(
             "http://localhost:5173/pairing-boards",
             pairingBoard
