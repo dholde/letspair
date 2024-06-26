@@ -26,6 +26,16 @@ const handlers = [
 
   rest.put("http://localhost:5173/pairing-boards/:id", (req, res, ctx) => {
     const pairingBoard: PairingBoard = req.body as PairingBoard;
+    pairingBoard.users.forEach((user) => {
+      if (!user.id) {
+        user.id = v4();
+      }
+    });
+    pairingBoard.tasks.forEach((task) => {
+      if (!task.id) {
+        task.id = v4();
+      }
+    });
     localStorage.setItem("pairingBoard", JSON.stringify(pairingBoard));
 
     return res(ctx.status(200), ctx.json(pairingBoard));

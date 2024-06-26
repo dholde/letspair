@@ -83,7 +83,9 @@ export const useStore = defineStore({
 
     async createEntity(entityType: "task" | "user") {
       const entityListOfInterest =
-        entityType === "task" ? this.tasks : this.users;
+        entityType === "task"
+          ? this.pairingBoard.tasks
+          : this.pairingBoard.users;
 
       const entity = instantiateEntity(entityListOfInterest, entityType);
 
@@ -99,8 +101,6 @@ export const useStore = defineStore({
           this.pairingBoard
         );
         this.pairingBoard = response.data as PairingBoard;
-        this.tasks = this.pairingBoard.tasks;
-        this.users = this.pairingBoard.users;
       } catch (err) {
         alert(`Error creating entity of type ${entityType}: ${err}`);
         console.error(err);
@@ -108,7 +108,9 @@ export const useStore = defineStore({
     },
     async updateEntity(entity: Draggable, entityType: "task" | "user") {
       const entityListOfInterest =
-        entityType === "task" ? this.tasks : this.users;
+        entityType === "task"
+          ? this.pairingBoard.tasks
+          : this.pairingBoard.users;
       const entityToUpdate = entityListOfInterest.find(
         (existingEntity) => existingEntity.id === entity.id
       );
@@ -177,7 +179,7 @@ export const useStore = defineStore({
         userToUpdate.name = userName;
         try {
           const response = await axios.put(
-            "http://localhost:5173/pairing-board",
+            "http://localhost:5173/pairing-boards/${this.pairingBoard.id}",
             this.pairingBoard
           );
           this.pairingBoard = response.data as PairingBoard;
