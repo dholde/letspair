@@ -36,6 +36,13 @@ const handlers = [
         task.id = v4();
       }
     });
+
+    pairingBoard.lanes.forEach((lane) => {
+      if (!lane.id) {
+        lane.id = v4();
+      }
+    });
+
     localStorage.setItem("pairingBoard", JSON.stringify(pairingBoard));
 
     return res(ctx.status(200), ctx.json(pairingBoard));

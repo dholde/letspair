@@ -4,7 +4,7 @@ import { useStore } from "@/stores/letspairStore";
 import PairingLane from "@/components/PairingLane.vue";
 const store = useStore();
 const lanes = computed(() => {
-  return store.lanes;
+  return store.pairingBoard.lanes;
 });
 
 function createLane() {
