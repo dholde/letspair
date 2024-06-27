@@ -96,6 +96,7 @@ describe("PairingLane", () => {
         dataTransfer: {
           getData: (dataType: string) => {
             if (dataType === dataTransferType) {
+              console.log(`Returning task: ${JSON.stringify(task)}`);
               return JSON.stringify(task);
             }
           },
@@ -106,11 +107,17 @@ describe("PairingLane", () => {
           ],
         },
       });
-      const userListItems = await waitFor(
-        async () => await findAllByRole("listitem")
-      );
-      const userListItem = userListItems[0];
-      expect(userListItem.innerHTML).toContain(task.description);
+      await nextTick();
+      console.log(`Checkcheck`);
+      const taskListItems = await waitFor(async () => {
+        console.log(`Finding all list items`);
+        await findAllByRole("listitem");
+        console.log(`Found all list items`);
+      });
+
+      console.log(`Task list items: ${taskListItems}`);
+      const taskListItem = taskListItems[0];
+      expect(taskListItem.innerHTML).toContain(task.description);
     } else {
       assert.fail("PairingLane component was not rendered.");
     }

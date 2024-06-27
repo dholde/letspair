@@ -111,9 +111,20 @@ export const useStore = defineStore({
         entityType === "task"
           ? this.pairingBoard.tasks
           : this.pairingBoard.users;
-      const entityToUpdate = entityListOfInterest.find(
+      let entityToUpdate = entityListOfInterest.find(
         (existingEntity) => existingEntity.id === entity.id
       );
+      if (!entityToUpdate) {
+        const entityTypeListType = `${entityType}s` as "users" | "tasks";
+        this.pairingBoard.lanes.some((lane) => {
+          entityToUpdate = lane[entityTypeListType].find(
+            (existingEntity) => existingEntity.id === entity.id
+          );
+          if (entityToUpdate) {
+            return true;
+          }
+        });
+      }
       if (entityToUpdate) {
         Object.assign(entityToUpdate, entity);
         try {
@@ -129,10 +140,10 @@ export const useStore = defineStore({
         }
       } else {
         alert(
-          `Entity of type ${entityType} not found in pairingBoard for id: ${entity.id}`
+          `Entity of type "${entityType}" not found in pairingBoard for id: ${entity.id}`
         );
         console.error(
-          `Entity of type ${entityType} not found in pairingBoard for id: ${entity.id}`
+          `Entity of type "${entityType}" not found in pairingBoard for id: ${entity.id}`
         );
       }
     },
