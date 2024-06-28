@@ -7,14 +7,14 @@ import { v4 as uuidv4 } from "uuid";
 import type { Task } from "@/models/Task";
 describe("TaskArea", () => {
   it("creates new task when pressing the '+' button", async () => {
-    const { getByRole, findByText } = render(TaskArea, {
+    const { getByRole, findByText, findByPlaceholderText } = render(TaskArea, {
       global: {
         plugins: [createTestingPinia({ stubActions: false })],
       },
     });
     const createTaskButton = getByRole("button", { name: "+" });
     await fireEvent.click(createTaskButton);
-    await findByText("Add a task decription here");
+    await findByPlaceholderText("Add the task description here");
   });
   it("contains only tasks that are not assigned to any PairingLane", async () => {
     const task1: Task = {
