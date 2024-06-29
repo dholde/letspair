@@ -288,39 +288,38 @@ export const useStore = defineStore({
         (user) => user.id === itemId && !user.isDraft
       );
       //TODO: Fix logic for finind the index and list where the task is contained
+      const [originalItem, itemList] = findItemAndRespectiveItemList(
+        itemId,
+        itemListName,
+        this.pairingBoard
+      );
       console.log(`Index: ${indexOfOriginalItem} `);
-      if (indexOfOriginalItem != -1) {
+      if (originalItem) {
         if (isDraftItemExists) {
-          this.pairingBoard[itemListName].splice(indexOfOriginalItem, 1);
+          this.pairingBoard[itemListName].splice(indexOfOriginalItem, 1); //TODO: Check also other lists for drafts
         } else {
-          const originalItem = this.pairingBoard[itemListName].find(
-            (item) => item.id == itemId
-          );
-          console.log(`originalItem: ${JSON.stringify(originalItem)} `);
-          if (originalItem) {
-            if (
-              originalItem.laneId == laneId ||
-              (!originalItem.laneId && !laneId)
-            ) {
-              console.log(`No laneId change: ${laneId}`);
-              return;
-            }
-            originalItem.laneId = laneId;
-            originalItem.order = 0;
-            if (laneId) {
-              const lane = this.pairingBoard.lanes.find(
-                (lane) => lane.id === laneId
-              );
-              if (lane) {
-                if (itemType === "task") {
-                  (lane[itemListName] as Task[]).push(originalItem as Task);
-                } else {
-                  (lane[itemListName] as User[]).push(originalItem);
-                }
+          if (
+            originalItem.laneId == laneId ||
+            (!originalItem.laneId && !laneId)
+          ) {
+            console.log(`No laneId change: ${laneId}`);
+            return;
+          }
+          originalItem.laneId = laneId;
+          originalItem.order = 0;
+          if (laneId) {
+            const lane = this.pairingBoard.lanes.find(
+              (lane) => lane.id === laneId
+            );
+            if (lane) {
+              if (itemType === "task") {
+                (lane[itemListName] as Task[]).push(originalItem as Task);
+              } else {
+                (lane[itemListName] as User[]).push(originalItem);
               }
             }
-            this.pairingBoard[itemListName].splice(indexOfOriginalItem, 1);
           }
+          this.pairingBoard[itemListName].splice(indexOfOriginalItem, 1);
         }
       }
       console.log(`PairingBoard: ${JSON.stringify(this.pairingBoard)} `);
