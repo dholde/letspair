@@ -267,6 +267,7 @@ export const useStore = defineStore({
       itemType: string,
       laneId: string | undefined
     ) {
+      console.log(`PairingBoard: ${JSON.stringify(this.pairingBoard)} `);
       const itemListName = itemType === "task" ? "tasks" : "users";
       let isDraftItemExists = false;
       this.pairingBoard[itemListName].forEach((item) => {
@@ -286,6 +287,8 @@ export const useStore = defineStore({
       const indexOfOriginalItem = this.pairingBoard[itemListName].findIndex(
         (user) => user.id === itemId && !user.isDraft
       );
+      //TODO: Fix logic for finind the index and list where the task is contained
+      console.log(`Index: ${indexOfOriginalItem} `);
       if (indexOfOriginalItem != -1) {
         if (isDraftItemExists) {
           this.pairingBoard[itemListName].splice(indexOfOriginalItem, 1);
@@ -293,11 +296,13 @@ export const useStore = defineStore({
           const originalItem = this.pairingBoard[itemListName].find(
             (item) => item.id == itemId
           );
+          console.log(`originalItem: ${JSON.stringify(originalItem)} `);
           if (originalItem) {
             if (
               originalItem.laneId == laneId ||
               (!originalItem.laneId && !laneId)
             ) {
+              console.log(`No laneId change: ${laneId}`);
               return;
             }
             originalItem.laneId = laneId;
@@ -318,48 +323,10 @@ export const useStore = defineStore({
           }
         }
       }
-      // else {
-      //   this.pairingBoard.lanes.forEach((lane) => {
-      //     const indexOfOriginalItem = lane[itemListName].findIndex(
-      //       (user) => user.id === itemId && !user.isDraft
-      //     );
-      //     if (indexOfOriginalItem != -1) {
-      //       if (isDraftItemExists) {
-      //         lane[itemListName].splice(indexOfOriginalItem, 1);
-      //       } else {
-      //         const originalItem = lane[itemListName].find(
-      //           (item) => item.id == itemId
-      //         );
-      //         if (originalItem) {
-      //           if (
-      //             originalItem.laneId == laneId ||
-      //             (!originalItem.laneId && !laneId)
-      //           ) {
-      //             return;
-      //           }
-      //           originalItem.laneId = laneId;
-      //           originalItem.order = 0;
-      //           if (laneId) {
-      //             const lane = this.pairingBoard.lanes.find(
-      //               (lane) => lane.id === laneId
-      //             );
-      //             if (lane) {
-      //               if (itemType === "task") {
-      //                 (lane[itemListName] as Task[]).push(originalItem as Task);
-      //               } else {
-      //                 (lane[itemListName] as User[]).push(originalItem);
-      //               }
-      //             }
-      //           }
-      //           this.pairingBoard[itemListName].splice(indexOfOriginalItem, 1);
-      //         }
-      //       }
-      //     }
-      //   });
-      // }
+      console.log(`PairingBoard: ${JSON.stringify(this.pairingBoard)} `);
       try {
         const response = await axios.put(
-          `http://localhost:5173/pairing-boards/${this.pairingBoard.id}`, //TODO: Apply the logic for updating/deleting items in the db
+          `http://localhost:5173/pairing-boards/${this.pairingBoard.id}`,
           this.pairingBoard
         );
         this.pairingBoard = response.data as PairingBoard;

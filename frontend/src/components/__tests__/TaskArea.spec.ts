@@ -5,9 +5,11 @@ import { nextTick } from "vue";
 import { createTestingPinia } from "@pinia/testing";
 import { v4 as uuidv4 } from "uuid";
 import type { Task } from "@/models/Task";
+import { PairingBoard } from "@/models/PairingBoard";
+import { prettyDOM } from "@testing-library/dom";
 describe("TaskArea", () => {
   it("creates new task when pressing the '+' button", async () => {
-    const { getByRole, findByText, findByPlaceholderText } = render(TaskArea, {
+    const { getByRole, findByPlaceholderText } = render(TaskArea, {
       global: {
         plugins: [createTestingPinia({ stubActions: false })],
       },
@@ -17,28 +19,46 @@ describe("TaskArea", () => {
     await findByPlaceholderText("Add the task description here");
   });
   it("contains only tasks that are not assigned to any PairingLane", async () => {
+    const laneId1 = uuidv4();
+    const laneId2 = uuidv4();
     const task1: Task = {
       id: uuidv4(),
       description: "Task 1",
       order: 1,
-      laneId: uuidv4(),
+      laneId: laneId1,
     };
     const task2: Task = {
       id: uuidv4(),
       description: "Task 2",
       order: 2,
-      laneId: uuidv4(),
+      laneId: laneId2,
     };
     const task3: Task = { id: uuidv4(), description: "Task 3", order: 3 };
     const task4: Task = { id: uuidv4(), description: "Task 4", order: 4 };
-    const { queryByRole, queryByText } = render(TaskArea, {
+    const { queryByRole, queryByText, findByText } = render(TaskArea, {
       global: {
         plugins: [
           createTestingPinia({
             stubActions: false,
             initialState: {
               letsPair: {
-                tasks: [task1, task2, task3, task4],
+                pairingBoard: {
+                  id: uuidv4(),
+                  lanes: [
+                    {
+                      id: laneId1,
+                      users: [],
+                      tasks: [task1],
+                    },
+                    {
+                      id: laneId2,
+                      users: [],
+                      tasks: [task2],
+                    },
+                  ],
+                  users: [],
+                  tasks: [task3, task4],
+                },
               },
             },
           }),
@@ -51,17 +71,23 @@ describe("TaskArea", () => {
     expect(elementConatainingtaskName1).toBeNull();
     const elementConatainingtaskName2 = queryByText(task2.description);
     expect(elementConatainingtaskName2).toBeNull();
-    const elementConatainingtaskName3 = queryByText(task3.description);
+    const elementConatainingtaskName3 = await findByText(task3.description);
+    if (elementConatainingtaskName3) {
+      console.log(prettyDOM(elementConatainingtaskName3));
+    } else {
+      console.log("Element containing task 3 was not found");
+    }
     expect(elementConatainingtaskName3?.innerHTML).toBe(task3.description);
     const elementConatainingtaskName4 = queryByText(task4.description);
     expect(elementConatainingtaskName4?.innerHTML).toBe(task4.description);
   });
   it("contains a task after dropping the task into the taskArea", async () => {
+    const laneId = uuidv4();
     const task: Task = {
       id: uuidv4(),
       description: "Task 1",
       order: 1,
-      laneId: uuidv4(),
+      laneId: laneId,
     };
     const { container, queryByText, findByText } = render(TaskArea, {
       global: {
@@ -70,7 +96,18 @@ describe("TaskArea", () => {
             stubActions: false,
             initialState: {
               letsPair: {
-                tasks: [task],
+                pairingBoard: {
+                  id: uuidv4(),
+                  lanes: [
+                    {
+                      id: laneId,
+                      users: [],
+                      tasks: [task],
+                    },
+                  ],
+                  users: [],
+                  tasks: [],
+                },
               },
             },
           }),
@@ -80,6 +117,7 @@ describe("TaskArea", () => {
     const querytaskNameResult = queryByText(task.description);
     expect(querytaskNameResult).toBeNull;
     const dropZone = container.firstElementChild;
+
     if (dropZone) {
       await nextTick(); // Waiting for the next render cycle is necessary because the events handlers are registered via the watch function
       await fireEvent.drop(dropZone, {
@@ -92,7 +130,10 @@ describe("TaskArea", () => {
           items: [{ type: "task" }],
         },
       });
+      await nextTick();
+      console.log(`Dropzone2: ${prettyDOM(dropZone)}`);
       await findByText(task.description);
+      console.log(`Dropzone4: ${prettyDOM(dropZone)}`);
     } else {
       assert.fail("The taskArea component was not rendered.");
     }

@@ -124,6 +124,9 @@ export function useDropEvent(
           elementFromDropEvent.order
         );
       } else {
+        console.log(
+          `LaneId: ${laneId}, ElementId: ${elementFromDropEvent.id}, DataTransferType: ${dataTransferType}`
+        );
         store.updateLaneForItem(
           elementFromDropEvent.id,
           dataTransferType,
