@@ -284,17 +284,20 @@ export const useStore = defineStore({
           }
         });
       });
-      const indexOfOriginalItem = this.pairingBoard[itemListName].findIndex(
-        (user) => user.id === itemId && !user.isDraft
-      );
+      // const indexOfOriginalItem = this.pairingBoard[itemListName].findIndex(
+      //   (user) => user.id === itemId && !user.isDraft
+      // );
       //TODO: Fix logic for finind the index and list where the task is contained
       const [originalItem, itemList] = findItemAndRespectiveItemList(
         itemId,
         itemListName,
         this.pairingBoard
       );
-      console.log(`Index: ${indexOfOriginalItem} `);
-      if (originalItem) {
+      if (originalItem && itemList) {
+        const indexOfOriginalItem = itemList.findIndex(
+          (item) => item.id === itemId && !item.isDraft
+        );
+        console.log(`Index: ${indexOfOriginalItem} `);
         if (isDraftItemExists) {
           this.pairingBoard[itemListName].splice(indexOfOriginalItem, 1); //TODO: Check also other lists for drafts
         } else {

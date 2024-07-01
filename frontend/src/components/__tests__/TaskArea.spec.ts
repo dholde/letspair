@@ -83,11 +83,18 @@ describe("TaskArea", () => {
   });
   it("contains a task after dropping the task into the taskArea", async () => {
     const laneId = uuidv4();
-    const task: Task = {
+    const originalTask: Task = {
       id: uuidv4(),
       description: "Task 1",
       order: 1,
       laneId: laneId,
+    };
+    const draftTask: Task = {
+      id: uuidv4(),
+      description: "Task 1",
+      order: 1,
+      laneId: laneId,
+      isDraft: true,
     };
     const { container, queryByText, findByText } = render(TaskArea, {
       global: {
@@ -102,11 +109,11 @@ describe("TaskArea", () => {
                     {
                       id: laneId,
                       users: [],
-                      tasks: [task],
+                      tasks: [originalTask],
                     },
                   ],
                   users: [],
-                  tasks: [],
+                  tasks: [draftTask],
                 },
               },
             },
@@ -114,7 +121,7 @@ describe("TaskArea", () => {
         ],
       },
     });
-    const querytaskNameResult = queryByText(task.description);
+    const querytaskNameResult = queryByText(originalTask.description);
     expect(querytaskNameResult).toBeNull;
     const dropZone = container.firstElementChild;
 
@@ -124,7 +131,7 @@ describe("TaskArea", () => {
         dataTransfer: {
           getData: function (dataType: string) {
             if (dataType === "task") {
-              return JSON.stringify(task);
+              return JSON.stringify(originalTask);
             }
           },
           items: [{ type: "task" }],
@@ -132,7 +139,7 @@ describe("TaskArea", () => {
       });
       await nextTick();
       console.log(`Dropzone2: ${prettyDOM(dropZone)}`);
-      await findByText(task.description);
+      await findByText(originalTask.description);
       console.log(`Dropzone4: ${prettyDOM(dropZone)}`);
     } else {
       assert.fail("The taskArea component was not rendered.");
