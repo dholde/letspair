@@ -267,27 +267,8 @@ export const useStore = defineStore({
       itemType: string,
       laneId: string | undefined
     ) {
-      console.log(`PairingBoard: ${JSON.stringify(this.pairingBoard)} `);
       const itemListName = itemType === "task" ? "tasks" : "users";
-      let isDraftItemExists = false;
-      this.pairingBoard[itemListName].forEach((item) => {
-        if (item.isDraft) {
-          item.isDraft = false;
-          isDraftItemExists = true;
-        }
-      });
-      this.pairingBoard.lanes.forEach((lane) => {
-        lane[itemListName].forEach((item) => {
-          if (item.isDraft) {
-            item.isDraft = false;
-            isDraftItemExists = true;
-          }
-        });
-      });
-      // const indexOfOriginalItem = this.pairingBoard[itemListName].findIndex(
-      //   (user) => user.id === itemId && !user.isDraft
-      // );
-      //TODO: Fix logic for finind the index and list where the task is contained
+      const isDraftItemExists = checkAndClearDraftItems(this, itemListName);
       const [originalItem, itemList] = findItemAndRespectiveItemList(
         itemId,
         itemListName,
@@ -297,17 +278,13 @@ export const useStore = defineStore({
         const indexOfOriginalItem = itemList.findIndex(
           (item) => item.id === itemId && !item.isDraft
         );
-        console.log(`Index: ${indexOfOriginalItem} `);
         if (isDraftItemExists) {
-          this.pairingBoard[itemListName].splice(indexOfOriginalItem, 1); //TODO: Check also other lists for drafts
+          this.pairingBoard[itemListName].splice(indexOfOriginalItem, 1);
         } else {
-          if (
-            originalItem.laneId == laneId ||
-            (!originalItem.laneId && !laneId)
-          ) {
-            console.log(`No laneId change: ${laneId}`);
+          if (isLaneIdUnchanged(originalItem, laneId)) {
             return;
           }
+          //TODO: continue refactoring here
           originalItem.laneId = laneId;
           originalItem.order = 0;
           if (laneId) {
@@ -325,7 +302,6 @@ export const useStore = defineStore({
           this.pairingBoard[itemListName].splice(indexOfOriginalItem, 1);
         }
       }
-      console.log(`PairingBoard: ${JSON.stringify(this.pairingBoard)} `);
       try {
         const response = await axios.put(
           `http://localhost:5173/pairing-boards/${this.pairingBoard.id}`,
@@ -333,6 +309,9 @@ export const useStore = defineStore({
         );
         this.pairingBoard = response.data as PairingBoard;
       } catch (err) {
+        alert(
+          `Error updating laneId '${laneId}' for item with type '${itemType}' and id '${itemId}': ${err}`
+        );
         console.error(err);
       }
     },
@@ -433,6 +412,15 @@ const findItemAndRespectiveItemList = (
     });
   }
   return [null, null];
+};
+
+const isLaneIdUnchanged = (
+  originalItem: Draggable,
+  newLaneId: string | undefined
+): boolean => {
+  return (
+    originalItem.laneId == newLaneId || (!originalItem.laneId && !newLaneId)
+  );
 };
 
 const findItemListAndIndex = (
@@ -536,4 +524,25 @@ const updateItemFields = (
 
 const updateItemOrders = (items: Task[] | User[]): void => {
   items.forEach((item, index) => (item.order = index));
+};
+const checkAndClearDraftItems = (
+  pairingBoard: PairingBoard,
+  itemListName: "users" | "tasks"
+): boolean => {
+  let isDraftItemExists = false;
+  pairingBoard[itemListName].forEach((item) => {
+    if (item.isDraft) {
+      item.isDraft = false;
+      isDraftItemExists = true;
+    }
+  });
+  pairingBoard.lanes.forEach((lane) => {
+    lane[itemListName].forEach((item) => {
+      if (item.isDraft) {
+        item.isDraft = false;
+        isDraftItemExists = true;
+      }
+    });
+  });
+  return isDraftItemExists;
 };

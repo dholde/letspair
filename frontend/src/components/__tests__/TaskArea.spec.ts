@@ -74,7 +74,7 @@ describe("TaskArea", () => {
     const elementConatainingtaskName4 = queryByText(task4.description);
     expect(elementConatainingtaskName4?.innerHTML).toBe(task4.description);
   });
-  it("contains a task after dropping the task into the taskArea", async () => {
+  it("contains a task after dropping the task into the TaskArea", async () => {
     const laneId = uuidv4();
     const originalTask: Task = {
       id: uuidv4(),
