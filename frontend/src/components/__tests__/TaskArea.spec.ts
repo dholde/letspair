@@ -5,8 +5,6 @@ import { nextTick } from "vue";
 import { createTestingPinia } from "@pinia/testing";
 import { v4 as uuidv4 } from "uuid";
 import type { Task } from "@/models/Task";
-import { PairingBoard } from "@/models/PairingBoard";
-import { prettyDOM } from "@testing-library/dom";
 describe("TaskArea", () => {
   it("creates new task when pressing the '+' button", async () => {
     const { getByRole, findByPlaceholderText } = render(TaskArea, {
@@ -72,11 +70,6 @@ describe("TaskArea", () => {
     const elementConatainingtaskName2 = queryByText(task2.description);
     expect(elementConatainingtaskName2).toBeNull();
     const elementConatainingtaskName3 = await findByText(task3.description);
-    if (elementConatainingtaskName3) {
-      console.log(prettyDOM(elementConatainingtaskName3));
-    } else {
-      console.log("Element containing task 3 was not found");
-    }
     expect(elementConatainingtaskName3?.innerHTML).toBe(task3.description);
     const elementConatainingtaskName4 = queryByText(task4.description);
     expect(elementConatainingtaskName4?.innerHTML).toBe(task4.description);
@@ -138,9 +131,7 @@ describe("TaskArea", () => {
         },
       });
       await nextTick();
-      console.log(`Dropzone2: ${prettyDOM(dropZone)}`);
       await findByText(originalTask.description);
-      console.log(`Dropzone4: ${prettyDOM(dropZone)}`);
     } else {
       assert.fail("The taskArea component was not rendered.");
     }
