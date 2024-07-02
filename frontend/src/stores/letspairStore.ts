@@ -268,39 +268,33 @@ export const useStore = defineStore({
       laneId: string | undefined
     ) {
       const itemListName = itemType === "task" ? "tasks" : "users";
-      const isDraftItemExists = checkAndClearDraftItems(this, itemListName);
-      const [originalItem, itemList] = findItemAndRespectiveItemList(
+      const [originalItem, originalItemList] = findItemAndRespectiveItemList(
         itemId,
         itemListName,
         this.pairingBoard
       );
-      if (originalItem && itemList) {
-        const indexOfOriginalItem = itemList.findIndex(
+      if (originalItem && originalItemList) {
+        const indexOfOriginalItem = originalItemList.findIndex(
           (item) => item.id === itemId && !item.isDraft
         );
-        if (isDraftItemExists) {
-          this.pairingBoard[itemListName].splice(indexOfOriginalItem, 1);
-        } else {
-          if (isLaneIdUnchanged(originalItem, laneId)) {
-            return;
-          }
-          //TODO: continue refactoring here
-          originalItem.laneId = laneId;
-          originalItem.order = 0;
-          if (laneId) {
-            const lane = this.pairingBoard.lanes.find(
-              (lane) => lane.id === laneId
-            );
-            if (lane) {
-              if (itemType === "task") {
-                (lane[itemListName] as Task[]).push(originalItem as Task);
-              } else {
-                (lane[itemListName] as User[]).push(originalItem);
-              }
-            }
-          }
-          this.pairingBoard[itemListName].splice(indexOfOriginalItem, 1);
+        const isDraftItemExists = checkAndClearDraftItems(
+          this.pairingBoard,
+          itemListName
+        );
+        if (isLaneIdUnchanged(originalItem, laneId)) {
+          return;
         }
+        //TODO: continue refactoring here
+        if (!isDraftItemExists) {
+          moveOriginalItemToNewLane(
+            originalItem,
+            laneId,
+            this.pairingBoard,
+            itemType,
+            itemListName
+          );
+        }
+        originalItemList.splice(indexOfOriginalItem, 1);
       }
       try {
         const response = await axios.put(
@@ -399,19 +393,23 @@ const findItemAndRespectiveItemList = (
   pairingBoard: PairingBoard
 ): [Draggable | null, Draggable[] | null] => {
   const item = pairingBoard[itemListFieldName].find(
-    (item) => item.id === itemId
+    (item) => item.id === itemId && !item.isDraft
   );
   if (item) {
     return [item, pairingBoard[itemListFieldName]];
   } else {
+    let itemVsItemList: [Draggable | null, Draggable[] | null] = [null, null];
     pairingBoard.lanes.forEach((lane) => {
-      const item = lane[itemListFieldName]?.find((item) => item.id === itemId);
+      const item = lane[itemListFieldName]?.find(
+        (item) => item.id === itemId && !item.isDraft
+      );
       if (item) {
-        return [item, lane[itemListFieldName]];
+        itemVsItemList = [item, lane[itemListFieldName]];
       }
     });
+    console.log(`itemVsItemList: ${JSON.stringify(itemVsItemList)}`);
+    return itemVsItemList;
   }
-  return [null, null];
 };
 
 const isLaneIdUnchanged = (
@@ -545,4 +543,25 @@ const checkAndClearDraftItems = (
     });
   });
   return isDraftItemExists;
+};
+
+const moveOriginalItemToNewLane = (
+  originalItem: Draggable,
+  laneId: string | undefined,
+  pairingBoard: PairingBoard,
+  itemType: "task" | "user",
+  itemListName: "users" | "tasks"
+) => {
+  originalItem.laneId = laneId;
+  originalItem.order = 0; // In case there is no draft item it means, that it's the first item in the lane
+  if (laneId) {
+    const lane = pairingBoard.lanes.find((lane) => lane.id === laneId);
+    if (lane) {
+      if (itemType === "task") {
+        (lane[itemListName] as Task[]).push(originalItem as Task);
+      } else {
+        (lane[itemListName] as User[]).push(originalItem);
+      }
+    }
+  }
 };
