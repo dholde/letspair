@@ -264,7 +264,7 @@ export const useStore = defineStore({
 
     async updateLaneForItem(
       itemId: string,
-      itemType: string,
+      itemType: "task" | "user",
       laneId: string | undefined
     ) {
       const itemListName = itemType === "task" ? "tasks" : "users";
@@ -474,55 +474,6 @@ const addDraftItemToLane = (
   }
 };
 
-const isDraftItemInsertedBeforeOriginalItem = (
-  indexOfDraftItem: number,
-  indexOfOriginalItem: number
-) => indexOfDraftItem < indexOfOriginalItem;
-
-const getIndexes = (
-  items: Task[] | User[],
-  itemId: string
-): { currentIndexOfDraggedItem: number; indexOfDraftItem: number } => {
-  const currentIndexOfDraggedItem = items.findIndex(
-    (item) => item.id === itemId && !item.isDraft
-  );
-  const indexOfDraftItem = items.findIndex(
-    (existingItem) =>
-      existingItem.id === itemId && existingItem.isDraft === true
-  );
-  return { currentIndexOfDraggedItem, indexOfDraftItem };
-};
-
-const getOriginalIndexOfItemToUpdate = (
-  indexOfDraftItem: number,
-  currentIndexOfDraggedItem: number
-): number => {
-  return isDraftItemInsertedBeforeOriginalItem(
-    indexOfDraftItem,
-    currentIndexOfDraggedItem
-  )
-    ? currentIndexOfDraggedItem - 1
-    : currentIndexOfDraggedItem;
-};
-
-const draftItemExists = (indexOfDraftItem: number): boolean => {
-  return indexOfDraftItem !== -1;
-};
-
-const updateItemFields = (
-  itemToUpdate: Draggable,
-  laneId: string | undefined,
-  itemId: string,
-  items: Task[] | User[]
-): void => {
-  itemToUpdate.isDraft = false;
-  itemToUpdate.laneId = laneId;
-  itemToUpdate.order = items.findIndex((item) => item.id === itemId);
-};
-
-const updateItemOrders = (items: Task[] | User[]): void => {
-  items.forEach((item, index) => (item.order = index));
-};
 const checkAndClearDraftItems = (
   pairingBoard: PairingBoard,
   itemListName: "users" | "tasks"
