@@ -509,10 +509,16 @@ const moveOriginalItemToNewLane = (
     const lane = pairingBoard.lanes.find((lane) => lane.id === laneId);
     if (lane) {
       if (itemType === "task") {
-        (lane[itemListName] as Task[]).push(originalItem as Task);
+        lane[itemListName].push(originalItem as Task);
       } else {
         (lane[itemListName] as User[]).push(originalItem);
       }
+    }
+  } else {
+    if (itemType === "task") {
+      pairingBoard[itemListName].push(originalItem as Task);
+    } else {
+      (pairingBoard[itemListName] as User[]).push(originalItem);
     }
   }
 };

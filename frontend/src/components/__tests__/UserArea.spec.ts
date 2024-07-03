@@ -4,6 +4,7 @@ import { nextTick } from "vue";
 import UserArea from "@/components/UserArea.vue";
 import { createTestingPinia } from "@pinia/testing";
 import { v4 as uuidv4 } from "uuid";
+import { prettyDOM } from "@testing-library/dom";
 
 describe("UserArea", () => {
   it("creates new user with placeholder text 'Name' when pressing the '+' button", async () => {
@@ -17,8 +18,10 @@ describe("UserArea", () => {
     await findByPlaceholderText("Name");
   });
   it("contains only users that are not assigned to any PairingLane", async () => {
-    const user1 = { id: uuidv4(), name: "Bruce Wayne", laneId: uuidv4() };
-    const user2 = { id: uuidv4(), name: "Peter Parker", laneId: uuidv4() };
+    const laneId1 = uuidv4();
+    const laneId2 = uuidv4();
+    const user1 = { id: uuidv4(), name: "Bruce Wayne", laneId: laneId1 };
+    const user2 = { id: uuidv4(), name: "Peter Parker", laneId: laneId2 };
     const user3 = { id: uuidv4(), name: "Robert Bruce Banner", laneId: "" };
     const user4 = { id: uuidv4(), name: "Barry Allen" };
     const { findAllByPlaceholderText } = render(UserArea, {
@@ -28,7 +31,14 @@ describe("UserArea", () => {
             stubActions: false,
             initialState: {
               letsPair: {
-                users: [user1, user2, user3, user4],
+                pairingBoard: {
+                  lanes: [
+                    { id: laneId1, name: "Lane 1", users: [user1] },
+                    { id: laneId2, name: "Lane 2", users: [user2] },
+                  ],
+                  users: [user3, user4],
+                  tasks: [],
+                },
               },
             },
           }),
@@ -53,6 +63,7 @@ describe("UserArea", () => {
 
   it("contains a user after dropping the user into the UserArea", async () => {
     const user = { id: uuidv4(), name: "John Wayne", laneId: uuidv4() };
+    const laneId = uuidv4();
     const { container, queryByText, findByPlaceholderText } = render(UserArea, {
       global: {
         plugins: [
@@ -60,7 +71,11 @@ describe("UserArea", () => {
             stubActions: false,
             initialState: {
               letsPair: {
-                users: [user],
+                pairingBoard: {
+                  lanes: [{ id: laneId, users: [user] }],
+                  users: [],
+                  tasks: [],
+                },
               },
             },
           }),
@@ -70,6 +85,7 @@ describe("UserArea", () => {
     const queryUserNameResult = queryByText("John Wayne");
     expect(queryUserNameResult).toBeNull;
     const dropZone = container.firstElementChild;
+
     if (dropZone) {
       await nextTick(); // Waiting for the next render cycle is necessary because the events handlers are registered via the watch function
       await fireEvent.drop(dropZone, {
@@ -82,6 +98,7 @@ describe("UserArea", () => {
           items: [{ type: "user" }],
         },
       });
+      await nextTick();
       const pairingUserElement = await findByPlaceholderText("Name");
       if (pairingUserElement) {
         expect((pairingUserElement as HTMLFormElement).value).toEqual(
