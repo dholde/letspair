@@ -251,14 +251,10 @@ export const useStore = defineStore({
       }
     },
     removeDraftItem(itemType: string) {
-      console.log(`removeDraftItem ...`);
       if (itemType === "user") {
-        console.log(`Print users: ${JSON.stringify(this.users)}`);
         this.users = this.users.filter((user) => !user.isDraft);
       } else if (itemType === "task") {
-        console.log(`Print tasks before: ${JSON.stringify(this.tasks)}`);
         this.tasks = this.tasks.filter((task) => !task.isDraft);
-        console.log(`Print tasks after: ${JSON.stringify(this.tasks)}`);
       }
     },
 
@@ -284,6 +280,7 @@ export const useStore = defineStore({
         if (isLaneIdUnchanged(originalItem, laneId)) {
           return;
         }
+
         //TODO: continue refactoring here
         if (!isDraftItemExists) {
           moveOriginalItemToNewLane(
@@ -407,7 +404,6 @@ const findItemAndRespectiveItemList = (
         itemVsItemList = [item, lane[itemListFieldName]];
       }
     });
-    console.log(`itemVsItemList: ${JSON.stringify(itemVsItemList)}`);
     return itemVsItemList;
   }
 };
@@ -466,9 +462,6 @@ const addDraftItemToLane = (
     const insertAtIndex = addAbove
       ? indexOfDraggedOverItem
       : indexOfDraggedOverItem + 1;
-    console.log(
-      `addAbove: ${addAbove}, indexOfDraggedOverItem: ${indexOfDraggedOverItem}, indertAtIndex: ${insertAtIndex}`
-    );
     draggedOverItemList.splice(insertAtIndex, 0, draftItem);
     draggedOverItemList.forEach((item, index) => (item.order = index));
   }

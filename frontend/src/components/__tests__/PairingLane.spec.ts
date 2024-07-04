@@ -5,23 +5,36 @@ import PairingLane from "@/components/PairingLane.vue";
 import { nextTick } from "vue";
 import { v4 as uuidv4 } from "uuid";
 import type { Task } from "@/models/Task";
+//import { prettyDOM } from "@testing-library/dom";
 
 describe("PairingLane", () => {
   it("should contain user after dropping a PairingUser element", async () => {
     const laneId = uuidv4();
-    const userName = "John Wayne";
+    const userName = "John Wayne!";
     const user = {
       id: uuidv4(),
       name: userName,
       laneId: "",
     };
-    const { findAllByRole, container } = render(PairingLane, {
+    const { container } = render(PairingLane, {
       global: {
         plugins: [
           createTestingPinia({
             stubActions: false,
             initialState: {
-              letsPair: { users: [user] },
+              letsPair: {
+                pairingBoard: {
+                  lanes: [
+                    {
+                      id: laneId,
+                      users: [],
+                      tasks: [],
+                    },
+                  ],
+                  users: [user],
+                  tasks: [],
+                },
+              },
             },
           }),
         ],
@@ -51,13 +64,13 @@ describe("PairingLane", () => {
           ],
         },
       });
+      await nextTick();
       const pairingUserInput = renderedComponent.querySelector("input");
       if (pairingUserInput) {
         expect(pairingUserInput.value).toEqual(userName);
       } else {
         assert.fail("PairingUser should be in pairing lane");
       }
-      //expect(userListItem.innerHTML).toContain(userName);
     } else {
       assert.fail("PairingLane component was not rendered.");
     }
@@ -76,7 +89,19 @@ describe("PairingLane", () => {
           createTestingPinia({
             stubActions: false,
             initialState: {
-              letsPair: { tasks: [task] },
+              letsPair: {
+                pairingBoard: {
+                  lanes: [
+                    {
+                      id: laneId,
+                      users: [],
+                      tasks: [],
+                    },
+                  ],
+                  users: [],
+                  tasks: [task],
+                },
+              },
             },
           }),
         ],
@@ -96,7 +121,6 @@ describe("PairingLane", () => {
         dataTransfer: {
           getData: (dataType: string) => {
             if (dataType === dataTransferType) {
-              console.log(`Returning task: ${JSON.stringify(task)}`);
               return JSON.stringify(task);
             }
           },
@@ -108,14 +132,9 @@ describe("PairingLane", () => {
         },
       });
       await nextTick();
-      console.log(`Checkcheck`);
       const taskListItems = await waitFor(async () => {
-        console.log(`Finding all list items`);
-        await findAllByRole("listitem");
-        console.log(`Found all list items`);
+        return await findAllByRole("listitem");
       });
-
-      console.log(`Task list items: ${taskListItems}`);
       const taskListItem = taskListItems[0];
       expect(taskListItem.innerHTML).toContain(task.description);
     } else {

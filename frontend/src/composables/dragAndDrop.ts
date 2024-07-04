@@ -15,7 +15,6 @@ export function useDragStartEvent(
       const children = target.value.children;
       Array.from(children).forEach((child) => {
         Array.from(child.children).forEach((subChild) => {
-          console.log(`TagName: ${subChild.tagName}`);
           if (subChild.tagName === "INPUT") {
             (subChild as HTMLFormElement).disabled = true;
           }
@@ -115,7 +114,6 @@ export function useDropEvent(
       ) as string;
       const elementFromDropEvent = JSON.parse(elementAsString);
       elementFromDropEvent.laneId = laneId;
-      console.log(`Element from drop: ${JSON.stringify(elementFromDropEvent)}`);
       const store = useStore();
       if (target.value && target.value.id === "deletionArea") {
         store.deleteItem(
@@ -124,9 +122,6 @@ export function useDropEvent(
           elementFromDropEvent.order
         );
       } else {
-        console.log(
-          `LaneId: ${laneId}, ElementId: ${elementFromDropEvent.id}, DataTransferType: ${dataTransferType}`
-        );
         store.updateLaneForItem(
           elementFromDropEvent.id,
           dataTransferType,
