@@ -1,10 +1,11 @@
 import { describe, it, expect } from "vitest";
-import { render, fireEvent, within, waitFor } from "@testing-library/vue";
+import { render, fireEvent, within } from "@testing-library/vue";
 import LaneArea from "@/components/LaneArea.vue";
-import { nextTick } from "vue";
+import { nextTick, useSSRContext } from "vue";
 import { createTestingPinia } from "@pinia/testing";
 import { retry } from "./Utils";
 import { v4 as uuidv4 } from "uuid";
+//import { prettyDOM } from "@testing-library/dom";
 
 describe("LaneArea", () => {
   it("creates a new lanes when clicking on the '+' button", async () => {
@@ -30,16 +31,33 @@ describe("LaneArea", () => {
     await retry(assertThree, 1, 1000);
   });
   it("removes a user from a lane if the user is moved (dropped) to another lane", async () => {
-    const pairingLane1 = { id: uuidv4() };
-    const pairingLane2 = { id: uuidv4() };
-    const user = { id: uuidv4(), name: "John Wayne", laneId: pairingLane1.id };
+    const laneId1 = uuidv4();
+    const laneId2 = uuidv4();
+    const user = { id: uuidv4(), name: "John Wayne", laneId: laneId1 };
     const { baseElement } = render(LaneArea, {
       global: {
         plugins: [
           createTestingPinia({
             stubActions: false,
             initialState: {
-              letsPair: { lanes: [pairingLane1, pairingLane2], users: [user] },
+              letsPair: {
+                pairingBoard: {
+                  lanes: [
+                    {
+                      id: laneId1,
+                      users: [user],
+                      tasks: [],
+                    },
+                    {
+                      id: laneId2,
+                      users: [user],
+                      tasks: [],
+                    },
+                  ],
+                  users: [],
+                  tasks: [],
+                },
+              },
             },
           }),
         ],
@@ -48,10 +66,10 @@ describe("LaneArea", () => {
     const renderedLaneArea = baseElement;
     const renderedPairingLane1 = Array.from(
       renderedLaneArea.querySelectorAll("div.pairing-lane")
-    ).find((renderedPairingLane) => renderedPairingLane.id === pairingLane1.id);
+    ).find((renderedPairingLane) => renderedPairingLane.id === laneId1);
     const renderedPairingLane2 = Array.from(
       renderedLaneArea.querySelectorAll("div.pairing-lane")
-    ).find((renderedPairingLane) => renderedPairingLane.id === pairingLane2.id);
+    ).find((renderedPairingLane) => renderedPairingLane.id === laneId2);
     if (renderedPairingLane1 && renderedPairingLane2) {
       let userInput = renderedPairingLane1.querySelector("input");
       if (userInput) {
